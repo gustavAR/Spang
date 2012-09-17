@@ -71,10 +71,7 @@ public class Connection implements IConnection {
 	}
 	
 	private boolean canConnect() {
-		if(this.socket == null)
-			return true;
-		else 
-			return false;
+		return this.socket == null;	
 	}
 
 	private void createConnection() {
