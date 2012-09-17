@@ -16,7 +16,15 @@ public class UDPServer {
 		
 		
 		while(true) {
-			byte[] recievDataBuffer = new byte[1024];
+            connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+            connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+            connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+            connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+            connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+            connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+            connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+            connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+            connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));			byte[] recievDataBuffer = new byte[1024];
 			DatagramPacket packet = new DatagramPacket(recievDataBuffer, 1024);
 			server.socket.receive(packet);		
 			String string = new String(packet.getData());

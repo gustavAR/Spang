@@ -19,12 +19,19 @@ namespace Spang_PC_C_sharp
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+          //  Application.EnableVisualStyles();
+          //  Application.SetCompatibleTextRenderingDefault(false);
+          //  Application.Run(new Form1());
 
-            Connection connection = new Connection();
-           // connection.connect(ADDRESS, PORT);
+            Server server = new Server();
+            IConnection connection = server.ReciveConnection(1337);
+
+            for (int i = 0; i < 5; i++)
+            {
+                connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+            }
+
+            // connection.connect(ADDRESS, PORT);
             
             while(true) 
             {

@@ -7,18 +7,12 @@ namespace Spang_PC_C_sharp
 {
     interface IConnection
     {
-            /*
-             * Connects a user to the default address and port. 
-             */
-            void reconnect();
+            
 
-            /*
-             * Connects the IConnection to the given address and port.
-             * @param hostName the host to connect to.
-             * @param port the port to connect to.
-             * Note: This has to be called before data can be sent or recived across the network.
-             */
-            void connect(String hostName, int port);
+            /// <summary>
+            /// Reconnects the user to a given port.
+            /// </summary>
+        void reconnect();
 
             /*
              * Sends the supplied data using the UDP-protocol. 
