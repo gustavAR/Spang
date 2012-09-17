@@ -10,12 +10,13 @@ public interface IConnection {
 	/**
 	 * Connects a user to the default address and port. 
 	 */
-	void connect();
+	void reconnect();
 	
 	/**
 	 * Connects the IConnection to the given address and port.
 	 * @param hostName the host to connect to.
 	 * @param port the port to connect to.
+	 * Note: This has to be called before data can be sent or recived across the network.
 	 */
 	void connect(String hostName, int port);
 	
