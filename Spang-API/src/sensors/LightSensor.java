@@ -1,0 +1,123 @@
+package sensors;
+
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
+
+/**
+ * Class that contains the devices light-sensor 
+ * and simplifies usage of it.
+ * @author Pontus Pall & Gustav Alm Rosenblad
+ *
+ */
+public class LightSensor implements SpangSensor {
+	public static final int SENSOR_TYPE = Sensor.TYPE_LIGHT; 
+	public static final byte ENCODE_ID = 0x01;
+	
+	private float[] values = new float[1];
+	private int accuracy;
+	private boolean isActive;
+	
+	private SensorManager lSensorManager;
+	private Sensor lSensor;
+	
+	/**
+	 * Doesn't start listening to the sensor. Only gets the light-sensor from the device.
+	 * If the device has no light sensor, a NoSensorException is thrown.
+	 * @param context
+	 */
+	public LightSensor(Context context) {
+		this.lSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		this.lSensor = lSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+		
+		if(this.lSensor == null) {
+			throw new NoSensorException("Device has no light-sensor");
+		}
+	}
+	/**
+	 * {@inheritDoc}
+	 */	
+	@Override
+	public void start() {
+		lSensorManager.registerListener(this, lSensor, SensorManager.SENSOR_DELAY_NORMAL);
+		this.isActive = true;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */	
+	@Override
+	public void stop() {
+		lSensorManager.unregisterListener(this);
+		this.isActive = false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @return the light-sensor value in lx. 
+	 * Return value occupies only the first position of the array.
+	 */	
+	@Override
+	public float[] getValues() {
+		return values;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */	
+	@Override
+	public void onAccuracyChanged(Sensor unused, int newAccuracy) {
+		accuracy = newAccuracy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		values = event.values.clone();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getAccuracy() {
+		return this.accuracy;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getSensorID() {
+		return SENSOR_TYPE;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isRunning() {
+		return isActive;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public byte[] encode() {
+		byte[] encodedValue = new byte[5];
+		encodedValue[0] = ENCODE_ID;
+		
+		int float0 = Float.floatToRawIntBits(getValues()[0]);
+		
+		encodedValue[1]  = (byte)((float0>>24) & 0xff);
+		encodedValue[2]  = (byte)((float0>>16) & 0xff);
+		encodedValue[3]  = (byte)((float0>>8) & 0xff);
+		encodedValue[4]  = (byte)(float0 & 0xff);
+		
+		return encodedValue;
+	}
+}
