@@ -1,4 +1,4 @@
-
+package API;
 public class NotImplementedException extends RuntimeException {
 
 	/**

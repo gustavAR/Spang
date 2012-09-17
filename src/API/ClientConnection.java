@@ -1,3 +1,5 @@
+package API;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -20,13 +22,13 @@ public class ClientConnection implements IConnection {
 	private static final int CONNECTION_TIMEOUT = 15000;
 	//The maximum receive size of a datagram packet;
 	private static final int RECEIVE_CAPACITY = 1024;
-	
-	
+
+
 	private InetAddress address;
 	private int port;
-	
+
 	private final DatagramSocket socket;
-	
+
 	/**
 	 * 
 	 * @param address This has to be a valid adress and cannot be null
@@ -36,7 +38,7 @@ public class ClientConnection implements IConnection {
 	public ClientConnection(InetAddress address, int port) {
 		this.validatePort(port);
 		this.validateAddress(address);
-		
+
 		try {
 			this.socket = new DatagramSocket(port);
 		} catch (SocketException e) {
@@ -44,7 +46,7 @@ public class ClientConnection implements IConnection {
 		}
 		this.address = address;
 		this.port = port;
-				
+
 	}
 	//Makes sure that the InetAdress is valid
 	private void validateAddress(InetAddress address) {
@@ -63,36 +65,34 @@ public class ClientConnection implements IConnection {
 			throw new IllegalArgumentException(String.format("The port must be in the range 1024- but was %d", port));
 		}
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */	
-	@Override
 	public void connect() {
 		this.socket.connect(this.address, port);
 	}
-/**
- * {@inheritDoc}
- */
-	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public void connect(String hostName, int port) {
 		this.updateAddress(hostName);
 		this.socket.connect(address, port);
 	}
 
 	private void updateAddress(String hostName) {
-		
+
 		try {
 			this.address = InetAddress.getByName(hostName);
 		} catch (UnknownHostException e) {
 			throw new IllegalArgumentException("The hostName was not found to be a valid IP adress");
 		}
-		
+
 	}
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+
 	public void sendUDP(byte[] data) {
 		DatagramPacket packet = new DatagramPacket(data, data.length);
 		try {
@@ -104,7 +104,6 @@ public class ClientConnection implements IConnection {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void sendTCP(byte[] data) {
 		// TODO Auto-generated method stub
 		throw new NotImplementedException();
@@ -112,7 +111,6 @@ public class ClientConnection implements IConnection {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public byte[] reciveUDP() {
 		DatagramPacket packet = new DatagramPacket(new byte[RECEIVE_CAPACITY], RECEIVE_CAPACITY);
 		return packet.getData();
@@ -120,7 +118,6 @@ public class ClientConnection implements IConnection {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public byte[] reciveTCP() {
 		throw new NotImplementedException();
 	}

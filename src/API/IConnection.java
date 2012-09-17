@@ -1,3 +1,4 @@
+package API;
 /**
  * Interface to handle the connection at the most basic level.
  * 

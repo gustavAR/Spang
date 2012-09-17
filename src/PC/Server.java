@@ -1,3 +1,5 @@
+package PC;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,7 +31,6 @@ public class Server implements Runnable {
 	}
 
 
-	@Override
 	public void run() {
 		char c;
 		try {
