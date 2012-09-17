@@ -31,6 +31,10 @@ namespace Spang_PC_C_sharp
 			    byte[] data = connection.reciveUDP();	
 			    string message = Encoding.ASCII.GetString(data, 0, data.Length);
                 Console.WriteLine(message);
+                if (message == "move")
+                {
+                    Cursor.Position = new System.Drawing.Point(Cursor.Position.X + 10, Cursor.Position.Y - 10);
+                }
 		    }
         }
     }

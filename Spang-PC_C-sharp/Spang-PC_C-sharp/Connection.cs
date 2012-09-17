@@ -8,7 +8,7 @@ using System.Net.Sockets;
 namespace Spang_PC_C_sharp
 {
 	
-    class Connection : IConnection
+    class Connection : IConnection 
     {
         //The lowest number a port can take without using reserved port numbers.
 	    private static int LOW_PORT = 1024;
