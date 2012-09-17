@@ -11,7 +11,7 @@ namespace Spang_PC_C_sharp
     static class Program
     {
         private static int PORT = 1337;
-        private static String ADDRESS = "localhost";
+        private static String ADDRESS = "192.168.33.102";
         
         /// <summary>
         /// The main entry point for the application.
@@ -24,7 +24,7 @@ namespace Spang_PC_C_sharp
             Application.Run(new Form1());
 
             Connection connection = new Connection();
-            connection.connect(ADDRESS, PORT);
+           // connection.connect(ADDRESS, PORT);
             
             while(true) 
             {
