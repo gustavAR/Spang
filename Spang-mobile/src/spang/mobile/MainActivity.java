@@ -14,7 +14,7 @@ import android.widget.EditText;
 
 public class MainActivity extends Activity {
 	private static final int PORT = 1337;
-	private static final String ADDR = "192.168.33.222";
+	private static final String ADDR = "localhost";
 
 	private Socket socket;
 	private PrintWriter writer;

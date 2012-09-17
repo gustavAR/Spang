@@ -11,7 +11,7 @@ namespace Spang_PC_C_sharp
     static class Program
     {
         private static int PORT = 1337;
-        private static String ADDRESS = "";
+        private static String ADDRESS = "localhost";
         
         /// <summary>
         /// The main entry point for the application.
