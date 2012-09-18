@@ -1,5 +1,6 @@
 package spang.mobile;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -39,7 +40,13 @@ public class MainActivity extends Activity {
     }
     public void reading(){
     	while(true){
-    		String string = new String(this.connection.reciveUDP());
+    		String string ="";
+			try {
+				string = new String(this.connection.reciveUDP(),"UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     		Log.i("Hej", string);
     	}
     }
@@ -54,7 +61,7 @@ public class MainActivity extends Activity {
     	EditText text = (EditText)this.findViewById(R.id.editText1); 
     	String message = text.getText().toString();
     	byte[] data = message.getBytes();
-    	connection.sendUDP(data);
+    	connection.sendTCP(data);
     	
     	
     	//writer.println(message);

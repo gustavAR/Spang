@@ -1,10 +1,12 @@
 package network;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
+import java.util.Arrays;
 
 /**
  * A utility class implementing IConnection making it easier to send and receive data through a connection
@@ -52,8 +54,10 @@ public class Connection implements IConnection {
 	 */
 	public void sendTCP(byte[] data) {
 		try {
-			OutputStream stream = this.tcpSocket.getOutputStream();
+			DataOutputStream stream = new DataOutputStream(this.tcpSocket.getOutputStream());
+			stream.writeShort(data.length);
 			stream.write(data);
+			stream.flush();
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -70,7 +74,15 @@ public class Connection implements IConnection {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return packet.getData();
+		packet.getLength();
+		
+		
+		byte[] copy = new byte[packet.getLength()];
+		for (int i = 0; i < copy.length; i++) {
+			copy[i] = packet.getData()[i];
+		}
+		
+		return copy;
 	}
 	
 	/**
@@ -81,6 +93,8 @@ public class Connection implements IConnection {
 			java.io.InputStream stream = this.tcpSocket.getInputStream();
 			int available = stream.available();
 			byte[] data = new byte[available];
+			
+			
 			stream.read(data);
 			return data;
 		} catch (IOException e) {
