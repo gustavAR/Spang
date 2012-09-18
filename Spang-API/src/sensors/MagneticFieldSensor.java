@@ -14,6 +14,8 @@ import android.hardware.SensorManager;
 public class MagneticFieldSensor implements SpangSensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_MAGNETIC_FIELD;
 	public static final byte ENCODE_ID = 0x04;
+	public static final int VALUES_LENGTH = 3;
+	public static final int ENCODED_LENGTH = VALUES_LENGTH * 4 + 1;
 
 	private float[] values = new float[3];
 	private int accuracy;
@@ -135,5 +137,21 @@ public class MagneticFieldSensor implements SpangSensor {
 		encodedValue[12] = (byte) (float2 & 0xff);
 
 		return encodedValue;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getValuesLength() {
+		return VALUES_LENGTH;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getEncodedLength() {
+		return ENCODED_LENGTH;
 	}
 }

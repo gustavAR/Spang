@@ -20,19 +20,16 @@ public interface SpangSensor extends SensorEventListener {
 	public void stop();
 	
 	/**
-	 * Method to get the current sensor-values.
 	 * @return the current sensor-values
 	 */
 	public float[] getValues();
 	
 	/**
-	 * Gets the last reported accuracy of the sensor.
 	 * @return the last reported accuracy of the sensor
 	 */
 	public int getAccuracy();
 	
 	/**
-	 * Gets the type of sensor defined by android. 
 	 * @return the type of sensor defined by android. 
 	 */
 	public int getSensorID();
@@ -44,8 +41,17 @@ public interface SpangSensor extends SensorEventListener {
 	public boolean isRunning();
 	
 	/**
-	 * Returns the sensor-values encoded and ready for sending over network.
 	 * @return the sensor-values encoded and ready for sending over network.
 	 */
 	public byte[] encode();
+	
+	/**
+	 * @return the constant number of values returned by the sensor.
+	 */
+	public int getValuesLength();
+	
+	/**
+	 * @return the constant number of bytes needed to encode the values of the sensor. 
+	 */
+	public int getEncodedLength();
 }

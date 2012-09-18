@@ -14,6 +14,8 @@ import android.hardware.SensorManager;
 public class LightSensor implements SpangSensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_LIGHT; 
 	public static final byte ENCODE_ID = 0x01;
+	public static final int VALUES_LENGTH = 1;
+	public static final int ENCODED_LENGTH = VALUES_LENGTH * 4 + 1; 
 	
 	private float[] values = new float[1];
 	private int accuracy;
@@ -119,5 +121,21 @@ public class LightSensor implements SpangSensor {
 		encodedValue[4]  = (byte)(float0 & 0xff);
 		
 		return encodedValue;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getValuesLength() {
+		return VALUES_LENGTH;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getEncodedLength() {
+		return ENCODED_LENGTH;
 	}
 }
