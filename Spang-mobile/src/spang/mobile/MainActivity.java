@@ -60,4 +60,8 @@ public class MainActivity extends Activity {
     	//writer.println(message);
     	//writer.flush();
     }
+    
+    public void goToMouse() {
+    	System.out.print("Klick!");
+    }
 }
