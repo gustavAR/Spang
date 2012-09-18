@@ -11,14 +11,14 @@ namespace Spang_PC_C_sharp
     {
         public IConnection ReciveConnection(int port)
         {
-            IPAddress addr = IPAddress.Parse("192.168.33.102");
+            IPAddress addr = IPAddress.Any;// Parse("192.158.33.221");
             TcpListener listener = new TcpListener(addr, port);
             listener.Start();
             
             TcpClient tpcClient = listener.AcceptTcpClient();
             IPEndPoint localEndPoint = (IPEndPoint)tpcClient.Client.LocalEndPoint;
             UdpClient udpClient = new UdpClient(new IPEndPoint(IPAddress.Any, localEndPoint.Port));
-
+            listener.Stop();
 
             Connection connection = new Connection(tpcClient, udpClient, localEndPoint.Port);
             return connection;

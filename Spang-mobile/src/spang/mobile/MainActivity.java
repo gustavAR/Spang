@@ -16,7 +16,7 @@ import android.widget.EditText;
 
 public class MainActivity extends Activity {
 	private static final int PORT = 1337;
-	private static final String ADDR = "192.168.33.102";
+	private static final String ADDR = "192.168.33.221";
 	private IConnection connection;
 	
     @Override
@@ -42,10 +42,9 @@ public class MainActivity extends Activity {
     	while(true){
     		String string ="";
 			try {
-				string = new String(this.connection.reciveUDP(),"UTF-8");
+				string = new String(this.connection.reciveTCP(),"UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new NetworkException();
 			}
     		Log.i("Hej", string);
     	}

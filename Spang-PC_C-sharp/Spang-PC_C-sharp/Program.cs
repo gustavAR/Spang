@@ -33,7 +33,7 @@ namespace Spang_PC_C_sharp
             {
                 while (true)
                 {
-                    connection.sendUDP(Encoding.UTF8.GetBytes(Console.ReadLine()));
+                    connection.sendTCP(Encoding.UTF8.GetBytes(Console.ReadLine()));
                 }
             }).Start();
             

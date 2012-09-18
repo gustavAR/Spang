@@ -48,6 +48,8 @@ namespace Spang_PC_C_sharp
         public void sendTCP(byte[] data)
         {
             Stream stream = tcpSocket.GetStream();
+            stream.WriteByte((byte)((data.Length >> 8) & 0xFF));
+            stream.WriteByte((byte)(data.Length & 0xFF));
             stream.Write(data, 0, data.Length);
         }
 
@@ -56,7 +58,7 @@ namespace Spang_PC_C_sharp
             Stream stream = tcpSocket.GetStream();
             int b1 = stream.ReadByte();
             int b2 = stream.ReadByte();
-            int length = (b1 << 8) & b2;
+            int length = (b1 << 8) | b2;
 
             byte[] data = new byte[length];
             stream.Read(data, 0, length);

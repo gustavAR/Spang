@@ -2,6 +2,7 @@ package network;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -33,8 +34,13 @@ public class Connection implements IConnection {
 	/**
 	 * {@inheritDoc}
 	 */	
-	public void reconnect() {
-		throw new NotImplementedException();
+	public void reconnect() {		
+		try {
+			this.tcpSocket.connect(this.tcpSocket.getRemoteSocketAddress());
+			this.udpSocket.connect(this.tcpSocket.getRemoteSocketAddress());
+		} catch (IOException e) {
+			throw new NetworkException();
+		}
 	}
 	
 	/**
@@ -54,8 +60,12 @@ public class Connection implements IConnection {
 	 */
 	public void sendTCP(byte[] data) {
 		try {
-			DataOutputStream stream = new DataOutputStream(this.tcpSocket.getOutputStream());
-			stream.writeShort(data.length);
+			OutputStream stream = this.tcpSocket.getOutputStream();
+			short length = (short)data.length;
+			
+			stream.write((byte)((length >> 8) & 0xFF));
+			stream.write((byte)(length & 0xFF));
+			
 			stream.write(data);
 			stream.flush();
 		} catch (IOException e) {
@@ -90,9 +100,12 @@ public class Connection implements IConnection {
 	 */
 	public byte[] reciveTCP() {
 		try {
-			java.io.InputStream stream = this.tcpSocket.getInputStream();
-			int available = stream.available();
-			byte[] data = new byte[available];
+			InputStream stream = this.tcpSocket.getInputStream();
+			
+			int b1 = stream.read();
+			int b2 = stream.read();
+			int length = (b1 << 8) | b2;			
+			byte[] data = new byte[length];
 			
 			
 			stream.read(data);
