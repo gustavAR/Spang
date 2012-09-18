@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace Spang_PC_C_sharp
 {
@@ -26,12 +27,15 @@ namespace Spang_PC_C_sharp
             Server server = new Server();
             IConnection connection = server.ReciveConnection(1337);
 
-            for (int i = 0; i < 5; i++)
-            {
-                connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
-            }
-
             // connection.connect(ADDRESS, PORT);
+
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+                }
+            }).Start();
             
             while(true) 
             {

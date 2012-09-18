@@ -3,6 +3,7 @@
 	<name>Spang-mobile</name>
 	<comment></comment>
 	<projects>
+		<project>Spang-API</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

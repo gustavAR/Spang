@@ -13,14 +13,6 @@ public interface IConnection {
 	void reconnect();
 	
 	/**
-	 * Connects the IConnection to the given address and port.
-	 * @param hostName the host to connect to.
-	 * @param port the port to connect to.
-	 * Note: This has to be called before data can be sent or recived across the network.
-	 */
-	void connect(String hostName, int port);
-	
-	/**
 	 * Sends the supplied data using the UDP-protocol. 
 	 * @param data the data to be sent.
 	 */
