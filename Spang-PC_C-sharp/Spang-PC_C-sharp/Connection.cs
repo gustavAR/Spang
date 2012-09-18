@@ -53,15 +53,15 @@ namespace Spang_PC_C_sharp
 
         public byte[] reciveTCP()
         {
-            List<byte> bytes = new List<byte>();
             Stream stream = tcpSocket.GetStream();
-            int b;
-            while ((b = stream.ReadByte()) != -1)
-            {
-                bytes.Add((byte)b);
-            }
+            int b1 = stream.ReadByte();
+            int b2 = stream.ReadByte();
+            int length = (b1 << 8) & b2;
 
-            return bytes.ToArray();
+            byte[] data = new byte[length];
+            stream.Read(data, 0, length);
+
+            return data;
         } 
     }
 }

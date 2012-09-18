@@ -33,14 +33,14 @@ namespace Spang_PC_C_sharp
             {
                 while (true)
                 {
-                    connection.sendUDP(Encoding.ASCII.GetBytes(Console.ReadLine()));
+                    connection.sendUDP(Encoding.UTF8.GetBytes(Console.ReadLine()));
                 }
             }).Start();
             
             while(true) 
             {
-			    byte[] data = connection.reciveUDP();	
-			    string message = Encoding.ASCII.GetString(data, 0, data.Length);
+                byte[] data = connection.reciveTCP();	
+			    string message = Encoding.UTF8.GetString(data, 0, data.Length);
                 Console.WriteLine(message);
                 if (message == "move")
                 {
