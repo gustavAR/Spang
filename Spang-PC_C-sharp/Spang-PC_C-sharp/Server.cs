@@ -11,7 +11,7 @@ namespace Spang_PC_C_sharp
     {
         public IConnection ReciveConnection(int port)
         {
-            IPAddress addr = IPAddress.Parse("192.168.33.221");
+            IPAddress addr = IPAddress.Parse("192.168.33.102");
             TcpListener listener = new TcpListener(addr, port);
             listener.Start();
             

@@ -64,7 +64,12 @@ public class Connection implements IConnection {
 	 */
 	public byte[] reciveUDP() {
 		DatagramPacket packet = new DatagramPacket(new byte[DATA_CAPACITY], DATA_CAPACITY);
-		this.udpSocket.receive(packet);
+		try {
+			this.udpSocket.receive(packet);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return packet.getData();
 	}
 	

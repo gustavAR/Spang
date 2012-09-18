@@ -15,7 +15,7 @@ import android.widget.EditText;
 
 public class MainActivity extends Activity {
 	private static final int PORT = 1337;
-	private static final String ADDR = "192.168.33.221";
+	private static final String ADDR = "192.168.33.102";
 	private IConnection connection;
 	
     @Override
