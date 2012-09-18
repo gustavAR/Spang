@@ -25,7 +25,7 @@
         </activity>
         <activity
             android:name=".MouseActivity"
-            android:label="@string/title_activity_mouse" >
+            android:label="@string/title_activity_mouse" android:parentActivityName="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
