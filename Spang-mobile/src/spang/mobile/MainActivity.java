@@ -1,46 +1,47 @@
 package spang.mobile;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+
 import network.IConnection;
+import network.INetworkListener;
+import network.Network;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Xml.Encoding;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class MainActivity extends Activity {
 	private static final int PORT = 1337;
 	private static final String ADDR = "192.168.33.221";
-	private IConnection connection;
+	private ArrayAdapter<String> adapter;
+	private ArrayList<String> serverList;
+
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-      /*  Client client = new Client();
-       
-        try {
-			this.connection= client.connectTo(InetAddress.getByName(ADDR), PORT);
-		} catch (UnknownHostException e) {
-			throw new NetworkException(e);
-		}
         
-        new Thread(new Runnable() {
+        serverList = new ArrayList<String>();
+        adapter = new ArrayAdapter<String>(this, R.id.listView1, serverList);
+        
+        Network.ListenToBroadcasts(9673, new INetworkListener() {
 			
-			public void run() {
-				reading();
+			public void listen(byte[] data) {
+				try {
+					serverList.add(new String(data,"UTF-8"));
+					adapter.notifyDataSetChanged();
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		}).start();*/
-    }
-    public void reading(){
-    /*	while(true){
-    		String string ="";
-			try {
-				string = new String(this.connection.reciveTCP(),"UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				throw new NetworkException();
-			}
-    		Log.i("Hej", string);
-    	}*/
+		});
     }
 
     @Override
@@ -50,14 +51,11 @@ public class MainActivity extends Activity {
     }
     
     public void sendData(View view){
-   // 	EditText text = (EditText)this.findViewById(R.id.editText1); 
-    //	String message = text.getText().toString();
-    //byte[] data = message.getBytes();
-    //	connection.sendTCP(data);  	
-    	//writer.println(message);
-    	//writer.flush();
+    	ListView listView = (ListView) this.findViewById(R.id.listView1);
+    	String selected = (String) listView.getSelectedItem();
     	
     	Intent intent = new Intent(this, MouseActivity.class);
+    	intent.putExtra("connection", selected);
     	this.startActivity(intent);
     }
 }

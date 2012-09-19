@@ -30,13 +30,15 @@ public class MouseView extends View{
 	private GestureDetector gestureDetector;
 	
 	private static final int PORT = 1337;
-	private static final String ADDR = "129.16.177.89";
+	private final String adress;
 	private IConnection connection;
 	
 	private SensorProcessor sp;
 
-	public MouseView(Context context, AttributeSet attrs) {
+	public MouseView(Context context, AttributeSet attrs, String connectionAddr) {
 		super(context, attrs);
+		
+		adress = connectionAddr;
 
 		paint.setAntiAlias(true);
 		paint.setStrokeWidth(6f);
@@ -50,7 +52,7 @@ public class MouseView extends View{
 		Client client = new Client();
 	       
         try {
-			this.connection= client.connectTo(InetAddress.getByName(ADDR), PORT);
+			this.connection= client.connectTo(InetAddress.getByName(adress), PORT);
 		} catch (UnknownHostException e) {
 			throw new NetworkException(e);
 		}
