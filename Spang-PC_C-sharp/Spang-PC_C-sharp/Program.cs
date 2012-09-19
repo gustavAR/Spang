@@ -31,8 +31,6 @@ namespace Spang_PC_C_sharp
             
             while(true) 
             {
-                Thread.Sleep(1000);
-
                 byte[] data = connection.reciveUDP();
                 messageHandler.DecodeMessage(data);   
 		    }
