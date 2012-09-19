@@ -20,6 +20,8 @@ namespace Spang_PC_C_sharp
             dict.Add(6, new MagneticField());
             dict.Add(7, new VolumeUP());
             dict.Add(8, new VolumeDown());
+            dict.Add(9, new Proximity());
+            dict.Add(10, new NetworkedText());
 
             return new MessageHandler(dict);
         }
