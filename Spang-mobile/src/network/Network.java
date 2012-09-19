@@ -14,9 +14,14 @@ public class Network {
 			
 			public void run() {
 				try {
-					DatagramSocket udpSocket = new DatagramSocket(9673, InetAddress.getByName("0.0.0.0"));
+					InetAddress addr = InetAddress.getByName("0.0.0.0");
+					
+					DatagramSocket udpSocket = new DatagramSocket(9673, addr);
+					
 					udpSocket.setBroadcast(true);
 					DatagramPacket packet = new DatagramPacket(new byte[100], 100);
+					
+					
 					udpSocket.receive(packet);
 					
 					byte[] copy = new byte[packet.getLength()];

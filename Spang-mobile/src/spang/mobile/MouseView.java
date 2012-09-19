@@ -59,9 +59,9 @@ public class MouseView extends View{
 			throw new NetworkException(e);
 		}
 
-		this.sp = new SensorProcessor(context, connection);
-		this.sp.setActive(Sensor.TYPE_ACCELEROMETER, true);
-		this.sp.startProcess();
+        this.sp = new SensorProcessor(context, connection);
+        this.sp.setActive(Sensor.TYPE_LINEAR_ACCELERATION, true);
+        this.sp.startProcess();
 	}
 
 	@Override

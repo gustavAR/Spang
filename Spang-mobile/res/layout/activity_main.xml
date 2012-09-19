@@ -11,15 +11,16 @@
         android:layout_centerHorizontal="true"
         android:onClick="sendData"
         android:text="@string/button_send" />
-
-    <ListView
-        android:id="@+id/listView1"
-        android:layout_width="match_parent"
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/button1"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" >
-
-    </ListView>
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="71dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text="@string/default_ip" />
 
 </RelativeLayout>
