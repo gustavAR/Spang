@@ -2,6 +2,7 @@ package spang.mobile;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 
 public class MouseActivity extends Activity {
@@ -11,10 +12,8 @@ public class MouseActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(new MouseView(this, null));
-        
-       
-        
-        System.out.println("YAAAY!");
+          
+       Log.i("Hej", "YAAAY!");
     }
     
     @Override

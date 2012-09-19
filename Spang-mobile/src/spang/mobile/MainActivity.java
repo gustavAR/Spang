@@ -1,18 +1,11 @@
 package spang.mobile;
 
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import network.Client;
 import network.IConnection;
-import network.NetworkException;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.EditText;
 
 public class MainActivity extends Activity {
 	private static final int PORT = 1337;
@@ -23,7 +16,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Client client = new Client();
+      /*  Client client = new Client();
        
         try {
 			this.connection= client.connectTo(InetAddress.getByName(ADDR), PORT);
@@ -36,10 +29,10 @@ public class MainActivity extends Activity {
 			public void run() {
 				reading();
 			}
-		}).start();
+		}).start();*/
     }
     public void reading(){
-    	while(true){
+    /*	while(true){
     		String string ="";
 			try {
 				string = new String(this.connection.reciveTCP(),"UTF-8");
@@ -47,7 +40,7 @@ public class MainActivity extends Activity {
 				throw new NetworkException();
 			}
     		Log.i("Hej", string);
-    	}
+    	}*/
     }
 
     @Override
@@ -57,13 +50,14 @@ public class MainActivity extends Activity {
     }
     
     public void sendData(View view){
-    	EditText text = (EditText)this.findViewById(R.id.editText1); 
-    	String message = text.getText().toString();
-    	byte[] data = message.getBytes();
-    	connection.sendTCP(data);
-    	
-    	
+   // 	EditText text = (EditText)this.findViewById(R.id.editText1); 
+    //	String message = text.getText().toString();
+    //byte[] data = message.getBytes();
+    //	connection.sendTCP(data);  	
     	//writer.println(message);
     	//writer.flush();
+    	
+    	Intent intent = new Intent(this, MouseActivity.class);
+    	this.startActivity(intent);
     }
 }
