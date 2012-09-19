@@ -25,7 +25,7 @@ namespace Spang_PC_C_sharp
           //  Application.Run(new Form1());
 
             Server server = new Server();
-         //   IConnection connection = server.ReciveConnection(1337);
+            IConnection connection = server.ReciveConnection(1337);
 
             // connection.connect(ADDRESS, PORT);
 
@@ -43,7 +43,7 @@ namespace Spang_PC_C_sharp
             {
                 Thread.Sleep(1000);
 
-                byte[] data = { 1, 2 ,30,0,0,0, 30,0,0,0};
+                byte[] data = connection.reciveUDP();
                 messageHandler.DecodeMessage(data);   
 		    }
         }
