@@ -3,6 +3,8 @@ package spang.mobile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import sensors.SensorProcessor;
+
 import network.Client;
 import network.IConnection;
 import network.NetworkException;
@@ -10,6 +12,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Sensor;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -23,14 +26,14 @@ public class MouseView extends View{
 	private float previousTouchY;
 	private float dX;
 	private float dY;
-	
-//	private SensorProcessor processor;
 
 	private GestureDetector gestureDetector;
 	
 	private static final int PORT = 1337;
 	private static final String ADDR = "129.16.177.89";
 	private IConnection connection;
+	
+	private SensorProcessor sp;
 
 	public MouseView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -51,6 +54,9 @@ public class MouseView extends View{
 		} catch (UnknownHostException e) {
 			throw new NetworkException(e);
 		}
+        
+        this.sp = new SensorProcessor(context, connection);
+        this.sp.setActive(Sensor.TYPE_ACCELEROMETER, true);
 	}
 
 	@Override
@@ -93,7 +99,7 @@ public class MouseView extends View{
 
 	private void sendMovementData() {
 		Log.d("MOTIONEVENT:", "dX = " + dX + "   dY = " + dY);
-    	String message = "dx" + dX + "dy" + dY;
+    	String message = (int)dX + ";" + (int)dY;
     	byte[] data = message.getBytes();
     	connection.sendUDP(data);
 	}

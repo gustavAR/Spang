@@ -1,7 +1,8 @@
+package sensors;
 import java.util.ArrayList;
 import java.util.List;
 
-import sensors.SpangSensor;
+import network.IConnection;
 import android.content.Context;
 import android.util.Log;
 
@@ -13,18 +14,20 @@ import android.util.Log;
 public class SensorProcessor {
 	private List<SpangSensor> sensors = new ArrayList<SpangSensor>();
 	private byte[] encodedSensorInput; 
+	private IConnection connection;
 
-	public SensorProcessor(Context context) {
+	public SensorProcessor(Context context, IConnection connection) {
 		SensorListBuilder builder = new SensorListBuilder(context);
-		sensors = builder.build();
+		this.sensors = builder.build();
+		this.connection = connection;	
 	}
+	
 	/**
 	 * Starts a thread which processes the input from all active sensors 
 	 * approximately 60 times per second.
 	 */
 	public void startProcess() {
 		Runnable runnable = new Runnable() {
-			@Override
 			public void run() {
 				processInput();
 				try {
@@ -63,6 +66,7 @@ public class SensorProcessor {
 		fillOutput(output);
 		
 		this.encodedSensorInput = output;
+		this.connection.sendUDP(output);
 		Log.d("Sensor-output:", output.toString());
 	}
 

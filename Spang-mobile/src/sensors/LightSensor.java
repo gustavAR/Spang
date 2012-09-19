@@ -40,7 +40,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */	
-	@Override
+	
 	public void start() {
 		lSensorManager.registerListener(this, lSensor, SensorManager.SENSOR_DELAY_NORMAL);
 		this.isActive = true;
@@ -49,7 +49,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */	
-	@Override
+	
 	public void stop() {
 		lSensorManager.unregisterListener(this);
 		this.isActive = false;
@@ -60,7 +60,7 @@ public class LightSensor implements SpangSensor {
 	 * @return the light-sensor value in lx. 
 	 * Return value occupies only the first position of the array.
 	 */	
-	@Override
+	
 	public float[] getValues() {
 		return values;
 	}
@@ -68,7 +68,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */	
-	@Override
+	
 	public void onAccuracyChanged(Sensor unused, int newAccuracy) {
 		accuracy = newAccuracy;
 	}
@@ -76,7 +76,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void onSensorChanged(SensorEvent event) {
 		values = event.values.clone();
 	}
@@ -84,7 +84,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public int getAccuracy() {
 		return this.accuracy;
 	}
@@ -92,7 +92,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public int getSensorID() {
 		return SENSOR_TYPE;
 	}
@@ -100,7 +100,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public boolean isRunning() {
 		return isActive;
 	}
@@ -108,7 +108,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public byte[] encode() {
 		byte[] encodedValue = new byte[5];
 		encodedValue[0] = ENCODE_ID;
@@ -126,7 +126,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public int getValuesLength() {
 		return VALUES_LENGTH;
 	}
@@ -134,7 +134,7 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public int getEncodedLength() {
 		return ENCODED_LENGTH;
 	}

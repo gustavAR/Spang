@@ -6,14 +6,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
 /**
- * Class that contains the devices Accelerometer-sensor 
+ * Class that contains the devices gyroscope-sensor 
  * and simplifies usage of it.
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
  */
-public class AccelerometerSensor implements SpangSensor {
-	public static final int SENSOR_TYPE = Sensor.TYPE_ACCELEROMETER;
-	public static final byte ENCODE_ID = 0x02;
+public class GyroscopeSensor implements SpangSensor {
+	public static final int SENSOR_TYPE = Sensor.TYPE_GYROSCOPE;
+	public static final byte ENCODE_ID = 0x04;
 	public static final int VALUES_LENGTH = 3;
 	public static final int ENCODED_LENGTH = VALUES_LENGTH * 4 + 1;
 
@@ -25,25 +25,24 @@ public class AccelerometerSensor implements SpangSensor {
 	private Sensor sensor;
 
 	/**
-	 * Doesn't start listening to the sensor. Only gets the accelerometer-sensor from the device.
-	 * If the device has no accelerometer sensor, a NoSensorException is thrown.
+	 * Doesn't start listening to the sensor. Only gets the gyroscope-sensor from the device.
+	 * If the device has no gyroscope sensor, a NoSensorException is thrown.
 	 * @param context
 	 */
-	public AccelerometerSensor(Context context) {
+	public GyroscopeSensor(Context context) {
 		this.sensorManager = (SensorManager) context
 				.getSystemService(Context.SENSOR_SERVICE);
 		this.sensor = sensorManager
-				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+				.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
 		if (this.sensor == null) {
-			throw new NoSensorException("Device has no Accelerometer-sensor");
+			throw new NoSensorException("Device has no Gyroscope-sensor");
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void start() {
 		sensorManager.registerListener(this, sensor,
 				SensorManager.SENSOR_DELAY_NORMAL);
@@ -53,7 +52,6 @@ public class AccelerometerSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void stop() {
 		sensorManager.unregisterListener(this);
 		this.isActive = false;
@@ -61,10 +59,9 @@ public class AccelerometerSensor implements SpangSensor {
 
 	/**
 	 * {@inheritDoc}
-	 * @return the Accelerometer-sensor value. 
+	 * @return the Gyroscope-sensor value. 
 	 * Return value occupies only 3 positions in the array.
 	 */
-	@Override
 	public float[] getValues() {
 		return values;
 	}
@@ -72,7 +69,6 @@ public class AccelerometerSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void onAccuracyChanged(Sensor unused, int newAccuracy) {
 		accuracy = newAccuracy;
 	}
@@ -80,7 +76,6 @@ public class AccelerometerSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void onSensorChanged(SensorEvent event) {
 		values = event.values.clone();
 	}
@@ -88,7 +83,6 @@ public class AccelerometerSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public int getAccuracy() {
 		return this.accuracy;
 	}
@@ -96,7 +90,6 @@ public class AccelerometerSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public int getSensorID() {
 		return SENSOR_TYPE;
 	}
@@ -104,7 +97,6 @@ public class AccelerometerSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public boolean isRunning() {
 		return isActive;
 	}
@@ -112,7 +104,6 @@ public class AccelerometerSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public byte[] encode() {
 		byte[] encodedValue = new byte[13];
 		encodedValue[0] = ENCODE_ID;
@@ -142,7 +133,6 @@ public class AccelerometerSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public int getValuesLength() {
 		return VALUES_LENGTH;
 	}
@@ -150,7 +140,6 @@ public class AccelerometerSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public int getEncodedLength() {
 		return ENCODED_LENGTH;
 	}

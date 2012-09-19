@@ -13,7 +13,7 @@ import android.hardware.SensorManager;
  */
 public class MagneticFieldSensor implements SpangSensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_MAGNETIC_FIELD;
-	public static final byte ENCODE_ID = 0x04;
+	public static final byte ENCODE_ID = 0x05;
 	public static final int VALUES_LENGTH = 3;
 	public static final int ENCODED_LENGTH = VALUES_LENGTH * 4 + 1;
 
@@ -43,7 +43,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void start() {
 		sensorManager.registerListener(this, sensor,
 				SensorManager.SENSOR_DELAY_NORMAL);
@@ -53,7 +53,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void stop() {
 		sensorManager.unregisterListener(this);
 		this.isActive = false;
@@ -64,7 +64,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	 * @return the MagneticField-sensor value. 
 	 * Return value occupies only 3 positions in the array.
 	 */
-	@Override
+	
 	public float[] getValues() {
 		return values;
 	}
@@ -72,7 +72,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void onAccuracyChanged(Sensor unused, int newAccuracy) {
 		accuracy = newAccuracy;
 	}
@@ -80,7 +80,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void onSensorChanged(SensorEvent event) {
 		values = event.values.clone();
 	}
@@ -88,7 +88,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public int getAccuracy() {
 		return this.accuracy;
 	}
@@ -96,7 +96,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public int getSensorID() {
 		return SENSOR_TYPE;
 	}
@@ -104,7 +104,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public boolean isRunning() {
 		return isActive;
 	}
@@ -112,7 +112,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public byte[] encode() {
 		byte[] encodedValue = new byte[13];
 		encodedValue[0] = ENCODE_ID;
@@ -142,7 +142,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public int getValuesLength() {
 		return VALUES_LENGTH;
 	}
@@ -150,7 +150,7 @@ public class MagneticFieldSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public int getEncodedLength() {
 		return ENCODED_LENGTH;
 	}
