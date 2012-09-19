@@ -1,4 +1,6 @@
 package sensors;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +15,7 @@ import android.util.Log;
  */
 public class SensorProcessor {
 	private List<SpangSensor> sensors = new ArrayList<SpangSensor>();
-	private byte[] encodedSensorInput; 
+	private ByteBuffer encodedSensorInput; 
 	private IConnection connection;
 
 	public SensorProcessor(Context context, IConnection connection) {
@@ -21,7 +23,7 @@ public class SensorProcessor {
 		this.sensors = builder.build();
 		this.connection = connection;	
 	}
-	
+
 	/**
 	 * Starts a thread which processes the input from all active sensors 
 	 * approximately 60 times per second.
@@ -29,17 +31,19 @@ public class SensorProcessor {
 	public void startProcess() {
 		Runnable runnable = new Runnable() {
 			public void run() {
-				processInput();
-				try {
-					Thread.sleep(167);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				while(true){
+					processInput();
+					try {
+						Thread.sleep(17);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		};
 		new Thread(runnable).start();
 	}
-	
+
 	/**
 	 * Starts or stops a specific sensor.  
 	 * @param sensorID the sensor to be started/stopped.
@@ -61,44 +65,30 @@ public class SensorProcessor {
 	/**
 	 * Updates the value of getEncodedSensorInput();
 	 */
-	private void processInput() {		
-		byte[] output = new byte[getOutputLength()];
-		fillOutput(output);
+	private void processInput() {
+		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
 		
-		this.encodedSensorInput = output;
-		this.connection.sendUDP(output);
-		Log.d("Sensor-output:", output.toString());
+		fillOutput();
+
+		this.connection.sendUDP(encodedSensorInput.array());
 	}
 
-	private void fillOutput(byte[] output) {
-		int outputIndex = 0;
-		
+	private void fillOutput() {
 		for (SpangSensor sensor : sensors) {
 			if(sensor.isRunning()) {
-				byte[] encodedValues = sensor.encode();		
-				for(int i = 0; i < encodedValues.length; i++) {
-					output[outputIndex] = encodedValues[i];
-					outputIndex++;
-				}
+				sensor.encode(this.encodedSensorInput);		
 			}
 		}
 	}
 
 	private int getOutputLength() {
 		int totalEncodedLength = 0;
-		
+
 		for (SpangSensor sensor : sensors) {
 			if(sensor.isRunning()) {
 				totalEncodedLength += sensor.getEncodedLength();
 			}
 		}
 		return totalEncodedLength;
-	}
-
-	/**
-	 * @return an array containing all the encoded sensor values.
-	 */
-	public byte[] getEncodedSensorInput() {
-		return encodedSensorInput;
 	}
 }

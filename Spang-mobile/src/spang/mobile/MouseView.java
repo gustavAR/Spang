@@ -3,6 +3,7 @@ package spang.mobile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import sensors.SensorProcessor;
 
@@ -60,6 +61,7 @@ public class MouseView extends View{
         
         this.sp = new SensorProcessor(context, connection);
         this.sp.setActive(Sensor.TYPE_ACCELEROMETER, true);
+        this.sp.startProcess();
 	}
 
 	@Override
@@ -102,7 +104,7 @@ public class MouseView extends View{
 
 	private void sendMovementData() {
 		Log.d("MOTIONEVENT:", "dX = " + dX + "   dY = " + dY);
-    	byte[] data = ByteBuffer.allocate(9).put((byte)2).putInt((int)dX).putInt((int)dY).array();
+    	byte[] data = ByteBuffer.allocate(9).order(ByteOrder.LITTLE_ENDIAN).put((byte)2).putInt((int)dX).putInt((int)dY).array();
     	connection.sendUDP(data);
 	}
 
@@ -121,6 +123,7 @@ public class MouseView extends View{
 
 		public void onLongPress(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onLongPress");
+	    	connection.sendUDP(new byte[]{(byte)1});
 		}
 
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,

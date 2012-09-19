@@ -1,5 +1,7 @@
 package sensors;
 
+import java.nio.ByteBuffer;
+
 import android.hardware.SensorEventListener;
 
 /**
@@ -41,9 +43,10 @@ public interface SpangSensor extends SensorEventListener {
 	public boolean isRunning();
 	
 	/**
-	 * @return the sensor-values encoded and ready for sending over network.
+	 * @param the ByteBuffer with all sensor-input 
+	 * Puts the sensor-values in the ByteBuffer.
 	 */
-	public byte[] encode();
+	public void encode(ByteBuffer buffer);
 	
 	/**
 	 * @return the constant number of values returned by the sensor.

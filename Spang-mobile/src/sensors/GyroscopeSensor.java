@@ -1,5 +1,8 @@
 package sensors;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -104,30 +107,9 @@ public class GyroscopeSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public byte[] encode() {
-		byte[] encodedValue = new byte[13];
-		encodedValue[0] = ENCODE_ID;
-
-		int float0 = Float.floatToRawIntBits(getValues()[0]);
-		int float1 = Float.floatToRawIntBits(getValues()[1]);
-		int float2 = Float.floatToRawIntBits(getValues()[2]);
-
-		encodedValue[1] = (byte) ((float0 >> 24) & 0xff);
-		encodedValue[2] = (byte) ((float0 >> 16) & 0xff);
-		encodedValue[3] = (byte) ((float0 >> 8) & 0xff);
-		encodedValue[4] = (byte) (float0 & 0xff);
-
-		encodedValue[5] = (byte) ((float1 >> 24) & 0xff);
-		encodedValue[6] = (byte) ((float1 >> 16) & 0xff);
-		encodedValue[7] = (byte) ((float1 >> 8) & 0xff);
-		encodedValue[8] = (byte) (float1 & 0xff);
-
-		encodedValue[9] = (byte) ((float2 >> 24) & 0xff);
-		encodedValue[10] = (byte) ((float2 >> 16) & 0xff);
-		encodedValue[11] = (byte) ((float2 >> 8) & 0xff);
-		encodedValue[12] = (byte) (float2 & 0xff);
-
-		return encodedValue;
+	public void encode(ByteBuffer buffer) {
+		buffer.put(ENCODE_ID)
+					.putFloat(this.values[0]).putFloat(this.values[1]).putFloat(this.values[2]);
 	}
 	
 	/**

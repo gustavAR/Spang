@@ -1,5 +1,8 @@
 package sensors;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -108,19 +111,9 @@ public class LightSensor implements SpangSensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	
-	public byte[] encode() {
-		byte[] encodedValue = new byte[5];
-		encodedValue[0] = ENCODE_ID;
-		
-		int float0 = Float.floatToRawIntBits(getValues()[0]);
-		
-		encodedValue[1]  = (byte)((float0>>24) & 0xff);
-		encodedValue[2]  = (byte)((float0>>16) & 0xff);
-		encodedValue[3]  = (byte)((float0>>8) & 0xff);
-		encodedValue[4]  = (byte)(float0 & 0xff);
-		
-		return encodedValue;
+	public void encode(ByteBuffer buffer) {
+		buffer.put(ENCODE_ID)
+					.putFloat(this.values[0]);
 	}
 	
 	/**
