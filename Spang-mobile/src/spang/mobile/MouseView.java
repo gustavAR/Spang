@@ -2,6 +2,7 @@ package spang.mobile;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 
 import sensors.SensorProcessor;
 
@@ -101,8 +102,7 @@ public class MouseView extends View{
 
 	private void sendMovementData() {
 		Log.d("MOTIONEVENT:", "dX = " + dX + "   dY = " + dY);
-    	String message = (int)dX + ";" + (int)dY;
-    	byte[] data = message.getBytes();
+    	byte[] data = ByteBuffer.allocate(9).put((byte)2).putInt((int)dX).putInt((int)dY).array();
     	connection.sendUDP(data);
 	}
 
@@ -135,9 +135,7 @@ public class MouseView extends View{
 
 		public boolean onSingleTapUp(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onSingleTapUp");
-	    	String message = "click";
-	    	byte[] data = message.getBytes();
-	    	connection.sendUDP(data);
+	    	connection.sendUDP(new byte[]{(byte)0});
 			return true;
 		}
 	};

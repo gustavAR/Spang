@@ -25,10 +25,13 @@ public class SensorListBuilder {
 	public SensorListBuilder(Context context) {
 		this.manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE); 
 
-		sensorBindings.put(Sensor.TYPE_LIGHT, new LightSensor(context));
-		sensorBindings.put(Sensor.TYPE_ACCELEROMETER, new AccelerometerSensor(context));
-		sensorBindings.put(Sensor.TYPE_MAGNETIC_FIELD, new MagneticFieldSensor(context));
-		sensorBindings.put(Sensor.TYPE_GYROSCOPE, new GyroscopeSensor(context));
+
+		if(this.manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!=null)
+			sensorBindings.put(Sensor.TYPE_ACCELEROMETER, new AccelerometerSensor(context));
+
+		//		sensorBindings.put(Sensor.TYPE_MAGNETIC_FIELD, new MagneticFieldSensor(context));
+		//		sensorBindings.put(Sensor.TYPE_GYROSCOPE, new GyroscopeSensor(context));
+		//		sensorBindings.put(Sensor.TYPE_LIGHT, new LightSensor(context));
 	}
 
 	/**
