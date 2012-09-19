@@ -5,11 +5,10 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import sensors.SensorProcessor;
-
 import network.Client;
 import network.IConnection;
 import network.NetworkException;
+import sensors.SensorProcessor;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -18,6 +17,7 @@ import android.hardware.Sensor;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -30,16 +30,16 @@ public class MouseView extends View{
 	private float dY;
 
 	private GestureDetector gestureDetector;
-	
+
 	private static final int PORT = 1337;
 	private final String adress;
 	private IConnection connection;
-	
+
 	private SensorProcessor sp;
 
 	public MouseView(Context context, AttributeSet attrs, String connectionAddr) {
 		super(context, attrs);
-		
+
 		adress = connectionAddr;
 
 		paint.setAntiAlias(true);
@@ -47,32 +47,32 @@ public class MouseView extends View{
 		paint.setColor(Color.BLACK);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeJoin(Paint.Join.ROUND);
-		
+
 		this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
-		
-		
+
+
 		Client client = new Client();
-	       
-        try {
+
+		try {
 			this.connection= client.connectTo(InetAddress.getByName(adress), PORT);
 		} catch (UnknownHostException e) {
 			throw new NetworkException(e);
 		}
-        
-        this.sp = new SensorProcessor(context, connection);
-        this.sp.setActive(Sensor.TYPE_ACCELEROMETER, true);
-        this.sp.startProcess();
+
+		this.sp = new SensorProcessor(context, connection);
+		this.sp.setActive(Sensor.TYPE_ACCELEROMETER, true);
+		this.sp.startProcess();
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawLine(previousTouchX, previousTouchY, previousTouchX + dX, previousTouchY + dY, paint);
 	}
-	
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		gestureDetector.onTouchEvent(event);
-		
+
 		float eventX = event.getX();
 		float eventY = event.getY();
 
@@ -104,8 +104,8 @@ public class MouseView extends View{
 
 	private void sendMovementData() {
 		Log.d("MOTIONEVENT:", "dX = " + dX + "   dY = " + dY);
-    	byte[] data = ByteBuffer.allocate(9).order(ByteOrder.LITTLE_ENDIAN).put((byte)2).putInt((int)dX).putInt((int)dY).array();
-    	connection.sendUDP(data);
+		byte[] data = ByteBuffer.allocate(9).order(ByteOrder.LITTLE_ENDIAN).put((byte)2).putInt((int)dX).putInt((int)dY).array();
+		connection.sendUDP(data);
 	}
 
 	GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
@@ -123,7 +123,7 @@ public class MouseView extends View{
 
 		public void onLongPress(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onLongPress");
-	    	connection.sendUDP(new byte[]{(byte)1});
+			connection.sendUDP(new byte[]{(byte)1});
 		}
 
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
@@ -138,8 +138,34 @@ public class MouseView extends View{
 
 		public boolean onSingleTapUp(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onSingleTapUp");
-	    	connection.sendUDP(new byte[]{(byte)0});
+			connection.sendUDP(new byte[]{(byte)0});
 			return true;
 		}
 	};
-} 
+
+	//Skeleton from Stack Overflow aka public domain.
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		int action = event.getAction();
+		int keyCode = event.getKeyCode();
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			if (action == KeyEvent.ACTION_UP) {
+				Log.d("Volume up", "YES!");
+				connection.sendUDP(new byte[]{(byte)7});
+				return true;
+			}
+			return false;
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			if (action == KeyEvent.ACTION_DOWN) {
+				Log.d("Volume up", "YES!");
+				connection.sendUDP(new byte[]{(byte)8});
+				return true;
+			}
+			return false;
+		default:
+			return super.dispatchKeyEvent(event);
+		}
+	}
+}
+
