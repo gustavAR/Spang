@@ -18,6 +18,8 @@ namespace Spang_PC_C_sharp
             dict.Add(4, new Luminance());
             dict.Add(5, new Gyroscope());
             dict.Add(6, new MagneticField());
+            dict.Add(7, new VolumeUP());
+            dict.Add(8, new VolumeDown());
 
             return new MessageHandler(dict);
         }
