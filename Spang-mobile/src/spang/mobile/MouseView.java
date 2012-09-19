@@ -29,7 +29,7 @@ public class MouseView extends View{
 	private GestureDetector gestureDetector;
 	
 	private static final int PORT = 1337;
-	private static final String ADDR = "192.168.33.221";
+	private static final String ADDR = "129.16.177.89";
 	private IConnection connection;
 
 	public MouseView(Context context, AttributeSet attrs) {
