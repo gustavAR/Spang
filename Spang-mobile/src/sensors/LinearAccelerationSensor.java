@@ -1,7 +1,6 @@
 package sensors;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -9,13 +8,13 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
 /**
- * Class that contains the devices Accelerometer-sensor 
+ * Class that contains the devices linear acceleration-sensor 
  * and simplifies usage of it.
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
  */
-public class AccelerometerSensor implements SpangSensor {
-	public static final int SENSOR_TYPE = Sensor.TYPE_ACCELEROMETER;
+public class LinearAccelerationSensor implements SpangSensor {
+	public static final int SENSOR_TYPE = Sensor.TYPE_LINEAR_ACCELERATION;
 	public static final byte ENCODE_ID = 0x03;
 	public static final int VALUES_LENGTH = 3;
 	public static final int ENCODED_LENGTH = VALUES_LENGTH * 4 + 1;
@@ -28,18 +27,18 @@ public class AccelerometerSensor implements SpangSensor {
 	private Sensor sensor;
 
 	/**
-	 * Doesn't start listening to the sensor. Only gets the accelerometer-sensor from the device.
-	 * If the device has no accelerometer sensor, a NoSensorException is thrown.
+	 * Doesn't start listening to the sensor. Only gets the linear acceleration-sensor from the device.
+	 * If the device has no linear acceleration sensor, a NoSensorException is thrown.
 	 * @param context
 	 */
-	public AccelerometerSensor(Context context) {
+	public LinearAccelerationSensor(Context context) {
 		this.sensorManager = (SensorManager) context
 				.getSystemService(Context.SENSOR_SERVICE);
 		this.sensor = sensorManager
-				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+				.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 
 		if (this.sensor == null) {
-			throw new NoSensorException("Device has no Accelerometer-sensor");
+			throw new NoSensorException("Device has no linear acceleration-sensor");
 		}
 	}
 
@@ -62,7 +61,7 @@ public class AccelerometerSensor implements SpangSensor {
 
 	/**
 	 * {@inheritDoc}
-	 * @return the Accelerometer-sensor value. 
+	 * @return the linear acceleration-sensor value. 
 	 * Return value occupies only 3 positions in the array.
 	 */
 	public float[] getValues() {

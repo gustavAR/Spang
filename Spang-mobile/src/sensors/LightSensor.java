@@ -1,7 +1,6 @@
 package sensors;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import android.content.Context;
 import android.hardware.Sensor;

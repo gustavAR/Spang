@@ -6,7 +6,6 @@ import java.util.List;
 
 import network.IConnection;
 import android.content.Context;
-import android.util.Log;
 
 /**
  * Class used to communicate sensor input with other parts of the system.
