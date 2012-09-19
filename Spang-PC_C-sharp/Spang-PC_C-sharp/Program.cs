@@ -42,7 +42,7 @@ namespace Spang_PC_C_sharp
         {
             Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
-            IPEndPoint iep = new IPEndPoint(IPAddress.Broadcast, 9999);
+            IPEndPoint iep = new IPEndPoint(IPAddress.Broadcast, 9673);
 
             string hostname = Dns.GetHostName();
             byte[] data = Encoding.ASCII.GetBytes(hostname);
