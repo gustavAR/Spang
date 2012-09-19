@@ -30,6 +30,7 @@ public class MouseView extends View{
 	private float dY;
 
 	private GestureDetector gestureDetector;
+	private OnKeyListener onKeyListener;
 
 	private static final int PORT = 1337;
 	private final String adress;
@@ -49,7 +50,7 @@ public class MouseView extends View{
 		paint.setStrokeJoin(Paint.Join.ROUND);
 
 		this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
-
+		this.setOnKeyListener(this.onKeyListener);
 
 		Client client = new Client();
 
@@ -144,28 +145,19 @@ public class MouseView extends View{
 	};
 
 	//Skeleton from Stack Overflow aka public domain.
-	@Override
-	public boolean dispatchKeyEvent(KeyEvent event) {
-		int action = event.getAction();
-		int keyCode = event.getKeyCode();
+	public boolean onKey(View v, int keyCode, KeyEvent event) {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_VOLUME_UP:
-			if (action == KeyEvent.ACTION_UP) {
-				Log.d("Volume up", "YES!");
-				connection.sendUDP(new byte[]{(byte)7});
-				return true;
-			}
-			return false;
+			Log.d("Volume key:", "UP");
+			connection.sendUDP(new byte[]{(byte)7});
+			return true;
+		
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
-			if (action == KeyEvent.ACTION_DOWN) {
-				Log.d("Volume up", "YES!");
-				connection.sendUDP(new byte[]{(byte)8});
-				return true;
-			}
-			return false;
-		default:
-			return super.dispatchKeyEvent(event);
-		}
+			Log.d("Volume key:", "DOWN");
+			connection.sendUDP(new byte[]{(byte)8});
+			return true;
+		}	
+		return false;
 	}
 }
 
