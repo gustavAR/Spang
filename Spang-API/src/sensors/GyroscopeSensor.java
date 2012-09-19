@@ -6,7 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
 /**
- * Class that contains the devices Gyroscope-sensor 
+ * Class that contains the devices gyroscope-sensor 
  * and simplifies usage of it.
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
@@ -25,8 +25,8 @@ public class GyroscopeSensor implements SpangSensor {
 	private Sensor sensor;
 
 	/**
-	 * Doesn't start listening to the sensor. Only gets the light-sensor from the device.
-	 * If the device has no Gyroscope sensor, a NoSensorException is thrown.
+	 * Doesn't start listening to the sensor. Only gets the gyroscope-sensor from the device.
+	 * If the device has no gyroscope sensor, a NoSensorException is thrown.
 	 * @param context
 	 */
 	public GyroscopeSensor(Context context) {

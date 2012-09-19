@@ -25,8 +25,8 @@ public class AccelerometerSensor implements SpangSensor {
 	private Sensor sensor;
 
 	/**
-	 * Doesn't start listening to the sensor. Only gets the light-sensor from the device.
-	 * If the device has no Accelerometer sensor, a NoSensorException is thrown.
+	 * Doesn't start listening to the sensor. Only gets the accelerometer-sensor from the device.
+	 * If the device has no accelerometer sensor, a NoSensorException is thrown.
 	 * @param context
 	 */
 	public AccelerometerSensor(Context context) {

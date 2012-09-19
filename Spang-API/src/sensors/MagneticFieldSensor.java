@@ -6,7 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 
 /**
- * Class that contains the devices MagneticField-sensor 
+ * Class that contains the devices magneticfield-sensor 
  * and simplifies usage of it.
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
@@ -25,8 +25,8 @@ public class MagneticFieldSensor implements SpangSensor {
 	private Sensor sensor;
 
 	/**
-	 * Doesn't start listening to the sensor. Only gets the light-sensor from the device.
-	 * If the device has no MagneticField sensor, a NoSensorException is thrown.
+	 * Doesn't start listening to the sensor. Only gets the magnetic field-sensor from the device.
+	 * If the device has no magnetic field-sensor, a NoSensorException is thrown.
 	 * @param context
 	 */
 	public MagneticFieldSensor(Context context) {
