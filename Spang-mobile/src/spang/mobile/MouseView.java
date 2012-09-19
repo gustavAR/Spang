@@ -1,5 +1,11 @@
 package spang.mobile;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import network.Client;
+import network.IConnection;
+import network.NetworkException;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,19 +23,34 @@ public class MouseView extends View{
 	private float previousTouchY;
 	private float dX;
 	private float dY;
+	
+//	private SensorProcessor processor;
 
 	private GestureDetector gestureDetector;
+	
+	private static final int PORT = 1337;
+	private static final String ADDR = "192.168.33.221";
+	private IConnection connection;
 
 	public MouseView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 
 		paint.setAntiAlias(true);
 		paint.setStrokeWidth(6f);
-		paint.setColor(Color.WHITE);
+		paint.setColor(Color.BLACK);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		
-		 this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
+		this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
+		
+		
+		Client client = new Client();
+	       
+        try {
+			this.connection= client.connectTo(InetAddress.getByName(ADDR), PORT);
+		} catch (UnknownHostException e) {
+			throw new NetworkException(e);
+		}
 	}
 
 	@Override
@@ -50,7 +71,7 @@ public class MouseView extends View{
 			previousTouchY = eventY;
 			return true;
 		case MotionEvent.ACTION_MOVE:
-			dX = previousTouchX + eventX;
+			dX = previousTouchX - eventX;
 			dY = previousTouchY - eventY;
 			previousTouchX = eventX;
 			previousTouchY = eventY;
@@ -72,6 +93,9 @@ public class MouseView extends View{
 
 	private void sendMovementData() {
 		Log.d("MOTIONEVENT:", "dX = " + dX + "   dY = " + dY);
+    	String message = "dx" + dX + "dy" + dY;
+    	byte[] data = message.getBytes();
+    	connection.sendUDP(data);
 	}
 
 	GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
@@ -103,6 +127,9 @@ public class MouseView extends View{
 
 		public boolean onSingleTapUp(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onSingleTapUp");
+	    	String message = "click";
+	    	byte[] data = message.getBytes();
+	    	connection.sendUDP(data);
 			return true;
 		}
 	};

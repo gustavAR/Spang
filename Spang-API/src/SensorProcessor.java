@@ -3,6 +3,7 @@ import java.util.List;
 
 import sensors.SpangSensor;
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Class used to communicate sensor input with other parts of the system.
@@ -62,6 +63,7 @@ public class SensorProcessor {
 		fillOutput(output);
 		
 		this.encodedSensorInput = output;
+		Log.d("Sensor-output:", output.toString());
 	}
 
 	private void fillOutput(byte[] output) {
