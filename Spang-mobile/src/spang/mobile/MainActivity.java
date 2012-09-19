@@ -2,6 +2,7 @@ package spang.mobile;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -12,6 +13,13 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        if(Integer.parseInt(Build.VERSION.SDK) <= Build.VERSION_CODES.CUPCAKE)
+        findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                sendData(v);
+            }
+        });
     }
 
     @Override
