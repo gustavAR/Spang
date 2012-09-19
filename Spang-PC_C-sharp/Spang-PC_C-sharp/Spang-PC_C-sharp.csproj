@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="AccelerometerDecoder.cs" />
     <Compile Include="Connection.cs" />
+    <Compile Include="Gyroscope.cs" />
     <Compile Include="IMessageHandler.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -60,6 +61,7 @@
     </Compile>
     <Compile Include="IConnection.cs" />
     <Compile Include="Luminance.cs" />
+    <Compile Include="MagneticField.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="MessageHandlerBuilder.cs" />
     <Compile Include="MouseClicker.cs" />
