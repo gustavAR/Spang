@@ -111,7 +111,7 @@ namespace Spang_PC_C_sharp
 
         private void HandleNetworkedText(BinaryReader reader)
         {
-            int length = reader.ReadInt16();
+            int length = reader.ReadInt32();
             byte[] textValue = reader.ReadBytes(length);
             String text = Encoding.UTF8.GetString(textValue);
 

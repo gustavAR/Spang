@@ -43,7 +43,7 @@ namespace Spang_PC_C_sharp
 
         public void VerticalScroll(int delta)
         {
-            MouseEventSender.SendEvent(MouseEvent.MouseHWheel, delta, 0);
+            MouseEventSender.SendEvent(MouseEvent.MouseWheel, delta, 0);
         }
 
         public void HorizontalScroll(int delta)

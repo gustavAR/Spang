@@ -21,7 +21,7 @@
         android:layout_below="@+id/editText1"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="34dp"
-        android:onClick="SendText"
+        android:onClick="sendText"
         android:text="Button" />
 
 </RelativeLayout>
