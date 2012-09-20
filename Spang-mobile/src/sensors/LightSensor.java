@@ -15,7 +15,7 @@ import android.hardware.SensorManager;
  */
 public class LightSensor implements SpangSensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_LIGHT; 
-	public static final byte ENCODE_ID = 0x01;
+	public static final byte ENCODE_ID = 0x04;
 	public static final int VALUES_LENGTH = 1;
 	public static final int ENCODED_LENGTH = VALUES_LENGTH * 4 + 1; 
 	

@@ -38,7 +38,7 @@ namespace Spang_PC_C_sharp
              ushort CalcVol = (ushort)(CurrVol & 0x0000ffff);
              CalcVol = (ushort) ((int)CalcVol + delta);
 
-             uint NewVolumeAllChannels = (((uint)CalcVol) | ((uint)CalcVol << 16));
+             uint NewVolumeAllChannels = (((uint)CalcVol & 0x0000FFFF) | ((uint)CalcVol << 16));
              
              waveOutSetVolume(IntPtr.Zero, NewVolumeAllChannels);
         }

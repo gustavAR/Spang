@@ -9,6 +9,7 @@ import network.Client;
 import network.IConnection;
 import network.NetworkException;
 import sensors.SensorProcessor;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -29,8 +30,9 @@ public class MouseView extends View{
 	private float dX;
 	private float dY;
 
+	private boolean scrolling;
+
 	private GestureDetector gestureDetector;
-	private OnKeyListener onKeyListener;
 
 	private static final int PORT = 1337;
 	private final String adress;
@@ -50,8 +52,6 @@ public class MouseView extends View{
 		paint.setStrokeJoin(Paint.Join.ROUND);
 
 		this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
-		this.setOnKeyListener(this.onKeyListener);
-
 		Client client = new Client();
 
 		try {
@@ -60,9 +60,9 @@ public class MouseView extends View{
 			throw new NetworkException(e);
 		}
 
-        this.sp = new SensorProcessor(context, connection);
-        this.sp.setActive(Sensor.TYPE_LINEAR_ACCELERATION, true);
-        this.sp.startProcess();
+		this.sp = new SensorProcessor(context, connection);
+		this.sp.setActive(Sensor.TYPE_LINEAR_ACCELERATION, true);
+		this.sp.startProcess();
 	}
 
 	@Override
@@ -70,6 +70,7 @@ public class MouseView extends View{
 		canvas.drawLine(previousTouchX, previousTouchY, previousTouchX + dX, previousTouchY + dY, paint);
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		gestureDetector.onTouchEvent(event);
@@ -81,6 +82,10 @@ public class MouseView extends View{
 		case MotionEvent.ACTION_DOWN:
 			previousTouchX = eventX;
 			previousTouchY = eventY;
+
+			if(event.getPointerCount()==2)
+				scrolling=true;
+
 			return true;
 		case MotionEvent.ACTION_MOVE:
 			dX = previousTouchX - eventX;
@@ -93,6 +98,9 @@ public class MouseView extends View{
 		case MotionEvent.ACTION_UP:
 			this.dX = 0;
 			this.dY = 0;
+
+			scrolling = false;
+
 			break;
 		default:
 			return false;
@@ -109,7 +117,7 @@ public class MouseView extends View{
 		connection.sendUDP(data);
 	}
 
-	GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
+	private GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
 
 		public boolean onDown(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onDown");
@@ -129,7 +137,19 @@ public class MouseView extends View{
 
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 				float distanceY) {
-			Log.d("MOTIONEVENT:", "onScroll");
+			if(scrolling){
+				//Vertical Scroll
+				Log.d("MOTIONEVENT:", "onScroll");
+				byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+						.put((byte)11).putInt((int)distanceY).array();
+				connection.sendUDP(vertData);
+
+
+				//Horizontal Scroll
+				byte[] horiData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+						.put((byte)12).putInt((int)distanceX).array();
+				connection.sendUDP(horiData);
+			}
 			return true;
 		}
 
@@ -144,20 +164,38 @@ public class MouseView extends View{
 		}
 	};
 
-	//Skeleton from Stack Overflow aka public domain.
-	public boolean onKey(View v, int keyCode, KeyEvent event) {
+	private OnKeyListener onKeyListener = new OnKeyListener(){
+		//Skeleton from Stack Overflow aka public domain.
+		public boolean onKey(View v, int keyCode, KeyEvent event) {
+			switch (keyCode) {
+			case KeyEvent.KEYCODE_VOLUME_UP:
+				Log.d("Volume key:", "UP");
+				connection.sendUDP(new byte[]{(byte)7});
+				return true;
+
+			case KeyEvent.KEYCODE_VOLUME_DOWN:
+				Log.d("Volume key:", "DOWN");
+				connection.sendUDP(new byte[]{(byte)8});
+				return true;
+			}	
+			return false;
+		}
+	};
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_VOLUME_UP:
 			Log.d("Volume key:", "UP");
 			connection.sendUDP(new byte[]{(byte)7});
 			return true;
-		
+
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
 			Log.d("Volume key:", "DOWN");
 			connection.sendUDP(new byte[]{(byte)8});
 			return true;
 		}	
-		return false;
+		return super.onKeyDown(keyCode, event);
 	}
 }
 
