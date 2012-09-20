@@ -5,6 +5,7 @@ import java.nio.ByteOrder;
 
 import network.IConnection;
 import sensors.SensorProcessor;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,12 +17,13 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
+@SuppressLint("NewApi")
 public class MouseView extends AbstractSpangView{
 	private final Paint paint = new Paint();
 	private final boolean multiTouchEnabled = Integer.parseInt(Build.VERSION.SDK) >= Build.VERSION_CODES.CUPCAKE;
 
 	private float xPos, yPos, radius;
-	private float xPosPrev, yPosPrev;
+	private float prevXPos, prevYPos;
 
 	private boolean scrolling, normalInputAllowed = true;
 
@@ -29,9 +31,11 @@ public class MouseView extends AbstractSpangView{
 
 	private SensorProcessor sp;
 
+	private static final int INVALID_POINTER_ID = -1;
+	private int mActivePointerID = INVALID_POINTER_ID;
+
 	public MouseView(Context context, AttributeSet attrs, IConnection connection) {
 		super(context, attrs, connection);
-
 
 		paint.setAntiAlias(true);
 		paint.setStrokeWidth(6f);
@@ -55,45 +59,73 @@ public class MouseView extends AbstractSpangView{
 	public boolean onTouchEvent(MotionEvent event) {
 		if(normalInputAllowed)
 			gestureDetector.onTouchEvent(event);
-		xPos = event.getX();
-		yPos = event.getY();
-		radius = event.getPressure()*100;
 
 		int eventID = event.getAction();
+		
+		switch(eventID & MotionEvent.ACTION_MASK) {
+		case MotionEvent.ACTION_DOWN:
+			mActivePointerID = event.getPointerId(0);
+			final int activeIndex = event.findPointerIndex(mActivePointerID);
+			prevXPos = event.getX(activeIndex);
+			prevYPos = event.getY(activeIndex);
+			break;
+		case MotionEvent.ACTION_MOVE:
+			final int activePointerIndex = event.findPointerIndex(mActivePointerID);
+			xPos = event.getX(activePointerIndex);
+			yPos = event.getY(activePointerIndex);
+			
+			radius = event.getPressure()*100;
+			byte[] pressureData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+					.put((byte)13).putInt((int)radius).array();
+			connection.sendUDP(pressureData);
+			
+			if(scrolling){
+				//Vertical Scroll
+				Log.d("MOTIONEVENT:", "onScroll");
+				byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+						.put((byte)11).putInt((int)(4*(yPos - prevYPos + 0.5f))).array();
+				connection.sendUDP(vertData);
 
-		byte[] pressureData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-				.put((byte)13).putInt((int)radius).array();
-		connection.sendUDP(pressureData);
-
-		if(scrolling){
-			//Vertical Scroll
-			Log.d("MOTIONEVENT:", "onScroll");
-			byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-					.put((byte)11).putInt((int)(4*(yPos - yPosPrev + 0.5f))).array();
-			connection.sendUDP(vertData);
-
-//			Horizontal Scroll
-//			byte[] horiData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-//					.put((byte)12).putInt((int)(4*(xPos - xPosPrev + 0.5f))).array();
-//			connection.sendUDP(horiData);
-		}
-		if((eventID & 0x000000ff) == MotionEvent.ACTION_POINTER_DOWN){
+				//			Horizontal Scroll
+				//			byte[] horiData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+				//					.put((byte)12).putInt((int)(4*(xPos - xPosPrev + 0.5f))).array();
+				//			connection.sendUDP(horiData);
+			}
+			
+			prevXPos = xPos;
+			prevYPos = yPos;
+			
+			break;
+		case MotionEvent.ACTION_UP:
+			mActivePointerID = INVALID_POINTER_ID;
+			break;
+		case MotionEvent.ACTION_CANCEL:
+			mActivePointerID = INVALID_POINTER_ID;
+			break;
+		case MotionEvent.ACTION_POINTER_DOWN:
 			Log.d("MOTIONEVENT:", "ACTION_POINTER_DOWN");
 			scrolling=true;
 			normalInputAllowed=false;
-			return true;
-		} 
-		else if((eventID & 0x000000ff) == MotionEvent.ACTION_POINTER_UP){
+			break;
+		case MotionEvent.ACTION_POINTER_UP:
 			Log.d("MOTIONEVENT:", "ACTION_POINTER_UP");
+			final int pointerIndex = (eventID & MotionEvent.ACTION_POINTER_INDEX_MASK) >> 
+			MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+			final int pointerID = event.getPointerId(pointerIndex);
+			if(pointerID == mActivePointerID) {
+				final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+				prevXPos = event.getX(newPointerIndex);
+				prevYPos = event.getY(newPointerIndex);
+				mActivePointerID = event.getPointerId(newPointerIndex);
+			}
+			
 			scrolling = false;
 			inputTimer(100);
-			return true;
-		}
+			break;
+		}	
+
 		// Schedules a repaint.
 		invalidate();
-
-		xPosPrev = xPos;
-		yPosPrev = yPos;
 		return true;
 	}
 
@@ -112,8 +144,6 @@ public class MouseView extends AbstractSpangView{
 	}
 
 	private GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
-
-
 		public boolean onDown(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onDown");
 			return true;
