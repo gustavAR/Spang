@@ -13,7 +13,7 @@ import android.hardware.SensorManager;
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
  */
-public class LightSensor implements SpangSensor {
+public class LightSensor implements ISensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_LIGHT; 
 	public static final byte ENCODE_ID = 0x04;
 	public static final int VALUES_LENGTH = 1;

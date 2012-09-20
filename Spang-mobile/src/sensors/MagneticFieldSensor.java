@@ -13,7 +13,7 @@ import android.hardware.SensorManager;
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
  */
-public class MagneticFieldSensor implements SpangSensor {
+public class MagneticFieldSensor implements ISensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_MAGNETIC_FIELD;
 	public static final byte ENCODE_ID = 0x05;
 	public static final int VALUES_LENGTH = 3;

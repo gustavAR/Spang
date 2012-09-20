@@ -13,7 +13,7 @@ import android.content.Context;
  *
  */
 public class SensorProcessor {
-	private List<SpangSensor> sensors = new ArrayList<SpangSensor>();
+	private List<ISensor> sensors = new ArrayList<ISensor>();
 	private ByteBuffer encodedSensorInput; 
 	private IConnection connection;
 
@@ -49,7 +49,7 @@ public class SensorProcessor {
 	 * @param value starts if true, stops if false.
 	 */
 	public void setActive(int sensorID, boolean value) {
-		for (SpangSensor sensor : sensors) {
+		for (ISensor sensor : sensors) {
 			if(sensor.getSensorID() == sensorID) {
 				if(value){
 					sensor.start();
@@ -73,7 +73,7 @@ public class SensorProcessor {
 	}
 
 	private void fillOutput() {
-		for (SpangSensor sensor : sensors) {
+		for (ISensor sensor : sensors) {
 			if(sensor.isRunning()) {
 				sensor.encode(this.encodedSensorInput);		
 			}
@@ -83,7 +83,7 @@ public class SensorProcessor {
 	private int getOutputLength() {
 		int totalEncodedLength = 0;
 
-		for (SpangSensor sensor : sensors) {
+		for (ISensor sensor : sensors) {
 			if(sensor.isRunning()) {
 				totalEncodedLength += sensor.getEncodedLength();
 			}

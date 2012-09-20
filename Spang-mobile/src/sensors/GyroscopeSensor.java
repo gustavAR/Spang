@@ -13,7 +13,7 @@ import android.hardware.SensorManager;
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
  */
-public class GyroscopeSensor implements SpangSensor {
+public class GyroscopeSensor implements ISensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_GYROSCOPE;
 	public static final byte ENCODE_ID = 0x04;
 	public static final int VALUES_LENGTH = 3;

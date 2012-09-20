@@ -9,7 +9,7 @@ import android.hardware.SensorEventListener;
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
  */
-public interface SpangSensor extends SensorEventListener {
+public interface ISensor extends SensorEventListener {
 	
 	/**
 	 * Method to start listening to the sensor. Should be called onResume.

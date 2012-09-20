@@ -13,7 +13,7 @@ import android.hardware.SensorManager;
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
  */
-public class LinearAccelerationSensor implements SpangSensor {
+public class LinearAccelerationSensor implements ISensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_LINEAR_ACCELERATION;
 	public static final byte ENCODE_ID = 0x03;
 	public static final int VALUES_LENGTH = 3;

@@ -14,9 +14,9 @@ import android.hardware.SensorManager;
  *
  */
 public class SensorListBuilder {
-	private List<SpangSensor> sensorList = new ArrayList<SpangSensor>();
+	private List<ISensor> sensorList = new ArrayList<ISensor>();
 	private SensorManager manager;
-	private Map<Integer, SpangSensor> sensorBindings = new HashMap<Integer, SpangSensor>();
+	private Map<Integer, ISensor> sensorBindings = new HashMap<Integer, ISensor>();
 
 	/**
 	 * For each new sensor, a binding must be created in the sensorBindings map. 
@@ -40,11 +40,11 @@ public class SensorListBuilder {
 	 * Builds and returns a list of all SpangSensors on the current device.
 	 * @return a list of all SpangSensors on the current device. 
 	 */
-	public List<SpangSensor> build() {
+	public List<ISensor> build() {
 		List<Sensor> sensors = manager.getSensorList(Sensor.TYPE_ALL);
 
 		for (Sensor sensor : sensors) {
-			SpangSensor spangSensor = sensorBindings.get(sensor.getType());
+			ISensor spangSensor = sensorBindings.get(sensor.getType());
 			if(spangSensor != null)
 				sensorList.add(spangSensor);
 		}
