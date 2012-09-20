@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using CoreAudioApi;
 
 namespace Spang_PC_C_sharp
 {
@@ -10,7 +11,7 @@ namespace Spang_PC_C_sharp
     {
         public void Decode(System.IO.BinaryReader reader)
         {
-            VolumeChanger.ChangeVolume(-(short.MaxValue / 10));
+            VolumeChanger.DecreaseVolume();
         }
     }
 
@@ -18,34 +19,29 @@ namespace Spang_PC_C_sharp
     {
         public void Decode(System.IO.BinaryReader reader)
         {
-            VolumeChanger.ChangeVolume(short.MaxValue/10);
+            VolumeChanger.IncreaseVolume();
         }
     }
 
     class VolumeChanger
     {
-        [DllImport("winmm.dll")]
-        public static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
-
-        [DllImport("winmm.dll")]
-        public static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
-
-        public static void ChangeVolume(short delta)
+        private static MMDeviceEnumerator devEnum;
+        private static MMDevice defaultDevice;
+        public static void mute()
         {
-            uint CurrVol = 0;
-         
-             waveOutGetVolume(IntPtr.Zero, out CurrVol);
-             ushort CalcVol = (ushort)(CurrVol & 0x0000ffff);
-             CalcVol = (ushort) ((int)CalcVol + delta);
-
-             uint NewVolumeAllChannels = (((uint)CalcVol & 0x0000FFFF) | ((uint)CalcVol << 16));
-             
-             waveOutSetVolume(IntPtr.Zero, NewVolumeAllChannels);
+            devEnum = new MMDeviceEnumerator();
+            defaultDevice = devEnum.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
+            defaultDevice.AudioEndpointVolume.Mute = !defaultDevice.AudioEndpointVolume.Mute;  
         }
 
-        public void SetVolume(uint volume)
+        public static void IncreaseVolume()
         {
+            defaultDevice.AudioEndpointVolume.VolumeStepUp();
+        }
 
+        public static void DecreaseVolume()
+        {
+            defaultDevice.AudioEndpointVolume.VolumeStepDown();
         }
     }
 }
