@@ -6,6 +6,6 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="button_send">Connect</string>
     <string name="title_activity_mouse">MouseActivity</string>
-    <string name="default_ip">129.16.190.246</string>
+    <string name="default_ip">129.16.188.22</string>
 
 </resources>

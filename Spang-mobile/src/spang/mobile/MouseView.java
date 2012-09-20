@@ -16,9 +16,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
 
-public class MouseView extends View{
+public class MouseView extends AbstractSpangView{
 	private final Paint paint = new Paint();
 	private final boolean multiTouchEnabled = Integer.parseInt(Build.VERSION.SDK) <= Build.VERSION_CODES.CUPCAKE;
 	
@@ -28,12 +27,10 @@ public class MouseView extends View{
 
 	private GestureDetector gestureDetector;
 
-	private IConnection connection;
-
 	private SensorProcessor sp;
 
 	public MouseView(Context context, AttributeSet attrs, IConnection connection) {
-		super(context, attrs);
+		super(context, attrs, connection);
 
 
 		paint.setAntiAlias(true);
@@ -44,8 +41,6 @@ public class MouseView extends View{
 
 		this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
 
-		this.connection= connection;
-
 		this.sp = new SensorProcessor(context, connection);
 		this.sp.setActive(Sensor.TYPE_LINEAR_ACCELERATION, true);
 		this.sp.startProcess();
@@ -53,18 +48,18 @@ public class MouseView extends View{
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		canvas.drawCircle(xPos, yPos, 42, paint);
+		canvas.drawCircle(xPos, yPos, 100, paint);
 	}
 
-	@SuppressLint("NewApi")
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		gestureDetector.onTouchEvent(event);
 		xPos = event.getX();
 		yPos = event.getY();
+			
 		
 		// Schedules a repaint.
-		invalidate();
+		postInvalidate();
 		return true;
 	}
 

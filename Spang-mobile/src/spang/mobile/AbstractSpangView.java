@@ -2,6 +2,7 @@ package spang.mobile;
 
 import network.IConnection;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -17,6 +18,8 @@ public abstract class AbstractSpangView extends View {
 		this.connection = connection;
 	}
 	
+	@Override
+	protected abstract void onDraw(Canvas canvas);
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
