@@ -27,10 +27,15 @@ namespace Spang_PC_C_sharp
     {
         private static MMDeviceEnumerator devEnum;
         private static MMDevice defaultDevice;
-        public static void mute()
+
+        public static void init()
         {
             devEnum = new MMDeviceEnumerator();
             defaultDevice = devEnum.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
+        }
+
+        public static void mute()
+        {
             defaultDevice.AudioEndpointVolume.Mute = !defaultDevice.AudioEndpointVolume.Mute;  
         }
 

@@ -24,17 +24,19 @@ namespace Spang_PC_C_sharp
             {
                 Brodcast();
             }).Start();
-            
+
             IConnection connection = server.ReciveConnection(1337);
 
             var messageHandler = MessageHandlerBuilder.Build();
-            
-            while(true) 
+
+            while (true)
             {
                 byte[] data = connection.reciveUDP();
-                messageHandler.DecodeMessage(data);   
-		    }
+                messageHandler.DecodeMessage(data);
+            }
+
         }
+
         /// <summary>
         /// http://www.java2s.com/Tutorial/CSharp/0580__Network/BroadcastSocketandbroadcastIPaddress.htm Assumed public licence
         /// </summary>
