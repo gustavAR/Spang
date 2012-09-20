@@ -27,7 +27,7 @@
             android:name=".MouseActivity"
             android:label="@string/title_activity_mouse" android:parentActivityName="@string/title_activity_main"
             android:screenOrientation="landscape"
-			android:configChanges="keyboardHidden|orientation|screenSize">
+			android:configChanges="keyboardHidden|orientation|screenSize" android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
