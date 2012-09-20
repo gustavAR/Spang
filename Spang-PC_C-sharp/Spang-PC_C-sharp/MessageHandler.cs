@@ -22,6 +22,8 @@ namespace Spang_PC_C_sharp
             while (memstream.Position < memstream.Length)
             {
                 var b = reader.ReadByte();
+                Console.WriteLine(b);
+
                 var handler = handlers[b];
                 handler.Decode(reader);
             }

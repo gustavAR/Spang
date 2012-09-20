@@ -18,7 +18,7 @@ namespace Spang_PC_C_sharp
             Y = reader.ReadSingle();
             Z = reader.ReadSingle();
 
-            Console.WriteLine(this.ToString());
+           // Console.WriteLine(this.ToString());
         }
         public string ToString()
         {

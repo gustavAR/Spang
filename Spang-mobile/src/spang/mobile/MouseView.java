@@ -21,7 +21,7 @@ public class MouseView extends AbstractSpangView{
 	private final Paint paint = new Paint();
 	private final boolean multiTouchEnabled = Integer.parseInt(Build.VERSION.SDK) <= Build.VERSION_CODES.CUPCAKE;
 	
-	private float xPos, yPos;
+	private float xPos, yPos, radius;
 
 	private boolean scrolling;
 
@@ -48,7 +48,7 @@ public class MouseView extends AbstractSpangView{
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		canvas.drawCircle(xPos, yPos, 100, paint);
+		canvas.drawCircle(xPos, yPos, radius, paint);
 	}
 
 	@Override
@@ -56,10 +56,14 @@ public class MouseView extends AbstractSpangView{
 		gestureDetector.onTouchEvent(event);
 		xPos = event.getX();
 		yPos = event.getY();
-			
+		
+		radius = event.getPressure()*100;
+		byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+				.put((byte)13).putInt((int)radius).array();
+		connection.sendUDP(vertData);
 		
 		// Schedules a repaint.
-		postInvalidate();
+		invalidate();
 		return true;
 	}
 
