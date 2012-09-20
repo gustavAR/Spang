@@ -37,7 +37,7 @@ namespace Spang_PC_C_sharp
     }
 
     /// <summary>
-    /// Class that sends events to the operating system
+    /// Class that sends mouse events to the operating system
     /// </summary>
     static class MouseEventSender
     {
@@ -51,6 +51,15 @@ namespace Spang_PC_C_sharp
             int y = Cursor.Position.Y;
 
             mouse_event((int)mouseEvent, x, y, 0, 0);
+           
+        }
+        public static void SendEvent(MouseEvent mouseEvent, int dwData, int dwExtraInfo )
+        {
+            int x = Cursor.Position.X;
+            int y = Cursor.Position.Y;
+
+            mouse_event((int)mouseEvent, x, y, dwData, dwExtraInfo);
+
         }
     }
 
@@ -63,6 +72,7 @@ namespace Spang_PC_C_sharp
         LeftDown = 0x02,
         LeftUp = 0x04,
         RightDown = 0x08,
-        RightUp = 0x10
+        RightUp = 0x10,
+        MouseWheel = 0x0800
     }
 }

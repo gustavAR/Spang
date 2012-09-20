@@ -22,6 +22,8 @@ namespace Spang_PC_C_sharp
             dict.Add(8, new VolumeDown());
             dict.Add(9, new Proximity());
             dict.Add(10, new NetworkedText());
+            dict.Add(11, new VScroller());
+            dict.Add(12, new HScroller());
 
             return new MessageHandler(dict);
         }
