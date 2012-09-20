@@ -7,7 +7,7 @@ using CoreAudioApi;
 
 namespace Spang_PC_C_sharp
 {
-    class VolumeDown : IMessageHandler
+    class VolumeDown 
     {
         public void Decode(System.IO.BinaryReader reader)
         {
@@ -15,7 +15,7 @@ namespace Spang_PC_C_sharp
         }
     }
 
-    class VolumeUP : IMessageHandler
+    class VolumeUP 
     {
         public void Decode(System.IO.BinaryReader reader)
         {

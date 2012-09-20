@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Drawing;
 
 namespace Spang_PC_C_sharp
 {
@@ -28,12 +29,18 @@ namespace Spang_PC_C_sharp
 
             IConnection connection = server.ReciveConnection(1337);
 
-            var messageHandler = MessageHandlerBuilder.Build();
+
+            IMessageDecoder messageHandler = new MessageDecoder();
+            Phone phone = new Phone(messageHandler);
+            DesktopController controller = new DesktopController(phone);
+
+
+
 
             while (true)
             {
                 byte[] data = connection.reciveUDP();
-                messageHandler.DecodeMessage(data);
+                phone.ProcessMessage(data);
             }
 
         }

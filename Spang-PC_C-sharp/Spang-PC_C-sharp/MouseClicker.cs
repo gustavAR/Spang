@@ -10,8 +10,14 @@ namespace Spang_PC_C_sharp
     /// <summary>
     /// Class that handles a left mouse button click message
     /// </summary>
-    class MouseLeftClicker : IMessageHandler
+    class MouseLeftClicker
     {
+        private readonly Phone phone;
+
+        public MouseLeftClicker(Phone phone)
+        {
+            this.phone = phone;
+        }
         public void Decode(BinaryReader reader)
         {
             MouseEventSender.SendEvent(MouseEvent.LeftDown);
@@ -25,8 +31,15 @@ namespace Spang_PC_C_sharp
     /// <summary>
     /// Class that handles a right mouse button click message
     /// </summary>
-    class MouseRightClicker : IMessageHandler
+    class MouseRightClicker
     {
+        private readonly Phone phone;
+
+        public MouseRightClicker(Phone phone)
+        {
+            // TODO: Complete member initialization
+            this.phone = phone;
+        }
         public void Decode(BinaryReader reader)
         {
             MouseEventSender.SendEvent(MouseEvent.RightDown);

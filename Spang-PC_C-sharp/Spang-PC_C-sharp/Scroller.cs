@@ -8,7 +8,7 @@ namespace Spang_PC_C_sharp
     /// <summary>
     /// Class for vertical scrolling
     /// </summary>
-    class VScroller : IMessageHandler
+    class VScroller
     {
         public void Decode(System.IO.BinaryReader reader)
         {
@@ -19,7 +19,7 @@ namespace Spang_PC_C_sharp
     /// <summary>
     /// Class for horizontal scrolling
     /// </summary>
-    class HScroller : IMessageHandler
+    class HScroller
     {
         public void Decode(System.IO.BinaryReader reader)
         {

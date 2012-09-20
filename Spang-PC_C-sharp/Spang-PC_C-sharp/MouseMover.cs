@@ -7,8 +7,15 @@ using System.Windows.Forms;
 
 namespace Spang_PC_C_sharp
 {
-    class MouseMover : IMessageHandler
+    class MouseMover
     {
+        private Phone phone;
+
+        public MouseMover(Phone phone)
+        {
+            // TODO: Complete member initialization
+            this.phone = phone;
+        }
        
         public void Decode(BinaryReader reader)
         {

@@ -53,10 +53,6 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MessageHandlerTest.cs" />
-    <Compile Include="MouseLeftClickerTest.cs" />
-    <Compile Include="MouseMoverTest.cs" />
-    <Compile Include="MouseRightClickerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
