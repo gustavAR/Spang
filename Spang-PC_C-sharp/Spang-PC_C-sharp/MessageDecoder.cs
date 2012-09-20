@@ -10,6 +10,10 @@ namespace Spang_PC_C_sharp
     {
         private IDictionary<byte, Action<BinaryReader>> handlers;
         private Phone phone;
+        public Phone Phone
+        {
+            set { this.phone = value; }
+        }
 
         public MessageDecoder()
         {
@@ -30,6 +34,7 @@ namespace Spang_PC_C_sharp
             this.handlers.Add(12, this.HandleHorizontalScroll);
             this.handlers.Add(13, this.HandlePressureUpdate);
             this.handlers.Add(14, this.HandleOrientationUpdate);
+            this.handlers.Add(15, this.HandleGPSUpdate);
         }
 
         public void DecodeMessage(byte[] message)
@@ -123,15 +128,14 @@ namespace Spang_PC_C_sharp
             this.phone.Orientation = ReadVector3(reader);
         }
 
+        private void HandleGPSUpdate(BinaryReader reader)
+        {
+            this.phone.GPSLocation = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+        }
+
         private Vector3 ReadVector3(BinaryReader reader)
         {
             return new Vector3 { X = reader.ReadSingle(), Y = reader.ReadSingle(), Z = reader.ReadSingle() };
-        }
-
-
-        public Phone Phone
-        {
-            set { this.phone = value; }
         }
     }
 }

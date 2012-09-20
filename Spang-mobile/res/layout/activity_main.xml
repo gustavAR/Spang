@@ -8,19 +8,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="21dp"
         android:onClick="sendData"
-        android:text="@string/button_send" />
-
+        android:text="MouseInput" />
+
     <EditText
         android:id="@+id/editText1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/button1"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="71dp"
+        android:layout_marginBottom="54dp"
         android:ems="10"
         android:inputType="text"
-        android:text="@string/default_ip" />
+        android:text="@string/default_ip" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/editText1"
+        android:layout_marginRight="38dp"
+        android:onClick="sendText"
+        android:text="TextSend" />
 
 </RelativeLayout>

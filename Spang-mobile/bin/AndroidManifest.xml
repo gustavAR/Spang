@@ -25,10 +25,20 @@
         </activity>
         <activity
             android:name=".MouseActivity"
-            android:label="@string/title_activity_mouse" android:parentActivityName="@string/title_activity_main"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_mouse"
+            android:parentActivityName="@string/title_activity_main"
             android:screenOrientation="landscape"
-			android:configChanges="keyboardHidden|orientation|screenSize" 
-			android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".TextSenderActivity"
+            android:label="@string/title_activity_text_sender" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

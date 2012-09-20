@@ -1,31 +1,35 @@
 package spang.mobile;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import network.Client;
 import network.IConnection;
 import network.NetworkException;
-import network.NotImplementedException;
 import android.app.Activity;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-import android.widget.ListView;
+import android.view.View;
+import android.widget.EditText;
 
-public class MouseActivity extends Activity {
+public class TextSenderActivity extends Activity {
+
 
 	private static final int PORT = 1337;
 	private String adress;
 	private IConnection connection;
 	
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_text_sender);
+        
         Intent intent = getIntent();
-
         this.adress = intent.getStringExtra("connection");
         
 		Client client = new Client();
@@ -35,23 +39,30 @@ public class MouseActivity extends Activity {
 		} catch (UnknownHostException e) {
 			throw new NetworkException(e);
 		}
-        
-		
-        MouseView mView = new MouseView(this, null, this.connection);
-       
-        setContentView(mView);
-        mView.setFocusableInTouchMode(true);
-        if(!mView.requestFocus())
-        	throw new NotImplementedException();
-          
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_mouse, menu);
+        getMenuInflater().inflate(R.menu.activity_text_sender, menu);
         return true;
     }
     
-  
+    public void sendText(View view) {
+    	EditText text = (EditText)this.findViewById(R.id.editText1);
+    	String toSend = text.getText().toString();
+    	
+    	ByteBuffer buffer = ByteBuffer.allocate(toSend.length() + 5).order(ByteOrder.LITTLE_ENDIAN);
+    	buffer.put((byte)10);
+    	
+    	buffer.putInt(toSend.length());
+    	try {
+			buffer.put(toSend.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	this.connection.sendUDP(buffer.array());
+    }
     
 }

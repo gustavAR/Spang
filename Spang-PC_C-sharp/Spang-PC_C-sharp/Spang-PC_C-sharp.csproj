@@ -63,18 +63,16 @@
     </Compile>
     <Compile Include="IConnection.cs" />
     <Compile Include="IMessageDecoder.cs" />
+    <Compile Include="KeyboardEventSender.cs" />
     <Compile Include="MessageDecoder.cs" />
-    <Compile Include="MouseClicker.cs" />
+    <Compile Include="MouseEventSender.cs" />
     <Compile Include="MouseMover.cs" />
-    <Compile Include="Pressure.cs" />
     <Compile Include="Phone.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scroller.cs" />
     <Compile Include="Server.cs" />
-    <Compile Include="UDPServer.cs" />
     <Compile Include="Vector3.cs" />
-    <Compile Include="Volume.cs" />
+    <Compile Include="VolumeChanger.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

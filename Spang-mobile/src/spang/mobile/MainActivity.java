@@ -36,4 +36,15 @@ public class MainActivity extends Activity {
     	intent.putExtra("connection", ip);
     	this.startActivity(intent);
     }
+    
+    public void sendText(View view){
+    	EditText text = (EditText)this.findViewById(R.id.editText1);
+    	String ip = text.getText().toString();
+    	
+    	Intent intent = new Intent(this, TextSenderActivity.class);
+    	intent.putExtra("connection", ip);
+    	this.startActivity(intent);
+    }
+    
+    
 }

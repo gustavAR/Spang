@@ -34,7 +34,7 @@ namespace Spang_PC_C_sharp
             Phone phone = new Phone(messageHandler);
             DesktopController controller = new DesktopController(phone);
 
-
+            
 
 
             while (true)

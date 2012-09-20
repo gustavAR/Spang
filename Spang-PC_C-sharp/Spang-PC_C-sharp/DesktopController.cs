@@ -26,6 +26,7 @@ namespace Spang_PC_C_sharp
             phone.VolumeDown += DecreaseVolume;
             phone.VerticalScroll += VerticalScroll;
             phone.Horizontalscroll += HorizontalScroll;
+            phone.NetworkedText += NetworkedText;
         }
 
         private void LeftClick()
@@ -42,12 +43,12 @@ namespace Spang_PC_C_sharp
 
         public void VerticalScroll(int delta)
         {
-            MouseEventSender.SendEvent(MouseEvent.MouseWheel, delta, 0);
+            MouseEventSender.SendEvent(MouseEvent.MouseHWheel, delta, 0);
         }
 
         public void HorizontalScroll(int delta)
         {
-            MouseEventSender.SendEvent(MouseEvent.MouseWheel, delta, 0x01000);
+            MouseEventSender.SendEvent(MouseEvent.MouseHWheel, delta, 0);
         }
 
         public void MoveMouse(int dx, int dy)
@@ -63,6 +64,14 @@ namespace Spang_PC_C_sharp
         public void DecreaseVolume()
         {
             VolumeChanger.DecreaseVolume();
+        }
+
+        public void NetworkedText(string text)
+        {
+            foreach (var item in text)
+            {
+                KeyboardEventSender.SendKey(item);
+            }
         }
 
     }

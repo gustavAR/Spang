@@ -44,6 +44,7 @@ namespace Spang_PC_C_sharp
         LeftUp = 0x04,
         RightDown = 0x08,
         RightUp = 0x10,
-        MouseWheel = 0x0800
+        MouseWheel = 0x0800,
+        MouseHWheel = 0x01000
     }
 }

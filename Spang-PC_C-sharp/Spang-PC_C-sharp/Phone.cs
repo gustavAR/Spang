@@ -261,8 +261,32 @@ namespace Spang_PC_C_sharp
         }
 
 
-        #endregion 
-    
+        #endregion   
 
+        #region GPS
+
+        private Vector2 gpsLocation;
+        public Vector2 GPSLocation
+        {
+            get { return this.gpsLocation; }
+
+            set
+            {
+                Vector2 temp = this.gpsLocation;
+                this.gpsLocation = value;
+                if (temp != this.gpsLocation)
+                    this.OnGPSLocationChanged(temp, this.gpsLocation);
+
+            }
+        }
+
+        public event Action<Vector2, Vector2> GPSLocationChanged;
+        private void OnGPSLocationChanged(Vector2 old, Vector2 current)
+        {
+            if (this.GPSLocationChanged != null)
+                this.GPSLocationChanged(old, current);
+        }
+
+        #endregion
     }
 }
