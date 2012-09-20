@@ -5,7 +5,6 @@ import java.nio.ByteOrder;
 
 import network.IConnection;
 import sensors.SensorProcessor;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,9 +18,10 @@ import android.view.MotionEvent;
 
 public class MouseView extends AbstractSpangView{
 	private final Paint paint = new Paint();
-	private final boolean multiTouchEnabled = Integer.parseInt(Build.VERSION.SDK) <= Build.VERSION_CODES.CUPCAKE;
-	
+	private final boolean multiTouchEnabled = Integer.parseInt(Build.VERSION.SDK) >= Build.VERSION_CODES.CUPCAKE;
+
 	private float xPos, yPos, radius;
+	private float xPosPrev, yPosPrev;
 
 	private boolean scrolling;
 
@@ -56,24 +56,49 @@ public class MouseView extends AbstractSpangView{
 		gestureDetector.onTouchEvent(event);
 		xPos = event.getX();
 		yPos = event.getY();
-		
 		radius = event.getPressure()*100;
-		byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-				.put((byte)13).putInt((int)radius).array();
-		connection.sendUDP(vertData);
 		
+		int eventID = event.getAction();
+		
+		byte[] pressureData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+				.put((byte)13).putInt((int)radius).array();
+		connection.sendUDP(pressureData);
+		
+		if(scrolling){
+			//Vertical Scroll
+			Log.d("MOTIONEVENT:", "onScroll");
+			byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+					.put((byte)11).putInt((int)(yPos - yPosPrev + 0.5f)).array();
+			connection.sendUDP(vertData);
+
+			//Horizontal Scroll
+			byte[] horiData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+					.put((byte)12).putInt((int)(xPos - xPosPrev + 0.5f)).array();
+			connection.sendUDP(horiData);
+		}
+		if((eventID & 0x000000ff) == MotionEvent.ACTION_POINTER_DOWN){
+			Log.d("MOTIONEVENT:", "ACTION_POINTER_DOWN");
+			scrolling=true;
+			return true;
+		} else if((eventID & 0x000000ff) == MotionEvent.ACTION_POINTER_UP){
+			Log.d("MOTIONEVENT:", "ACTION_POINTER_UP");
+			scrolling=false;
+			return true;
+		}
+
 		// Schedules a repaint.
 		invalidate();
+		
+		xPosPrev = xPos;
+		yPosPrev = yPos;
 		return true;
 	}
 
 	private GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
 
-		@SuppressLint("NewApi")
+
 		public boolean onDown(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onDown");
-			if(multiTouchEnabled && e.getPointerCount()==2)
-				scrolling=true;
 			return true;
 		}
 
@@ -91,24 +116,10 @@ public class MouseView extends AbstractSpangView{
 
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 				float distanceY) {
-			if(scrolling){
-				//Vertical Scroll
-				Log.d("MOTIONEVENT:", "onScroll");
-				byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-						.put((byte)11).putInt((int)distanceY).array();
-				connection.sendUDP(vertData);
-
-
-				//Horizontal Scroll
-				byte[] horiData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-						.put((byte)12).putInt((int)distanceX).array();
-				connection.sendUDP(horiData);
-			}else{
 				Log.d("MOTIONEVENT:", "dX = " + distanceX + "   dY = " + distanceY);
 				byte[] data = ByteBuffer.allocate(9).order(ByteOrder.LITTLE_ENDIAN)
-						.put((byte)2).putInt((int)distanceX).putInt((int)distanceY).array();
+						.put((byte)2).putInt((int)(distanceX + 0.5f)).putInt((int)(distanceY + 0.5f)).array();
 				connection.sendUDP(data);
-			}
 			return true;
 		}
 
