@@ -7,22 +7,6 @@ using CoreAudioApi;
 
 namespace Spang_PC_C_sharp
 {
-    class VolumeDown 
-    {
-        public void Decode(System.IO.BinaryReader reader)
-        {
-            VolumeChanger.DecreaseVolume();
-        }
-    }
-
-    class VolumeUP 
-    {
-        public void Decode(System.IO.BinaryReader reader)
-        {
-            VolumeChanger.IncreaseVolume();
-        }
-    }
-
     class VolumeChanger
     {
         private static MMDeviceEnumerator devEnum;

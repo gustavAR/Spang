@@ -8,48 +8,6 @@ using System.IO;
 namespace Spang_PC_C_sharp
 {
     /// <summary>
-    /// Class that handles a left mouse button click message
-    /// </summary>
-    class MouseLeftClicker
-    {
-        private readonly Phone phone;
-
-        public MouseLeftClicker(Phone phone)
-        {
-            this.phone = phone;
-        }
-        public void Decode(BinaryReader reader)
-        {
-            MouseEventSender.SendEvent(MouseEvent.LeftDown);
-            MouseEventSender.SendEvent(MouseEvent.LeftUp);
-
-            Console.WriteLine("Clicked left");
-        }
-
-    }
-
-    /// <summary>
-    /// Class that handles a right mouse button click message
-    /// </summary>
-    class MouseRightClicker
-    {
-        private readonly Phone phone;
-
-        public MouseRightClicker(Phone phone)
-        {
-            // TODO: Complete member initialization
-            this.phone = phone;
-        }
-        public void Decode(BinaryReader reader)
-        {
-            MouseEventSender.SendEvent(MouseEvent.RightDown);
-            MouseEventSender.SendEvent(MouseEvent.RightUp);
-
-            Console.WriteLine("Clicked right");
-        }
-    }
-
-    /// <summary>
     /// Class that sends mouse events to the operating system
     /// </summary>
     static class MouseEventSender
