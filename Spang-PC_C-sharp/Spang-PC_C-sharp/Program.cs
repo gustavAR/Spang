@@ -19,6 +19,7 @@ namespace Spang_PC_C_sharp
         /// </summary>
         static void Main()
         {
+            VolumeChanger.init();
             Server server = new Server();
             new Thread(() =>
             {
