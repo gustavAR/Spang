@@ -10,10 +10,12 @@ namespace Spang_PC_C_sharp
     class DesktopController
     {
         private readonly Phone phone;
+        private readonly OsInterface os;
 
-        public DesktopController(Phone phone)
+        public DesktopController(Phone phone, OsInterface os)
         {
             this.phone = phone;
+            this.os = os;
             this.RegisterEvents();
         }
 
@@ -31,24 +33,24 @@ namespace Spang_PC_C_sharp
 
         private void LeftClick()
         {
-            MouseEventSender.SendEvent(MouseEvent.LeftDown);
-            MouseEventSender.SendEvent(MouseEvent.LeftUp);
+            os.SendMouseEvent(MouseEvent.LeftDown);
+            os.SendMouseEvent(MouseEvent.LeftUp);
         }
 
         public void RightClick()
         {
-            MouseEventSender.SendEvent(MouseEvent.RightDown);
-            MouseEventSender.SendEvent(MouseEvent.RightUp);
+            os.SendMouseEvent(MouseEvent.RightDown);
+            os.SendMouseEvent(MouseEvent.LeftDown);
         }
 
         public void VerticalScroll(int delta)
         {
-            MouseEventSender.SendEvent(MouseEvent.MouseWheel, delta, 0);
+            os.SendMouseEvent(MouseEvent.MouseWheel, delta, 0);
         }
 
         public void HorizontalScroll(int delta)
         {
-            MouseEventSender.SendEvent(MouseEvent.MouseHWheel, delta, 0);
+            os.SendMouseEvent(MouseEvent.MouseHWheel, delta, 0);
         }
 
         public void MoveMouse(int dx, int dy)
@@ -58,19 +60,19 @@ namespace Spang_PC_C_sharp
 
         public void IncreaseVolume()
         {
-            VolumeChanger.IncreaseVolume();
+            os.IncreaseVolume();
         }
 
         public void DecreaseVolume()
         {
-            VolumeChanger.DecreaseVolume();
+            os.DecreaseVolume();
         }
 
         public void NetworkedText(string text)
         {
             foreach (var item in text)
             {
-                KeyboardEventSender.SendKey(item);
+                os.SendKey(item);
             }
         }
 

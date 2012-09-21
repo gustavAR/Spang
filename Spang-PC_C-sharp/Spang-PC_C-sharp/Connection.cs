@@ -9,12 +9,7 @@ using System.IO;
 namespace Spang_PC_C_sharp
 {	
     class Connection : IConnection 
-    {
-        //The lowest number a port can take without using reserved port numbers.
-	    private static int LOW_PORT = 1024;
-	    //The largest port number a port can take.
-	    private static int HIGH_PORT = 65536;
-   
+    {   
         private UdpClient udpSocket;
         private TcpClient tcpSocket;
         private IPEndPoint udpAddress;
