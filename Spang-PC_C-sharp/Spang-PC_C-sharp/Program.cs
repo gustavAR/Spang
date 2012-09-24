@@ -30,6 +30,8 @@ namespace Spang_PC_C_sharp
                         Phone phone = new Phone(messageHandler);
                         DesktopController controller = new DesktopController(phone, new OsInterface());
 
+                        phone.AccelerometerChanged += (o, n) => Console.WriteLine(n.ToString());
+
                         while (true)
                         {
                             byte[] data = connection.reciveUDP();

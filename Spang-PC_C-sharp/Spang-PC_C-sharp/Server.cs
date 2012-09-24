@@ -31,7 +31,10 @@ namespace Spang_PC_C_sharp
                     IPEndPoint localEndPoint = (IPEndPoint)tpcClient.Client.LocalEndPoint;
                     UdpClient udpClient = new UdpClient(new IPEndPoint(IPAddress.Any, localEndPoint.Port));
                     Connection connection = new Connection(tpcClient, udpClient, localEndPoint.Port);
-            
+
+                    tpcClient.ReceiveTimeout = 3000;
+                   
+
                     if (this.RecivedConnection != null)
                         this.RecivedConnection(connection);
                 }
