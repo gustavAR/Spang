@@ -9,9 +9,13 @@ using System.IO;
 namespace Spang_PC_C_sharp
 {	
     class Connection : IConnection 
-    {   
+    {
+        private const int BLOCK_TIMEOUT = 5000;
+
+
         private UdpClient udpSocket;
         private TcpClient tcpSocket;
+
         private IPEndPoint udpAddress;
         private IPEndPoint remoteEndPoint;
 
@@ -22,15 +26,17 @@ namespace Spang_PC_C_sharp
             this.udpAddress = new IPEndPoint(IPAddress.Any, port);
             this.remoteEndPoint = (IPEndPoint)tcpSocket.Client.RemoteEndPoint;
             udpClient.Connect(this.remoteEndPoint);
+            this.Timeout = BLOCK_TIMEOUT;
         }
 
         public void sendUDP(byte[] data)
         {
             udpSocket.Send(data, data.Length);
         }
-        
+
+
         public byte[] reciveUDP()
-        {
+        {                 
             return udpSocket.Receive(ref udpAddress);
         }
 
@@ -59,6 +65,26 @@ namespace Spang_PC_C_sharp
             stream.Read(data, 0, length);
 
             return data;
-        } 
+        }
+
+
+        public int Timeout
+        {
+            get
+            {
+                return this.tcpSocket.ReceiveTimeout;
+            }
+            set
+            {
+                this.tcpSocket.ReceiveTimeout = value;
+                this.tcpSocket.SendTimeout = value;
+            }
+        }
+
+        public void Close()
+        {
+            this.udpSocket.Close();
+            this.tcpSocket.Close();
+        }
     }
 }

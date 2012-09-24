@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncConnection.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="DesktopController.cs" />
     <Compile Include="Form1.cs">
@@ -62,6 +63,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="IConnection.cs" />
+    <Compile Include="IEndpoint.cs" />
     <Compile Include="IMessageDecoder.cs" />
     <Compile Include="MessageDecoder.cs" />
     <Compile Include="OsInterface.cs" />
