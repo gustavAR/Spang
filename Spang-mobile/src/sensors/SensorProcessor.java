@@ -6,6 +6,7 @@ import java.util.List;
 
 import network.IConnection;
 import android.content.Context;
+import android.hardware.SensorManager;
 
 /**
  * Class used to communicate sensor input with other parts of the system.
@@ -16,9 +17,11 @@ public class SensorProcessor {
 	private List<ISensor> sensors = new ArrayList<ISensor>();
 	private ByteBuffer encodedSensorInput; 
 	private IConnection connection;
+	private SensorManager manager;
 
 	public SensorProcessor(Context context, IConnection connection) {
-		SensorListBuilder builder = new SensorListBuilder(context);
+		this.manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE); 
+		SensorListBuilder builder = new SensorListBuilder(this.manager);
 		this.sensors = builder.build();
 		this.connection = connection;	
 	}

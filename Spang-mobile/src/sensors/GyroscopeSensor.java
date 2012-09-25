@@ -2,7 +2,6 @@ package sensors;
 
 import java.nio.ByteBuffer;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -15,13 +14,13 @@ import android.hardware.SensorManager;
  */
 public class GyroscopeSensor implements ISensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_GYROSCOPE;
-	public static final byte ENCODE_ID = 0x04;
 	public static final int VALUES_LENGTH = 3;
 	public static final int ENCODED_LENGTH = VALUES_LENGTH * 4 + 1;
 
 	private float[] values = new float[3];
 	private int accuracy;
 	private boolean isActive;
+	private byte encodeID;
 
 	private SensorManager sensorManager;
 	private Sensor sensor;
@@ -31,11 +30,10 @@ public class GyroscopeSensor implements ISensor {
 	 * If the device has no gyroscope sensor, a NoSensorException is thrown.
 	 * @param context
 	 */
-	public GyroscopeSensor(Context context) {
-		this.sensorManager = (SensorManager) context
-				.getSystemService(Context.SENSOR_SERVICE);
-		this.sensor = sensorManager
-				.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+	public GyroscopeSensor(SensorManager manager, byte encodeID) {
+		this.sensorManager = manager;
+		this.sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+		this.encodeID = encodeID;
 
 		if (this.sensor == null) {
 			throw new NoSensorException("Device has no Gyroscope-sensor");
@@ -107,7 +105,7 @@ public class GyroscopeSensor implements ISensor {
 	 * {@inheritDoc}
 	 */
 	public void encode(ByteBuffer buffer) {
-		buffer.put(ENCODE_ID)
+		buffer.put(encodeID)
 					.putFloat(this.values[0]).putFloat(this.values[1]).putFloat(this.values[2]);
 	}
 	

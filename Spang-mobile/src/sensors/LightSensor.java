@@ -2,7 +2,6 @@ package sensors;
 
 import java.nio.ByteBuffer;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -15,27 +14,28 @@ import android.hardware.SensorManager;
  */
 public class LightSensor implements ISensor {
 	public static final int SENSOR_TYPE = Sensor.TYPE_LIGHT; 
-	public static final byte ENCODE_ID = 0x04;
 	public static final int VALUES_LENGTH = 1;
 	public static final int ENCODED_LENGTH = VALUES_LENGTH * 4 + 1; 
 	
 	private float[] values = new float[1];
 	private int accuracy;
 	private boolean isActive;
+	private byte encodeID;
 	
-	private SensorManager lSensorManager;
-	private Sensor lSensor;
+	private SensorManager sensorManager;
+	private Sensor sensor;
 	
 	/**
 	 * Doesn't start listening to the sensor. Only gets the light-sensor from the device.
 	 * If the device has no light sensor, a NoSensorException is thrown.
 	 * @param context
 	 */
-	public LightSensor(Context context) {
-		this.lSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-		this.lSensor = lSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+	public LightSensor(SensorManager manager, byte encodeID) {
+		this.sensorManager = manager;
+		this.sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+		this.encodeID = encodeID;
 		
-		if(this.lSensor == null) {
+		if(this.sensor == null) {
 			throw new NoSensorException("Device has no light-sensor");
 		}
 	}
@@ -44,7 +44,7 @@ public class LightSensor implements ISensor {
 	 */	
 	
 	public void start() {
-		lSensorManager.registerListener(this, lSensor, SensorManager.SENSOR_DELAY_NORMAL);
+		sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
 		this.isActive = true;
 	}
 	
@@ -53,7 +53,7 @@ public class LightSensor implements ISensor {
 	 */	
 	
 	public void stop() {
-		lSensorManager.unregisterListener(this);
+		sensorManager.unregisterListener(this);
 		this.isActive = false;
 	}
 
@@ -111,7 +111,7 @@ public class LightSensor implements ISensor {
 	 * {@inheritDoc}
 	 */
 	public void encode(ByteBuffer buffer) {
-		buffer.put(ENCODE_ID)
+		buffer.put(encodeID)
 					.putFloat(this.values[0]);
 	}
 	

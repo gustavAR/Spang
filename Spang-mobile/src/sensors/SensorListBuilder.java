@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
@@ -16,23 +16,22 @@ import android.hardware.SensorManager;
 public class SensorListBuilder {
 	private List<ISensor> sensorList = new ArrayList<ISensor>();
 	private SensorManager manager;
+	@SuppressLint("UseSparseArrays")
 	private Map<Integer, ISensor> sensorBindings = new HashMap<Integer, ISensor>();
 
 	/**
 	 * For each new sensor, a binding must be created in the sensorBindings map. 
 	 * @param context
 	 */
-	public SensorListBuilder(Context context) {
-		this.manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE); 
-
-		
+	public SensorListBuilder(SensorManager manager) {
+	
 		if(this.manager.getDefaultSensor(LinearAccelerationSensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(LinearAccelerationSensor.SENSOR_TYPE, new LinearAccelerationSensor(context));
+			sensorBindings.put(LinearAccelerationSensor.SENSOR_TYPE, new LinearAccelerationSensor(manager, (byte) 0x03));
 		if(this.manager.getDefaultSensor(LightSensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(LightSensor.SENSOR_TYPE, new LightSensor(context));
+			sensorBindings.put(LightSensor.SENSOR_TYPE, new LightSensor(manager, (byte) 0x04));
 
 		//		sensorBindings.put(Sensor.TYPE_MAGNETIC_FIELD, new MagneticFieldSensor(context));
-		//		sensorBindings.put(Sensor.TYPE_GYROSCOPE, new GyroscopeSensor(context));
+		//		sensorBindings.put(Sensor.TYPE_GYROSCOPE, new GyroscopeSensor(context, (byte) 0x05));
 
 	}
 
