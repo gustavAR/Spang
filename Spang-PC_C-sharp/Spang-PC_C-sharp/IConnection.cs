@@ -2,34 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net;
 
 namespace Spang_PC_C_sharp
 {
     interface IConnection
     {
-        /*
-         * Sends the supplied data using the UDP-protocol. 
-         * @param data the data to be sent.
-         */
-        void sendUDP(byte[] data);
+        /// <summary>
+        /// Send a message using the UDP-protocoll.
+        /// </summary>
+        /// <param name="data">The Message</param>
+        void SendUDP(byte[] data);
 
-        /*
-         * Sends the supplied data using the TCP-protocol.
-         * @param data
-         */
-        void sendTCP(byte[] data);
+        /// <summary>
+        /// Send a message using the TCP-protocoll.
+        /// </summary>
+        /// <param name="data">The message</param>
+        void SendTCP(byte[] data);
 
-        /*
-         * Receives an array of byte data from the UDP-protocol.
-         * @return the array of byte that was sent over the network.
-         */
-        byte[] reciveUDP();
+        /// <summary>
+        /// Recives a UDP message.
+        /// </summary>
+        /// <returns>The message recived.</returns>
+        byte[] ReciveUDP();
 
-        /*
-         * Receives an array of byte data from the TCP-protocol.
-         * @return the array of byte that was sent over the network.
-         */
-        byte[] reciveTCP();
+        /// <summary>
+        /// Recives a TCP message.
+        /// </summary>
+        /// <returns>The message recived.</returns>
+        byte[] ReciveTCP();
 
         /// <summary>
         /// Gets or sets the time TCP send/recive will block.
@@ -40,6 +41,21 @@ namespace Spang_PC_C_sharp
         /// Closes the connection.
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// Gets the connected status.
+        /// </summary>
+        bool Connected { get; }
+
+        /// <summary>
+        /// The remote endpoint the connection is connected to.
+        /// </summary>
+        IPEndPoint RemoteEndPoint { get; }
+
+        /// <summary>
+        /// The local endpoint the connection is connected from.
+        /// </summary>
+        IPEndPoint LocalEndPoint { get; }
     }
 }
 

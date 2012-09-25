@@ -8,58 +8,80 @@ using System.IO;
 
 namespace Spang_PC_C_sharp
 {	
-    class Connection : IConnection 
+    /// <summary>
+    /// Syncronized implementation of IConnection.
+    /// </summary>
+    sealed class Connection : IConnection 
     {
-        private const int BLOCK_TIMEOUT = 5000;
+        //The default timeout.
+        private const int DEFAULT_TIMEOUT = 5000;
 
+        //Sockets used.
+        private readonly UdpClient udpSocket;
+        private readonly TcpClient tcpSocket;
 
-        private UdpClient udpSocket;
-        private TcpClient tcpSocket;
-
+        //Helper variables for udp sending and receiving.
         private IPEndPoint udpAddress;
-        private IPEndPoint remoteEndPoint;
 
-        public Connection(TcpClient tpcClient, UdpClient udpClient, int port)
+        /// <summary>
+        /// Creates a connection.
+        /// </summary>
+        /// <param name="tcpClient">The TcpClient used.</param>
+        /// <param name="udpClient">The UdpClient used.</param>
+        internal Connection(TcpClient tcpClient, UdpClient udpClient)
         {
-            this.tcpSocket = tpcClient;
+            //This connection assumes that the udp and tcp messges arrives on the same port.
+            if (((IPEndPoint)tcpClient.Client.LocalEndPoint).Port !=
+               ((IPEndPoint)udpClient.Client.LocalEndPoint).Port)
+                throw new ArgumentException("The tcpClient and udpClient must be bound on the same port!");
+
+            this.tcpSocket = tcpClient;
             this.udpSocket = udpClient;
-            this.udpAddress = new IPEndPoint(IPAddress.Any, port);
-            this.remoteEndPoint = (IPEndPoint)tcpSocket.Client.RemoteEndPoint;
-            udpClient.Connect(this.remoteEndPoint);
-            this.Timeout = BLOCK_TIMEOUT;
+            this.Timeout = DEFAULT_TIMEOUT;
+
+            this.udpAddress = new IPEndPoint(IPAddress.Any, this.LocalEndPoint.Port);
         }
 
-        public void sendUDP(byte[] data)
+        /// <summary>
+        /// <see cref="IConnection.SendUDP(byte[])"/>
+        /// </summary>
+        public void SendUDP(byte[] data)
         {
             udpSocket.Send(data, data.Length);
         }
 
 
-        public byte[] reciveUDP()
+        /// <summary>
+        /// <see cref="IConnection.ReciveUDP()"/>
+        /// </summary>
+        public byte[] ReciveUDP()
         {                 
             return udpSocket.Receive(ref udpAddress);
         }
-
-        public void reconnect()
-        {
-            this.udpSocket.Connect(remoteEndPoint);
-            this.tcpSocket.Connect(remoteEndPoint);
-        }
-
-        public void sendTCP(byte[] data)
+        
+        /// <summary>
+        /// <see cref="IConnection.SendTCP"/>
+        /// </summary>
+        public void SendTCP(byte[] data)
         {
             Stream stream = tcpSocket.GetStream();
+
+            //Tcp messages are prefixed with the length.
+            //Writes the length befoure sending the message.
             stream.WriteByte((byte)((data.Length >> 8) & 0xFF));
             stream.WriteByte((byte)(data.Length & 0xFF));
+            
             stream.Write(data, 0, data.Length);
+            stream.Flush();
         }
 
-        public byte[] reciveTCP()
+        /// <summary>
+        /// <see cref="IConnection.ReciveTCP"/>
+        /// </summary>
+        public byte[] ReciveTCP()
         {
             Stream stream = tcpSocket.GetStream();
-            int b1 = stream.ReadByte();
-            int b2 = stream.ReadByte();
-            int length = (b1 << 8) | b2;
+            int length = this.ReadLength(stream);
 
             byte[] data = new byte[length];
             stream.Read(data, 0, length);
@@ -67,7 +89,22 @@ namespace Spang_PC_C_sharp
             return data;
         }
 
+        private int ReadLength(Stream stream)
+        {
 
+            int b1 = stream.ReadByte();
+            int b2 = stream.ReadByte();
+            //If the stream cant be read from -1 is read.
+            //when this happens we can no longer read data from the socket
+            if (b1 == -1 || b2 == -1)
+                throw new IOException("The socket cannot be read from");
+            
+            return (b1 << 8) | b2;
+        }
+
+        /// <summary>
+        /// <see cref="IConnection.Timeout"/>
+        /// </summary>
         public int Timeout
         {
             get
@@ -81,10 +118,41 @@ namespace Spang_PC_C_sharp
             }
         }
 
+        /// <summary>
+        /// <see cref="IConnection.Close"/>
+        /// </summary>
         public void Close()
         {
             this.udpSocket.Close();
             this.tcpSocket.Close();
         }
+
+        /// <summary>
+        /// <see cref="IConnection.Connected"/>
+        /// </summary>
+        public bool Connected
+        {
+            get 
+            {
+                return this.tcpSocket.Connected;
+            }
+        }
+
+        /// <summary>
+        /// <see cref="IConnection.RemoteEndPoint"/>
+        /// </summary>
+        public IPEndPoint RemoteEndPoint
+        {
+            get { return (IPEndPoint)this.tcpSocket.Client.RemoteEndPoint; }
+        }
+
+        /// <summary>
+        /// <see cref="IConnection.LocalEndPoint"/>
+        /// </summary>
+        public IPEndPoint LocalEndPoint
+        {
+            get { return (IPEndPoint)this.tcpSocket.Client.LocalEndPoint; }
+        }
+
     }
 }

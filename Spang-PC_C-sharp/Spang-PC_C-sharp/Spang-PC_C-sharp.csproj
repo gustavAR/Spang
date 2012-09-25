@@ -53,7 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncConnection.cs" />
+    <Compile Include="Client.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="DesktopController.cs" />
     <Compile Include="Form1.cs">
@@ -65,7 +65,9 @@
     <Compile Include="IConnection.cs" />
     <Compile Include="IEndpoint.cs" />
     <Compile Include="IMessageDecoder.cs" />
+    <Compile Include="IServerConnection.cs" />
     <Compile Include="MessageDecoder.cs" />
+    <Compile Include="Network.cs" />
     <Compile Include="OsInterface.cs" />
     <Compile Include="Phone.cs" />
     <Compile Include="Program.cs" />
@@ -73,6 +75,9 @@
     <Compile Include="Server.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
+    <Compile Include="Workers\TcpWorker.cs" />
+    <Compile Include="Workers\UdpWorker.cs" />
+    <Compile Include="Workers\Worker.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

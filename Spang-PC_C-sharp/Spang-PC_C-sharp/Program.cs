@@ -40,12 +40,9 @@ namespace Spang_PC_C_sharp
 
 
 
-            IMessageDecoder messageHandler = new MessageDecoder();
-            Phone phone = new Phone(messageHandler);
-            DesktopController controller = new DesktopController(phone, new OsInterface());
-            bool reconnectNeeded = false;
+        /*  bool reconnectNeeded = false;
 
-            IEndpoint endpoint = new CEndPoint();
+            CEndPoint endpoint = new CEndPoint();
             endpoint.Connected += () => Console.WriteLine("Just Conencted!");
             endpoint.Dissconnected += () => 
             {
@@ -66,16 +63,44 @@ namespace Spang_PC_C_sharp
                     reconnectNeeded = false;
                     connect(endpoint);
                 }
-            }
-            
+            }*/
+
+            IMessageDecoder messageHandler = new MessageDecoder();
+            Phone phone = new Phone(messageHandler);
+            DesktopController controller = new DesktopController(phone, new OsInterface());
+
+            IServer server = new Server();
+
+            server.Start(1337);
+            server.Timeout = 2000000;
+
+            server.Connected += (x) => Console.WriteLine("A connection was recived");
+            server.Recived += (x, message) =>
+            {
+                Console.WriteLine("Recived message from Connection {0} ", x);
+                messageHandler.DecodeMessage(message);
+            };
+
+            OpenClient(0);
+          //  OpenClient(1);
+
         }
 
-
-        private static void connect(IEndpoint endpoint)
+        private static void OpenClient(int id)
         {
-            endpoint.ReviceConnection(1337);
-            endpoint.Timeout = 0;
-            endpoint.StartReceiving();
+            IClient client = new Client();
+            client.Timeout = 5000;
+
+            client.Connected += () => Console.WriteLine("Client connected! " + id);
+            client.Dissconnected += () => Console.WriteLine("Client Dced" + id);
+            client.Recived += (x) =>
+            {
+                if (x[0] == 0)
+                    Console.WriteLine("Got a heartbeat " + id);
+            };
+
+            client.Connect(1337, "192.168.0.12");
+            client.Start();
         }
     }
 }
