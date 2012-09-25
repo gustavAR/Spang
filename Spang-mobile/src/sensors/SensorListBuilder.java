@@ -14,16 +14,17 @@ import android.hardware.SensorManager;
  *
  */
 public class SensorListBuilder {
-	private List<ISensor> sensorList = new ArrayList<ISensor>();
-	private SensorManager manager;
+	private final List<ISensor> sensorList = new ArrayList<ISensor>();
+	private final SensorManager manager;
 	@SuppressLint("UseSparseArrays")
-	private Map<Integer, ISensor> sensorBindings = new HashMap<Integer, ISensor>();
+	private final Map<Integer, ISensor> sensorBindings = new HashMap<Integer, ISensor>();
 
 	/**
 	 * For each new sensor, a binding must be created in the sensorBindings map. 
 	 * @param context
 	 */
 	public SensorListBuilder(SensorManager manager) {
+		this.manager = manager;
 	
 		if(this.manager.getDefaultSensor(LinearAccelerationSensor.SENSOR_TYPE)!=null)
 			sensorBindings.put(LinearAccelerationSensor.SENSOR_TYPE, new LinearAccelerationSensor(manager, (byte) 0x03));

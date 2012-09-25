@@ -11,24 +11,28 @@ import android.hardware.SensorManager;
 /**
  * Class used to communicate sensor input with other parts of the system.
  * @author Pontus Pall & Gustav Alm Rosenblad
- *
  */
 public class SensorProcessor {
+	private static final int STANDARD_SAMPLING_RATE = 20;
+	
 	private List<ISensor> sensors = new ArrayList<ISensor>();
 	private ByteBuffer encodedSensorInput; 
 	private IConnection connection;
 	private SensorManager manager;
+	private int samplingRate;
 
 	public SensorProcessor(Context context, IConnection connection) {
 		this.manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE); 
 		SensorListBuilder builder = new SensorListBuilder(this.manager);
 		this.sensors = builder.build();
 		this.connection = connection;	
+		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
+		this.samplingRate = STANDARD_SAMPLING_RATE;
 	}
 
 	/**
 	 * Starts a thread which processes the input from all active sensors 
-	 * approximately 60 times per second.
+	 * with a specific sampling rate.
 	 */
 	public void startProcess() {
 		Runnable runnable = new Runnable() {
@@ -36,7 +40,7 @@ public class SensorProcessor {
 				while(true){
 					processInput();
 					try {
-						Thread.sleep(17);
+						Thread.sleep(samplingRate);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -68,10 +72,7 @@ public class SensorProcessor {
 	 * Updates the value of getEncodedSensorInput();
 	 */
 	private void processInput() {
-		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
-		
 		fillOutput();
-
 		this.connection.sendUDP(encodedSensorInput.array());
 	}
 
@@ -83,6 +84,9 @@ public class SensorProcessor {
 		}
 	}
 
+	/**
+	 * @return the length of the output of all used sensors.
+	 */
 	private int getOutputLength() {
 		int totalEncodedLength = 0;
 
@@ -92,5 +96,20 @@ public class SensorProcessor {
 			}
 		}
 		return totalEncodedLength;
+	}
+
+	/**
+	 * @return The sampling rate of the processor. 
+	 */
+	public int getSamplingRate() {
+		return samplingRate;
+	}
+
+	/**
+	 * Sets the sampling rate to a new value.
+	 * @param samplingRate the new sampling rate.
+	 */
+	public void setSamplingRate(int samplingRate) {
+		this.samplingRate = samplingRate;
 	}
 }
