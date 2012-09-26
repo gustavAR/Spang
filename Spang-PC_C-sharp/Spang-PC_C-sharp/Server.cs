@@ -23,7 +23,7 @@ namespace Spang_PC_C_sharp
         /// Gets or Sets the time a connection will wait for a 
         /// message without dissconnecting (milliseconds).
         /// <remarks>
-        /// If timeout is 0 it never disconnection.
+        /// If timeout is 0 it never disconnects.
         /// However then it cannot detect connection faliures.
         /// 5-15 sec is a good Timeout range.
         /// </remarks>
@@ -170,6 +170,7 @@ namespace Spang_PC_C_sharp
         public Server()
         {
             this.connections = new ConcurrentDictionary<int, IServerConnection>();
+            this.heartbeatInterval = 1000;
         }
 
         public void Start(int port)
@@ -269,6 +270,7 @@ namespace Spang_PC_C_sharp
         {
             if (IsHeartbeat(bytes))
             {
+                Console.WriteLine("Server got a heartbeat from {0}", connectionID);
                 return;
             }
             if (IsSystemMessage(bytes))

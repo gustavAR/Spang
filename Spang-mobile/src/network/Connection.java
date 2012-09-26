@@ -1,12 +1,18 @@
 package network;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
@@ -29,18 +35,6 @@ public class Connection implements IConnection {
 	{
 		this.tcpSocket = tcpSocket;
 		this.udpSocket = udpSocket;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */	
-	public void reconnect() {		
-		try {
-			this.tcpSocket.connect(this.tcpSocket.getRemoteSocketAddress());
-			this.udpSocket.connect(this.tcpSocket.getRemoteSocketAddress());
-		} catch (IOException e) {
-			throw new NetworkException();
-		}
 	}
 	
 	/**
@@ -113,5 +107,90 @@ public class Connection implements IConnection {
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isConnected() {
+		return this.tcpSocket.isConnected();
+	}
+
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setTimeout(int value) {
+		try {
+			this.tcpSocket.setSoTimeout(value);
+		} catch (SocketException e) {
+			//This exception should never be raised.
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getTimeout() {
+		try {
+			return this.tcpSocket.getSoTimeout();
+		} catch (SocketException e) {
+			//This exception should never be raised.
+			e.printStackTrace();
+			return 0;
+		}	
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public InetSocketAddress getRemoteEndPoint() {
+		return (InetSocketAddress) this.tcpSocket.getRemoteSocketAddress();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public InetSocketAddress getLocalEndPoint() {
+		return (InetSocketAddress) this.tcpSocket.getLocalSocketAddress();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void close() {
+		try {
+			this.tcpSocket.close();
+			this.udpSocket.close();
+		} catch (IOException e) {
+			throw new NetworkException("Failed to close the connection!");			
+		}
+	}
+	
+	public static IConnection connectTO(InetSocketAddress address) {
+		try {
+			Socket tcpSocket = new Socket(address.getAddress(), address.getPort());						
+			int localPort = tcpSocket.getLocalPort();
+			
+			DatagramSocket udpSocket = new DatagramSocket(localPort);
+		
+			int udpPort = readOutgoingUdpPort(tcpSocket);
+			//Connects the udpSocket to the correct receiving UDP-connection.
+			udpSocket.connect(tcpSocket.getInetAddress(), udpPort);		
+			
+			return new Connection(tcpSocket, udpSocket);
+			
+		} catch(Exception e) {
+			throw new NetworkException("Could not connect to " + address.getAddress() + " at port" + address.getPort(), e);
+		}		
+	}
+	
+	private static int readOutgoingUdpPort(Socket tcpSocket) throws IOException {
+		InputStream stream = new DataInputStream(tcpSocket.getInputStream());
+		//The format of the sent integer is little-endian so we convert it using a ByteBuffer.
+		ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
+		stream.read(buffer.array(),0, 4);
+		return buffer.getInt();
 	}
 }

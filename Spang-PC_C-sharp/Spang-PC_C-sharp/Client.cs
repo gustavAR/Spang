@@ -17,7 +17,7 @@ namespace Spang_PC_C_sharp
     interface IClient
     {
         /// <summary>
-        /// Gets the connection status of the IEndpoint.
+        /// Gets the connection status of the client.
         /// </summary>
         bool IsConnected { get; }
 
@@ -112,8 +112,6 @@ namespace Spang_PC_C_sharp
         /// </summary>
         private void Connect(IPEndPoint endpoint, bool reconnected)
         {
-            //If we are connected we need to terminate the current connection
-            //so that we can connect to a new one.
             if (connection != null)
                 throw new ArgumentException("We are already connected. Can't connect while connected");
 
@@ -165,14 +163,18 @@ namespace Spang_PC_C_sharp
             {
                 try
                 {
+                    Console.WriteLine("Trying to recconntect to " + this.connection.RemoteEndPoint);
                     //Connect to the last open connection.
                     this.Connect(this.connection.RemoteEndPoint, true);
+                    return;
                 }
                 catch (Exception)
                 {
-                    throw;
+                    Console.WriteLine("Failed to reconnect {0} retrying...",i);
                 }
             }
+
+            throw new Exception("Could not reconnect");
         }
 
         public void Disconnect()

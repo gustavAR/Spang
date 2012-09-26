@@ -40,11 +40,15 @@ namespace Spang_PC_C_sharp
             UdpClient udpClient = new UdpClient(new IPEndPoint(IPAddress.Any, 0));
             udpClient.Connect((IPEndPoint)tcpClient.Client.RemoteEndPoint);
 
+            Console.WriteLine("Connection recived!");
+
             //Writes the local udp port to the connection.
             //This is done so that the other end can configure it's Udp socket.
             BinaryWriter writer = new BinaryWriter(tcpClient.GetStream());
             writer.Write(((IPEndPoint)udpClient.Client.LocalEndPoint).Port);
             writer.Flush();
+
+            Console.WriteLine("Stil here");
 
             return new Connection(tcpClient, udpClient);            
         }

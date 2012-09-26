@@ -14,7 +14,7 @@ namespace Spang_PC_C_sharp
     {
         //Used to stop doing work.
         //Since multible threads can acces it it is volatile.
-        private volatile bool stopWorking;
+        protected volatile bool stopWorking;
 
         /// <summary>
         /// Starts doing work.

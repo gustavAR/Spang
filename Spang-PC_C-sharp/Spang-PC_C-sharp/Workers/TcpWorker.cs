@@ -9,7 +9,7 @@ namespace Spang_PC_C_sharp
     class TcpWorker : ContinuousWorker
     {
         //The connection used.
-        protected readonly IConnection connection;
+        private readonly IConnection connection;
 
         /// <summary>
         /// Invoked when a message arrives.

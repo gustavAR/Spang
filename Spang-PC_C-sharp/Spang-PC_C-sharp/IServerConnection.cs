@@ -25,6 +25,7 @@ namespace Spang_PC_C_sharp
         private UdpWorker uworker;
         private TcpWorker tworker;
         
+
         public ServerConnection(IConnection connection, Server server, int id)
         {
             this.server = server;

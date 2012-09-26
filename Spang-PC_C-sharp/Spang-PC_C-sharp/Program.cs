@@ -25,17 +25,18 @@ namespace Spang_PC_C_sharp
             DesktopController controller = new DesktopController(phone, new OsInterface());
 
             IServer server = new Server();
+            server.ConnectionTimeout = 5000;
 
             server.Start(1337);
 
             server.Connected += (x, y) => Console.WriteLine("A connection was recived");
             server.Recived += (x, message) =>
             {
-               // Console.WriteLine("Recived message from {0} of length {1}", x, message.Length);
-                
+                Console.WriteLine("Recived message from {0} of length {1}", message.ID, message.Data.Length);
                 messageHandler.DecodeMessage(message.Data);
             };
             server.Dissconnected += (x, y) => Console.WriteLine("Oh no we dced ;(");
+
 /*
             Thread.Sleep(2000);
 

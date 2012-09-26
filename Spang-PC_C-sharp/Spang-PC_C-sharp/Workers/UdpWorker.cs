@@ -34,6 +34,7 @@ namespace Spang_PC_C_sharp
             {
                 //Recives and sends the udp message.
                 byte[] bytes = connection.ReciveUDP();
+                
                 if (this.Recive != null)
                     this.Recive(bytes);
             }
