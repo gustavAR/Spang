@@ -19,51 +19,6 @@ namespace Spang_PC_C_sharp
         /// </summary>
         static void Main()
         {
-            /*Server server = new Server();
-            server.RecivedConnection += (connection) =>
-                {
-                    new Thread(() =>
-                    {
-                        Console.WriteLine("Recived connection!");
-                        phone.AccelerometerChanged += (o, n) => Console.WriteLine(n.ToString());
-
-                        while (true)
-                        {
-                            byte[] data = connection.reciveUDP();
-                            phone.ProcessMessage(data);
-                        }
-
-                    }).Start();
-                };
-
-            server.Start(PORT);*/
-
-
-
-        /*  bool reconnectNeeded = false;
-
-            CEndPoint endpoint = new CEndPoint();
-            endpoint.Connected += () => Console.WriteLine("Just Conencted!");
-            endpoint.Dissconnected += () => 
-            {
-                Console.WriteLine("Just dissconnected. Reconecting...");
-                reconnectNeeded = true;
-            };
-            endpoint.Recived += (message) =>
-            {
-                messageHandler.DecodeMessage(message);
-            };
-
-            connect(endpoint);
-            while (true)
-            {
-                Thread.Sleep(10);
-                if (reconnectNeeded)
-                {
-                    reconnectNeeded = false;
-                    connect(endpoint);
-                }
-            }*/
 
             IMessageDecoder messageHandler = new MessageDecoder();
             Phone phone = new Phone(messageHandler);
@@ -72,24 +27,39 @@ namespace Spang_PC_C_sharp
             IServer server = new Server();
 
             server.Start(1337);
-            server.Timeout = 2000000;
 
             server.Connected += (x) => Console.WriteLine("A connection was recived");
             server.Recived += (x, message) =>
             {
-                Console.WriteLine("Recived message from Connection {0} ", x);
+               // Console.WriteLine("Recived message from {0} of length {1}", x, message.Length);
+                
                 messageHandler.DecodeMessage(message);
             };
+            server.Dissconnected += (x) => Console.WriteLine("Oh no we dced ;(");
+/*
+            Thread.Sleep(2000);
 
-            OpenClient(0);
-          //  OpenClient(1);
+            IClient client0 = OpenClient(0);
+            IClient client1 = OpenClient(1);
+
+           // client1.SendUDP(new byte[] { 123, 10, 231 });
+
+            while (true)
+            {
+               client0.SendUDP(new byte[] { 0, 2, 21, 1 });
+               client1.SendUDP(new byte[] { 0, 1, 2, 3, 4 });
+                Thread.Sleep(100);
+            } */
+
+            
+            
 
         }
 
-        private static void OpenClient(int id)
+        private static IClient OpenClient(int id)
         {
             IClient client = new Client();
-            client.Timeout = 5000;
+            client.Timeout = 1;
 
             client.Connected += () => Console.WriteLine("Client connected! " + id);
             client.Dissconnected += () => Console.WriteLine("Client Dced" + id);
@@ -97,10 +67,14 @@ namespace Spang_PC_C_sharp
             {
                 if (x[0] == 0)
                     Console.WriteLine("Got a heartbeat " + id);
+                else
+                    Console.WriteLine(":O jsut got udp message");
             };
 
             client.Connect(1337, "192.168.0.12");
             client.Start();
+
+            return client;
         }
     }
 }

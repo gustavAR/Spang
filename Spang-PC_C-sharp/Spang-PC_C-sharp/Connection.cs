@@ -30,16 +30,12 @@ namespace Spang_PC_C_sharp
         /// <param name="udpClient">The UdpClient used.</param>
         internal Connection(TcpClient tcpClient, UdpClient udpClient)
         {
-            //This connection assumes that the udp and tcp messges arrives on the same port.
-            if (((IPEndPoint)tcpClient.Client.LocalEndPoint).Port !=
-               ((IPEndPoint)udpClient.Client.LocalEndPoint).Port)
-                throw new ArgumentException("The tcpClient and udpClient must be bound on the same port!");
-
             this.tcpSocket = tcpClient;
             this.udpSocket = udpClient;
-            this.Timeout = DEFAULT_TIMEOUT;
+            this.ReciveTimeout = DEFAULT_TIMEOUT;
+            this.SendTimeout = DEFAULT_TIMEOUT;
 
-            this.udpAddress = new IPEndPoint(IPAddress.Any, this.LocalEndPoint.Port);
+            this.udpAddress = new IPEndPoint(IPAddress.Any, ((IPEndPoint)this.udpSocket.Client.LocalEndPoint).Port);
         }
 
         /// <summary>
@@ -91,7 +87,6 @@ namespace Spang_PC_C_sharp
 
         private int ReadLength(Stream stream)
         {
-
             int b1 = stream.ReadByte();
             int b2 = stream.ReadByte();
             //If the stream cant be read from -1 is read.
@@ -100,22 +95,6 @@ namespace Spang_PC_C_sharp
                 throw new IOException("The socket cannot be read from");
             
             return (b1 << 8) | b2;
-        }
-
-        /// <summary>
-        /// <see cref="IConnection.Timeout"/>
-        /// </summary>
-        public int Timeout
-        {
-            get
-            {
-                return this.tcpSocket.ReceiveTimeout;
-            }
-            set
-            {
-                this.tcpSocket.ReceiveTimeout = value;
-                this.tcpSocket.SendTimeout = value;
-            }
         }
 
         /// <summary>
@@ -154,5 +133,62 @@ namespace Spang_PC_C_sharp
             get { return (IPEndPoint)this.tcpSocket.Client.LocalEndPoint; }
         }
 
+
+
+        /// <summary>
+        /// <see cref="IConnection.ReciveTimeout"/>
+        /// </summary>
+        public int ReciveTimeout
+        {
+            get
+            {
+                return this.tcpSocket.ReceiveTimeout;
+            }
+            set
+            {
+                this.tcpSocket.ReceiveTimeout = value;
+            }
+        }
+
+        /// <summary>
+        /// <see cref="IConnection.SendTimeout"/>
+        /// </summary>
+        public int SendTimeout
+        {
+            get
+            {
+                return this.tcpSocket.SendTimeout;
+            }
+            set
+            {
+                this.tcpSocket.SendTimeout = value;
+            }
+        }
+
+
+        //This is a temporary method that will exist until a better option is avalible.
+
+        /// <summary>
+        /// Creates a connection that connects to the specified endpoint.
+        /// </summary>
+        /// <param name="endpoint">The endpoint to connect to.</param>
+        /// <returns>A new IConnection.</returns>
+        public static IConnection ConnectTo(IPEndPoint endpoint)
+        {
+            TcpClient tcpClient = new TcpClient();
+            tcpClient.Connect(endpoint);
+
+            NetworkStream stream = tcpClient.GetStream();
+            BinaryReader reader = new BinaryReader(stream);
+            int udpPort = reader.ReadInt32();
+
+            IPEndPoint udpEndPoint = new IPEndPoint(endpoint.Address, udpPort);
+            
+            UdpClient udpClient = new UdpClient(new IPEndPoint(IPAddress.Any, ((IPEndPoint)                                                                                                                                           tcpClient.Client.LocalEndPoint).Port));
+            udpClient.Connect(udpEndPoint);
+
+
+            return new Connection(tcpClient, udpClient);
+        }
     }
 }

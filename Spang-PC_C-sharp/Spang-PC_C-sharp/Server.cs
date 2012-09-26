@@ -13,16 +13,61 @@ namespace Spang_PC_C_sharp
     /// </summary>
     interface IServer : IEndpoint
     {
+        /// <summary>
+        /// Starts the server. This will make the 
+        /// server able to recive incomming connections and
+        /// manage these connections.
+        /// </summary>
+        /// <remarks>This method needs to be called befoure send methods can be used.</remarks>
+        /// <param name="port">The port to listen for conenctions.</param>
         void Start(int port);
+
+        /// <summary>
+        /// Stops the server and ends all active connections.
+        /// </summary>
         void Stop();
 
+        /// <summary>
+        /// Invoked when a new connection is recived.
+        /// The parameter is the ID of the new connection.
+        /// </summary>
         event Action<int> Connected;
+        
+        /// <summary>
+        /// Invoked when a message is recived on 
+        /// the supplied connectionID.
+        /// </summary>
         event Action<int, byte[]> Recived;
+
+        /// <summary>
+        /// Invoked when a connection dissconnects.
+        /// </summary>
         event Action<int> Dissconnected;
         
+        /// <summary>
+        /// Sends a message to a client using the UDP-protocol.
+        /// </summary>
+        /// <param name="connectionID">ID of the client to send to.</param>
+        /// <param name="toSend">The message to send.</param>
         void sendUdp(int connectionID, byte[] toSend);
+
+        /// <summary>
+        /// Sends a message to a client using the TCP-protocol.
+        /// </summary>
+        /// <param name="connectionID">ID of the client to send to.</param>
+        /// <param name="toSend">The message to send.</param>
         void sendTcp(int connectionID, byte[] toSend);
+        
+        /// <summary>
+        /// Sends a message to all connected clients. Using UDP-Protocol.
+        /// </summary>
+        /// <param name="toSend">The message to send.</param>
         void sendToAllUdp(byte[] toSend);
+
+        /// <summary>
+        /// Sends a message to all connected clients. Using TCP-Protocol.
+        /// </summary>
+        /// <param name="toSend">The message to send.</param>
         void sendToAllTcp(byte[] toSend);
     }
 
@@ -105,7 +150,9 @@ namespace Spang_PC_C_sharp
                 this.connections.Add(id, sConnection);
             }
 
-            sConnection.Timeout = this.timeout;
+            sConnection.ReciveTimeout = this.timeout;
+            sConnection.SendTimeout = this.timeout;
+
             sConnection.StartAsyncRecive();  
 
             this.OnConnected(sConnection.ID);
@@ -151,7 +198,8 @@ namespace Spang_PC_C_sharp
                 {
                     foreach (var connection in this.connections.Values)
                     {
-                        connection.Timeout = value;
+                        connection.SendTimeout = value;
+                        connection.ReciveTimeout = value;
                     }
                 }
             }
@@ -165,8 +213,21 @@ namespace Spang_PC_C_sharp
             {
                 lock (connections)
                 {
+                    List<IServerConnection> toRemove = new List<IServerConnection>();
                     foreach (var item in this.connections.Values)
-                        item.SendTCP(new byte[] { 0 }); // Send a heart beat.
+                    {
+                        try
+                        {
+                            //Sends a heartbeat
+                            item.SendTCP(new byte[0]);
+                        }
+                        catch
+                        {
+                            //HB send failed. We assume that the connection is no longer valid.
+                            toRemove.Add(item);
+                        }
+                    }
+                    toRemove.ForEach((x) => this.RemoveConnection(x));
                 }
 
                 Thread.Sleep(HeatbeatIntevall);

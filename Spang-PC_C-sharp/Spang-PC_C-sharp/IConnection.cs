@@ -33,9 +33,14 @@ namespace Spang_PC_C_sharp
         byte[] ReciveTCP();
 
         /// <summary>
-        /// Gets or sets the time TCP send/recive will block.
+        /// Gets or sets the time TCP recive will block.
         /// </summary>
-        int Timeout { get; set; }
+        int ReciveTimeout { get; set; }
+
+        /// <summary>
+        /// Gets or sets the time TCP send will block.
+        /// </summary>
+        int SendTimeout { get; set; }
 
         /// <summary>
         /// Closes the connection.

@@ -40,7 +40,7 @@ namespace Spang_PC_C_sharp
         public void RightClick()
         {
             os.SendMouseEvent(MouseEvent.RightDown);
-            os.SendMouseEvent(MouseEvent.LeftDown);
+            os.SendMouseEvent(MouseEvent.RightUp);
         }
 
         public void VerticalScroll(int delta)

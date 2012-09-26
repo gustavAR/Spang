@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net.Sockets;
 
 namespace Spang_PC_C_sharp
 {
     /// <summary>
     /// Worker class that listens for incomming tpc messages.
     /// </summary>
-    class TcpWorker : ContinuousWorker
+    class ClientTcpWorker : ContinuousWorker
     {
         //The connection used.
         private readonly IConnection connection;
-
 
         /// <summary>
         /// Invoked when a message arrives.
@@ -29,7 +29,7 @@ namespace Spang_PC_C_sharp
         /// Creates a new TcpWorker.
         /// </summary>
         /// <param name="connection">The connection used by the worker.</param>
-        public TcpWorker(IConnection connection)
+        public ClientTcpWorker(IConnection connection)
         {
             this.connection = connection;
         }
@@ -41,7 +41,14 @@ namespace Spang_PC_C_sharp
                 //Recives and sends the tcp message.
                 byte[] bytes = this.connection.ReciveTCP();
                 
-                if(this.Recive != null)
+                if(IsHearbeat(bytes)){
+                    Console.WriteLine("Client recived HB");
+                    connection.SendTCP(bytes);
+                    Console.WriteLine("Client sends HB");
+                    return;
+                }
+
+                if (this.Recive != null)
                     this.Recive(bytes);
             }
             catch (Exception ex)
@@ -55,6 +62,11 @@ namespace Spang_PC_C_sharp
                 if (this.TimedOut != null)
                     this.TimedOut();
             }
+        }
+
+        private bool IsHearbeat(byte[] bytes)
+        {
+            return bytes.Length == 0;
         }
     }
 }

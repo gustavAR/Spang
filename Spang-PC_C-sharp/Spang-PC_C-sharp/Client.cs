@@ -45,6 +45,22 @@ namespace Spang_PC_C_sharp
         void Stop();
 
         /// <summary>
+        /// Sends a message using the UDP-protocol.
+        /// </summary>
+        /// <remarks>The client must be connected to Send messages</remarks>
+        /// <exception cref="ArgumentException">Thrown if the client is not connected.</exception>
+        /// <param name="toSend"></param>
+        void SendUDP(byte[] toSend);
+
+        /// <summary>
+        /// Sends a message using the TCP-protocol.
+        /// </summary>
+        /// <remarks>The client must be connected to Send messages.</remarks>
+        /// <exception cref="ArgumentException">Thrown if the client is not connected.</exception>
+        /// <param name="toSend"></param>
+        void SendTCP(byte[] toSend);
+        
+        /// <summary>
         /// Invoked when the IClient is connected.
         /// </summary>
         event Action Connected;
@@ -58,8 +74,6 @@ namespace Spang_PC_C_sharp
         /// Invoked when the client recived a message.
         /// </summary>
         event Action<byte[]> Recived;
-
-        
     }
 
     /// <summary>
@@ -72,7 +86,7 @@ namespace Spang_PC_C_sharp
         //Worker that listens to udp messages.
         private UdpWorker uworker;
         //Worker that listens to tcp messages.
-        private TcpWorker tworker;
+        private ClientTcpWorker tworker;
 
         #region Connect
 
@@ -138,7 +152,7 @@ namespace Spang_PC_C_sharp
             this.uworker = new UdpWorker(this.connection);
             uworker.Recive += this.OnRecived;
 
-            this.tworker = new TcpWorker(this.connection);
+            this.tworker = new ClientTcpWorker(this.connection);
             tworker.Recive += this.OnRecived;
             tworker.TimedOut += this.OnDissconnected;
 
@@ -233,10 +247,31 @@ namespace Spang_PC_C_sharp
             {
                 this.timeout = value;
                 if (this.connection != null)
-                    this.connection.Timeout = value;
+                    this.connection.ReciveTimeout = value;
             }
         }
 
         #endregion
+
+        #region Send
+
+        /// <summary>
+        /// <see cref="IClient.SendUDP"/>
+        /// </summary>
+        public void SendUDP(byte[] toSend)
+        {
+            this.connection.SendUDP(toSend);
+        }
+
+        /// <summary>
+        /// <see cref="IClient.SendTCP"/>
+        /// </summary>
+        public void SendTCP(byte[] toSend)
+        {
+            this.connection.SendTCP(toSend);
+        }
+
+        #endregion
+
     }
 }
