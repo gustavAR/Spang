@@ -11,6 +11,8 @@ import events.EventHandlerDelegate;
 
 public class Client implements IClient {
 
+	private static final int DEF_TIMEOUT = 10000;
+	
 	//The connection used to send and receive messages.
 	private IConnection connection;
 	//Worker used to receive udp messages asynchronously.
@@ -28,7 +30,16 @@ public class Client implements IClient {
 	private EventHandlerDelegate<IClient, DisconnectionCause> disconnectedEvent;
 	
 	//Stores the connectionTimeout.
-	private int connectionTimout;
+	private int connectionTimeout;
+	
+	
+	
+	public Client() {
+		this.connectionEvent = new EventHandlerDelegate<IClient, Boolean>();
+		this.recivedEvent = new EventHandlerDelegate<IClient, byte[]>();
+		this.disconnectedEvent = new EventHandlerDelegate<IClient, DisconnectionCause>();
+		this.connectionTimeout = DEF_TIMEOUT;
+	}
 	
 	/**
 	 * {@inheritDoc}
@@ -43,7 +54,7 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public int getConnectionTimeout() {
-		return this.connectionTimout;
+		return this.connectionTimeout;
 	}
 
 
@@ -51,7 +62,7 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public void setConnectionTimeout(int value) {
-		this.connectionTimout = value;
+		this.connectionTimeout = value;
 		if(this.connection != null)
 			this.connection.setTimeout(value);
 		
@@ -94,6 +105,8 @@ public class Client implements IClient {
 	}
 
 	private void onConnected(boolean reconnecting) {
+		this.connection.setTimeout(this.connectionTimeout);
+		
 		this.connectionEvent.invokeActions(this, reconnecting);
 		this.startReciving();
 	}
@@ -201,37 +214,32 @@ public class Client implements IClient {
 		System.out.println("Just recived a system message.");
 	}
 
-
 	/**
 	 * {@inheritDoc}
 	 */
 	public void sendUDP(byte[] toSend) {
-		// TODO Auto-generated method stub
-		
+		this.connection.sendUDP(toSend);		
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void sendTCP(byte[] toSend) {
-		// TODO Auto-generated method stub
-		
+		this.connection.sendTCP(toSend);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void addConnectedListener(EventHandler<IClient, Boolean> listener) {
-		// TODO Auto-generated method stub
-		
+		this.connectionEvent.addAction(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void removeConnectedListener(EventHandler<IClient, Boolean> listener) {
-		// TODO Auto-generated method stub
-		
+		this.connectionEvent.removeAction(listener);
 	}
 
 	/**
@@ -239,8 +247,7 @@ public class Client implements IClient {
 	 */
 	public void addDisconnectedListener(
 			EventHandler<IClient, DisconnectionCause> listener) {
-		// TODO Auto-generated method stub
-		
+		this.disconnectedEvent.addAction(listener);
 	}
 
 	/**
@@ -248,23 +255,20 @@ public class Client implements IClient {
 	 */
 	public void removeDisconnectedListener(
 			EventHandler<IClient, DisconnectionCause> listener) {
-		// TODO Auto-generated method stub
-		
+		this.disconnectedEvent.removeAction(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void addRevicedListener(EventHandler<IClient, byte[]> listener) {
-		// TODO Auto-generated method stub
-		
+		this.recivedEvent.addAction(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void removeRevicedListener(EventHandler<IClient, byte[]> listener) {
-		// TODO Auto-generated method stub
-		
+		this.recivedEvent.removeAction(listener);
 	}	
 }
