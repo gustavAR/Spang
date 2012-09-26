@@ -14,8 +14,24 @@ namespace Spang_PC_C_sharp
     /// A client is a class that can connect over a network
     /// and recives messages from that connection.
     /// </summary>
-    interface IClient : IEndpoint
+    interface IClient
     {
+        /// <summary>
+        /// Gets the connection status of the IEndpoint.
+        /// </summary>
+        bool IsConnected { get; }
+
+        /// <summary>
+        /// Gets or Sets the time a connection will wait for a 
+        /// message without dissconnecting (milliseconds).
+        /// <remarks>
+        /// If timeout is 0 it never disconnection.
+        /// However then it cannot detect connection faliures.
+        /// 5-15 sec is a good Timeout range.
+        /// </remarks>
+        /// </summary>
+        int ConnectionTimeout { get; set; }
+
         /// <summary>
         /// Connects to the endpoint.
         /// </summary>
@@ -32,17 +48,13 @@ namespace Spang_PC_C_sharp
         /// <summary>
         /// Reconnects to the last endpoint used.
         /// </summary>
-        void Reconnect();
+        /// <param name="retries">number of retries</param>
+        void Reconnect(int retries);
 
         /// <summary>
-        /// Starts reciving messages.
+        /// Disconnects the connection
         /// </summary>
-        void Start();
-
-        /// <summary>
-        /// Stops reciving messages.
-        /// </summary>
-        void Stop();
+        void Disconnect();
 
         /// <summary>
         /// Sends a message using the UDP-protocol.
@@ -63,17 +75,23 @@ namespace Spang_PC_C_sharp
         /// <summary>
         /// Invoked when the IClient is connected.
         /// </summary>
-        event Action Connected;
+        event Action<IClient, bool> Connected;
 
         /// <summary>
         /// Invoked when the IClient dissconnects.
         /// </summary>
-        event Action Dissconnected;
+        event Action<IClient, DisconnectCause> Dissconnected;
 
         /// <summary>
         /// Invoked when the client recived a message.
         /// </summary>
-        event Action<byte[]> Recived;
+        event Action<IClient, byte[]> Recived;
+    }
+
+    enum DisconnectCause
+    {
+        Graceful,
+        Unexpected
     }
 
     /// <summary>
@@ -86,23 +104,30 @@ namespace Spang_PC_C_sharp
         //Worker that listens to udp messages.
         private UdpWorker uworker;
         //Worker that listens to tcp messages.
-        private ClientTcpWorker tworker;
+        private TcpWorker tworker;
 
         #region Connect
+        /// <summary>
+        /// <see cref="IClient.Connect(IPEndPoint)"/>
+        /// </summary>
+        private void Connect(IPEndPoint endpoint, bool reconnected)
+        {
+            //If we are connected we need to terminate the current connection
+            //so that we can connect to a new one.
+            if (connection != null)
+                throw new ArgumentException("We are already connected. Can't connect while connected");
+
+            this.connection = Connection.ConnectTo(endpoint);
+
+            this.OnConnected(reconnected);
+        }
 
         /// <summary>
         /// <see cref="IClient.Connect(IPEndPoint)"/>
         /// </summary>
         public void Connect(IPEndPoint endpoint)
         {
-            //If we are connected we need to terminate the current connection
-            //so that we can connect to a new one.
-            if (connection != null && connection.Connected)
-                connection.Close();
-
-            this.connection = Network.ConnectTo(endpoint);
-
-            this.OnConnected();
+            this.Connect(endpoint, false);
         }
 
         /// <summary>
@@ -116,7 +141,7 @@ namespace Spang_PC_C_sharp
         /// <summary>
         ///  <see cref="IClient.Reconnect"/>
         /// </summary>
-        public void Reconnect()
+        public void Reconnect(int retries)
         {
             if (this.connection == null)
             {
@@ -130,9 +155,29 @@ namespace Spang_PC_C_sharp
             }
             else
             {
-                //Connect to the last open connection.
-                this.Connect(this.connection.RemoteEndPoint);
+                ReconnectInternal(retries);
             }
+        }
+
+        private void ReconnectInternal(int retries)
+        {
+            for (int i = 0; i < retries; i++)
+            {
+                try
+                {
+                    //Connect to the last open connection.
+                    this.Connect(this.connection.RemoteEndPoint, true);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        public void Disconnect()
+        {
+            this.OnDissconnected(DisconnectCause.Graceful);
         }
 
         #endregion
@@ -142,7 +187,7 @@ namespace Spang_PC_C_sharp
         /// <summary>
         ///  <see cref="IClient.Start"/>
         /// </summary>
-        public void Start()
+        private void Start()
         {
             if (uworker != null && tworker != null)
                 return; //We are already receiving.
@@ -152,9 +197,9 @@ namespace Spang_PC_C_sharp
             this.uworker = new UdpWorker(this.connection);
             uworker.Recive += this.OnRecived;
 
-            this.tworker = new ClientTcpWorker(this.connection);
+            this.tworker = new TcpWorker(this.connection);
             tworker.Recive += this.OnRecived;
-            tworker.TimedOut += this.OnDissconnected;
+            tworker.TimedOut += this.OnTimeout;
 
             new Thread(uworker.DoWork).Start();
             new Thread(tworker.DoWork).Start();
@@ -163,12 +208,16 @@ namespace Spang_PC_C_sharp
         /// <summary>
         ///  <see cref="IClient.Stop"/>
         /// </summary>
-        public void Stop()
+        private void Stop()
         {
             if (this.tworker != null || this.uworker != null)
             {
+                
                 //Stops the threads reciveing messages.
+                this.tworker.Recive -= this.OnRecived;
+                this.tworker.TimedOut -= this.OnTimeout;
                 this.tworker.StopWorking();
+                this.uworker.Recive -= this.OnRecived;
                 this.uworker.StopWorking();
                 this.tworker = null;
                 this.uworker = null;
@@ -182,39 +231,71 @@ namespace Spang_PC_C_sharp
         /// <summary>
         ///  <see cref="IClient.Connected"/>
         /// </summary>
-        public event Action Connected;
+        public event Action<IClient, bool> Connected;
         
         /// <summary>
         ///  <see cref="IClient.Dissconnected"/>
         /// </summary>
-        public event Action Dissconnected;
+        public event Action<IClient, DisconnectCause> Dissconnected;
 
         /// <summary>
         ///  <see cref="IClient.Recived"/>
         /// </summary>
-        public event Action<byte[]> Recived;
+        public event Action<IClient, byte[]> Recived;
 
-        private void OnConnected()
+        private void OnConnected(bool reconnected)
         {
             //Invokes Connected.
             if (this.Connected != null)
-                this.Connected();
+                this.Connected(this, reconnected);
+            this.Start();
         }
 
         private void OnRecived(byte[] recived)
         {
             //Invokes Recived.
+            if (IsHeartbeat(recived))
+            {
+                return;
+            }
+            if (IsSystemMessage(recived))
+            {
+                HandleSystemMessage(recived);
+                return;
+            }
+
             if (this.Recived != null)
-                this.Recived(recived);
+                this.Recived(this, recived);
         }
 
-        private void OnDissconnected()
+        private bool IsHeartbeat(byte[] recived)
         {
+            return recived.Length == 0;
+        }
+
+        private void HandleSystemMessage(byte[] recived)
+        {
+            Console.WriteLine("Just recieved a system message of length " + (recived.Length - 1));
+        }
+
+        private bool IsSystemMessage(byte[] recived)
+        {
+            return recived[0] == 0;
+        }
+
+        private void OnDissconnected(DisconnectCause cause)
+        {
+            this.Stop();
             //Closes the dissconnected connection.
             this.connection.Close();
             //Invokes Dissconnected.
             if (this.Dissconnected != null)
-                this.Dissconnected();
+                this.Dissconnected(this, cause);
+        }
+
+        private void OnTimeout()
+        {
+            this.OnDissconnected(DisconnectCause.Unexpected);
         }
 
         #endregion
@@ -237,7 +318,7 @@ namespace Spang_PC_C_sharp
         /// <summary>
         /// <see cref="IEndpoint.Timeout"/>
         /// </summary>
-        public int Timeout
+        public int ConnectionTimeout
         {
             get
             {

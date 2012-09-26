@@ -5,14 +5,31 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace Spang_PC_C_sharp
 {
     /// <summary>
     /// A server is a type of endpoint that can have multiple connections.
     /// </summary>
-    interface IServer : IEndpoint
+    interface IServer
     {
+        /// <summary>
+        /// Gets the connection status of the IEndpoint.
+        /// </summary>
+        bool IsConnected { get; }
+
+        /// <summary>
+        /// Gets or Sets the time a connection will wait for a 
+        /// message without dissconnecting (milliseconds).
+        /// <remarks>
+        /// If timeout is 0 it never disconnection.
+        /// However then it cannot detect connection faliures.
+        /// 5-15 sec is a good Timeout range.
+        /// </remarks>
+        /// </summary>
+        int ConnectionTimeout { get; set; }
+
         /// <summary>
         /// Starts the server. This will make the 
         /// server able to recive incomming connections and
@@ -31,18 +48,18 @@ namespace Spang_PC_C_sharp
         /// Invoked when a new connection is recived.
         /// The parameter is the ID of the new connection.
         /// </summary>
-        event Action<int> Connected;
+        event Action<IServer, ConnectionEventArgs> Connected;
         
         /// <summary>
         /// Invoked when a message is recived on 
         /// the supplied connectionID.
         /// </summary>
-        event Action<int, byte[]> Recived;
+        event Action<IServer, RecivedEventArgs> Recived;
 
         /// <summary>
         /// Invoked when a connection dissconnects.
         /// </summary>
-        event Action<int> Dissconnected;
+        event Action<IServer, DisconnectionEventArgs> Dissconnected;
         
         /// <summary>
         /// Sends a message to a client using the UDP-protocol.
@@ -82,89 +99,129 @@ namespace Spang_PC_C_sharp
         {
             public readonly int Port;
             private readonly Server server;
+            private readonly ConnectionListener listener;
 
             public ReciverWorker(int port, Server server)
             {
                 this.Port = port;
                 this.server = server;
+                this.listener = new ConnectionListener();
             }
             
             protected override void DoWorkInternal()
             {
+                listener.Start(Port);
                 //Recives a connection and adds it to the server.
-                IConnection connection = Network.ReciveConnection(Port);
-                this.server.AddConnection(connection);
+                var connection = listener.AcceptConnection();
+                int id = this.server.GetAvaibleID();
+                var sConnection =  new ServerConnection(connection, this.server, id);
+
+                sConnection.ReciveTimeout = this.server.timeout;
+                sConnection.SendTimeout = this.server.timeout;
+                this.server.AddConnection(sConnection);
+
+                listener.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Worker that keeps active connections alive.
+        /// </summary>
+        private class KeepAliveWorker : ContinuousWorker
+        {
+            private readonly Server server;
+
+            public KeepAliveWorker(Server server)
+            {
+                this.server = server;
+            }
+
+            protected override void DoWorkInternal()
+            {
+                foreach (var item in this.server.connections.Values)
+                {
+                    try
+                    {
+                        //Sends a heartbeat
+                        item.SendTCP(new byte[0]);
+                    }
+                    catch
+                    {
+                        //If the sends fails the connection is no longer valid and will be disconnected shortly
+                    }
+                }
+
+                Thread.Sleep(this.server.HeartbeatInterval);
             }
         }
 
         #endregion
 
-        private const int HeatbeatIntevall = 2000;
-        private ReciverWorker worker;
-        private readonly Dictionary<int, IServerConnection> connections;
-        private volatile bool running;
+        private volatile int heartbeatInterval;
+        public int HeartbeatInterval
+        {
+            get { return this.heartbeatInterval; }
+            set { this.heartbeatInterval = value; }
+        }
+        private ReciverWorker reciverWorker;
+        private KeepAliveWorker keepAliveWorker;
+        private readonly IDictionary<int, IServerConnection> connections;
         
         public Server()
         {
-            this.connections = new Dictionary<int, IServerConnection>();
+            this.connections = new ConcurrentDictionary<int, IServerConnection>();
         }
 
         public void Start(int port)
         {
-            if (worker != null)
-                throw new ArgumentException(string.Format("Already listening to {0}", worker.Port));
+            if (reciverWorker != null)
+                throw new ArgumentException(string.Format("Already listening to {0}", reciverWorker.Port));
 
-            worker = new ReciverWorker(port, this);
-            new Thread(worker.DoWork).Start();
+            reciverWorker = new ReciverWorker(port, this);
+            new Thread(reciverWorker.DoWork).Start();
 
-            running = true;
-            new Thread(this.KeepAlive).Start();
+            keepAliveWorker = new KeepAliveWorker(this);
+            new Thread(keepAliveWorker.DoWork).Start();
         }
 
         public void Stop()
         {
-            if (worker != null)
+            if (reciverWorker != null)
             {
-                worker.StopWorking();
-                worker = null;
+                reciverWorker.StopWorking();
+                reciverWorker = null;
             }
 
-            this.running = false;
-
-            lock (this.connections)
+            if (keepAliveWorker != null)
             {
-                foreach (var item in this.connections.Values)
-                {
-                    item.StopAsyncRecive();
-                }
+                keepAliveWorker.StopWorking();
+                keepAliveWorker = null;
             }
+
+            TerminateAllConnections();
         }
 
-        internal void AddConnection(IConnection connection)
+        private void TerminateAllConnections()
         {
-            ServerConnection sConnection = null;
-            lock (this.connections)
+            var tmp = new List<IServerConnection>();
+            foreach (var item in this.connections.Values)
             {
-                int id = GetAvaibleID();
-                sConnection = new ServerConnection(connection, this, id);
-                this.connections.Add(id, sConnection);
+                tmp.Add(item);
             }
+            tmp.ForEach((x) => this.OnDissconnected(x, DisconnectCause.Graceful));
+        }
 
-            sConnection.ReciveTimeout = this.timeout;
-            sConnection.SendTimeout = this.timeout;
-
-            sConnection.StartAsyncRecive();  
-
-            this.OnConnected(sConnection.ID);
+        internal void AddConnection(IServerConnection connection)
+        {
+            this.connections.Add(connection.ID, connection);
+            connection.StartAsyncRecive();  
         }
                
         internal void RemoveConnection(IServerConnection connection)
         {
-            lock (this.connections)
-            {
-                connection.Close();
-                this.connections.Remove(connection.ID);
-            }
+            connection.StopAsyncRecive();
+            connection.Close();
+            this.connections.Remove(connection.ID);
         }
 
         private int GetAvaibleID()
@@ -185,7 +242,7 @@ namespace Spang_PC_C_sharp
         }
 
         private int timeout;
-        public int Timeout
+        public int ConnectionTimeout
         {
             get
             {
@@ -194,73 +251,67 @@ namespace Spang_PC_C_sharp
             set
             {
                 this.timeout = value;
-                lock (connections)
+                foreach (var connection in this.connections.Values)
                 {
-                    foreach (var connection in this.connections.Values)
-                    {
-                        connection.SendTimeout = value;
-                        connection.ReciveTimeout = value;
-                    }
+                    connection.SendTimeout = value;
+                    connection.ReciveTimeout = value;
                 }
             }
         }
-
-        #region Keep Alive
-
-        private void KeepAlive()
-        {
-            while (running)
-            {
-                lock (connections)
-                {
-                    List<IServerConnection> toRemove = new List<IServerConnection>();
-                    foreach (var item in this.connections.Values)
-                    {
-                        try
-                        {
-                            //Sends a heartbeat
-                            item.SendTCP(new byte[0]);
-                        }
-                        catch
-                        {
-                            //HB send failed. We assume that the connection is no longer valid.
-                            toRemove.Add(item);
-                        }
-                    }
-                    toRemove.ForEach((x) => this.RemoveConnection(x));
-                }
-
-                Thread.Sleep(HeatbeatIntevall);
-            }
-
-        }
-
-        #endregion
 
         #region Events
 
-        public event Action<int> Connected;
-        public event Action<int> Dissconnected;
-        public event Action<int, byte[]> Recived;
+        public event Action<IServer, ConnectionEventArgs> Connected;
+        public event Action<IServer, DisconnectionEventArgs> Dissconnected;
+        public event Action<IServer, RecivedEventArgs> Recived;
 
         internal void OnRecived(int connectionID, byte[] bytes)
         {
+            if (IsHeartbeat(bytes))
+            {
+                return;
+            }
+            if (IsSystemMessage(bytes))
+            {
+                HandleSystemMessage(bytes);
+                return;
+            }
+            RecivedEventArgs eventArgs = new RecivedEventArgs(connectionID, bytes);
             if (this.Recived != null)
-                this.Recived(connectionID, bytes);
+                this.Recived(this, eventArgs);
         }
 
-        internal void OnDissconnected(int connectionID)
+        private bool IsHeartbeat(byte[] recived)
         {
-            this.RemoveConnection(this.connections[connectionID]);
+            return recived.Length == 0;
+        }
+
+        private void HandleSystemMessage(byte[] recived)
+        {
+            Console.WriteLine("Just recieved a system message of length " + (recived.Length - 1));
+        }
+
+        private bool IsSystemMessage(byte[] recived)
+        {
+            return recived[0] == 0;
+        }
+
+        internal void OnDissconnected(IServerConnection connection, DisconnectCause cause)
+        {
+            DisconnectionEventArgs eventArgs = new DisconnectionEventArgs(connection.ID, cause);
+
+            this.RemoveConnection(connection);
 
             if (this.Dissconnected != null)
-                this.Dissconnected(connectionID);
+                this.Dissconnected(this, eventArgs);
         }
 
-        internal void OnConnected(int connectionID)
+        internal void OnConnected(IServerConnection connection)
         {
+            ConnectionEventArgs eventArgs = new ConnectionEventArgs(connection.ID);
+            this.AddConnection(connection);
             if (this.Connected != null)
-                this.Connected(connectionID);
+                this.Connected(this, eventArgs);
         }
 
 
@@ -270,41 +321,29 @@ namespace Spang_PC_C_sharp
 
         public void sendUdp(int connectionID, byte[] toSend)
         {
-            lock (connections)
-            {
-                IServerConnection connection = this.connections[connectionID];
-                connection.SendUDP(toSend);
-            }
+            IServerConnection connection = this.connections[connectionID];
+            connection.SendUDP(toSend);
         }
 
         public void sendTcp(int connectionID, byte[] toSend)
         {
-            lock (connections)
-            {
-                IServerConnection connection = this.connections[connectionID];
-                connection.SendTCP(toSend);
-            }
+            IServerConnection connection = this.connections[connectionID];
+            connection.SendTCP(toSend);
         }
 
         public void sendToAllUdp(byte[] toSend)
         {
-            lock (connections)
+            foreach (var connection in this.connections.Values)
             {
-                foreach (var connection in this.connections.Values)
-                {
-                    connection.SendUDP(toSend);
-                }
+                connection.SendUDP(toSend);
             }
         }
 
         public void sendToAllTcp(byte[] toSend)
         {
-            lock (connections)
+            foreach (var connection in this.connections.Values)
             {
-                foreach (var connection in this.connections.Values)
-                {
-                    connection.SendTCP(toSend);
-                }
+                connection.SendTCP(toSend);
             }
         }
 

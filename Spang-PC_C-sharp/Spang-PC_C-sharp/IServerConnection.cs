@@ -23,7 +23,7 @@ namespace Spang_PC_C_sharp
         private readonly Server server;
      
         private UdpWorker uworker;
-        private ServerTcpWorker tworker;
+        private TcpWorker tworker;
         
         public ServerConnection(IConnection connection, Server server, int id)
         {
@@ -48,8 +48,9 @@ namespace Spang_PC_C_sharp
             this.uworker = new UdpWorker(this);
             uworker.Recive += this.OnRecived;
 
-            this.tworker = new ServerTcpWorker(this);
+            this.tworker = new TcpWorker(this);
             tworker.Recive += this.OnRecived;
+            tworker.TimedOut += this.OnTimeout;
 
             new Thread(uworker.DoWork).Start();
             new Thread(tworker.DoWork).Start();
@@ -63,6 +64,8 @@ namespace Spang_PC_C_sharp
                 this.uworker.Recive -= this.OnRecived;
                 this.tworker.Recive -= this.OnRecived;
 
+                this.tworker.TimedOut -= this.OnTimeout;
+
                 this.tworker.StopWorking();
                 this.uworker.StopWorking();
                 this.tworker = null;
@@ -73,6 +76,11 @@ namespace Spang_PC_C_sharp
         private void OnRecived(byte[] bytes)
         {
             server.OnRecived(this.ID, bytes);
+        }
+
+        private void OnTimeout()
+        {
+            server.OnDissconnected(this, DisconnectCause.Unexpected);
         }
 
         #region IConnection Delegation
@@ -140,8 +148,5 @@ namespace Spang_PC_C_sharp
         }
 
         #endregion
-
-
-
     }
 }

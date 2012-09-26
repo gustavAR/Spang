@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
+    <Compile Include="EventArgs.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="ConnectionListener.cs" />
     <Compile Include="DesktopController.cs" />
@@ -64,21 +65,17 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="IConnection.cs" />
-    <Compile Include="IEndpoint.cs" />
     <Compile Include="IMessageDecoder.cs" />
     <Compile Include="IServerConnection.cs" />
     <Compile Include="MessageDecoder.cs" />
-    <Compile Include="Network.cs" />
     <Compile Include="OsInterface.cs" />
     <Compile Include="Phone.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />
-    <Compile Include="SocketListener.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
-    <Compile Include="Workers\ClientTcpWorker.cs" />
-    <Compile Include="Workers\ServerTcpWorker.cs" />
+    <Compile Include="Workers\TcpWorker.cs" />
     <Compile Include="Workers\UdpWorker.cs" />
     <Compile Include="Workers\Worker.cs" />
     <EmbeddedResource Include="Form1.resx">

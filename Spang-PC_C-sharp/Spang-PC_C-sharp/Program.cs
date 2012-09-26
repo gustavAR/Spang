@@ -28,14 +28,14 @@ namespace Spang_PC_C_sharp
 
             server.Start(1337);
 
-            server.Connected += (x) => Console.WriteLine("A connection was recived");
+            server.Connected += (x, y) => Console.WriteLine("A connection was recived");
             server.Recived += (x, message) =>
             {
                // Console.WriteLine("Recived message from {0} of length {1}", x, message.Length);
                 
-                messageHandler.DecodeMessage(message);
+                messageHandler.DecodeMessage(message.Data);
             };
-            server.Dissconnected += (x) => Console.WriteLine("Oh no we dced ;(");
+            server.Dissconnected += (x, y) => Console.WriteLine("Oh no we dced ;(");
 /*
             Thread.Sleep(2000);
 
@@ -59,20 +59,19 @@ namespace Spang_PC_C_sharp
         private static IClient OpenClient(int id)
         {
             IClient client = new Client();
-            client.Timeout = 1;
+            client.ConnectionTimeout = 1;
 
-            client.Connected += () => Console.WriteLine("Client connected! " + id);
-            client.Dissconnected += () => Console.WriteLine("Client Dced" + id);
-            client.Recived += (x) =>
+            client.Connected += (x, y) => Console.WriteLine("Client connected! " + id);
+            client.Dissconnected += (x, y) => Console.WriteLine("Client Dced" + id);
+            client.Recived += (x, y) =>
             {
-                if (x[0] == 0)
+                if (y[0] == 0)
                     Console.WriteLine("Got a heartbeat " + id);
                 else
                     Console.WriteLine(":O jsut got udp message");
             };
 
             client.Connect(1337, "192.168.0.12");
-            client.Start();
 
             return client;
         }
