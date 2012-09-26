@@ -66,6 +66,8 @@ public class SensorProcessor {
 				return;
 			}
 		}
+		this.encodedSensorInput = null;
+		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
 	}
 
 	/**
@@ -74,6 +76,7 @@ public class SensorProcessor {
 	private void processInput() {
 		fillOutput();
 		this.connection.sendUDP(encodedSensorInput.array());
+		encodedSensorInput.clear();
 	}
 
 	private void fillOutput() {

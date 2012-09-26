@@ -19,7 +19,7 @@ public class LinearAccelerationSensor implements ISensor {
 
 	private float[] values = new float[3];
 	private int accuracy;
-	private boolean isActive;
+	private boolean isActive = false;
 	private byte encodeID;
 
 	private SensorManager sensorManager;
