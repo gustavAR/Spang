@@ -51,6 +51,8 @@ public class MouseView extends AbstractSpangView{
 		this.stateMachine.registerState(MOUSEMOVING_STATE, new MouseMovingState());
 		this.stateMachine.registerState(SCROLLING_STATE, new ScrollingState());
 		this.stateMachine.registerState(TIMEOUT_STATE, new TimeoutState());
+		
+		this.stateMachine.changeState(MOUSEMOVING_STATE);
 
 		paint.setAntiAlias(true);
 		paint.setStrokeWidth(6f);
@@ -107,14 +109,14 @@ public class MouseView extends AbstractSpangView{
 
 		public void onLongPress(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onLongPress");
-			connection.sendUDP(new byte[]{(byte)1});
+			connection.sendUDP(new byte[]{(byte)2});
 		}
 
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 				float distanceY) {
 			Log.d("MOTIONEVENT:", "dX = " + distanceX + "   dY = " + distanceY);
 			byte[] data = ByteBuffer.allocate(9).order(ByteOrder.LITTLE_ENDIAN)
-					.put((byte)2).putInt((int)(distanceX + 0.5f)).putInt((int)(distanceY + 0.5f)).array();
+					.put((byte)3).putInt((int)(distanceX + 0.5f)).putInt((int)(distanceY + 0.5f)).array();
 			connection.sendUDP(data);
 			return true;
 		}
@@ -125,7 +127,7 @@ public class MouseView extends AbstractSpangView{
 
 		public boolean onSingleTapUp(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onSingleTapUp");
-			connection.sendUDP(new byte[]{(byte)0});
+			connection.sendUDP(new byte[]{(byte)1});
 			return true;
 		}
 	};
@@ -159,7 +161,7 @@ public class MouseView extends AbstractSpangView{
 
 				radius = event.getPressure()*100;
 				byte[] pressureData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-						.put((byte)13).putInt((int)radius).array();
+						.put((byte)14).putInt((int)radius).array();
 				connection.sendUDP(pressureData);
 
 				prevPointers.add(activeIndex, pointers.get(activeIndex));
@@ -218,18 +220,18 @@ public class MouseView extends AbstractSpangView{
 
 				radius = event.getPressure()*100;
 				byte[] pressureData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-						.put((byte)13).putInt((int)radius).array();
+						.put((byte)14).putInt((int)radius).array();
 				connection.sendUDP(pressureData);
 
 				//Vertical Scroll
 				byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-						.put((byte)11).putInt((int)(4*(pointers.get(activeIndex).getY() - 
+						.put((byte)12).putInt((int)(20*(pointers.get(activeIndex).getY() - 
 								prevPointers.get(activeIndex).getY() + 0.5f))).array();
 				connection.sendUDP(vertData);
 
 				//   Horizontal Scroll
 				//   byte[] horiData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-				//     .put((byte)12).putInt((int)(4*(xPos - xPosPrev + 0.5f))).array();
+				//     .put((byte)13).putInt((int)(4*(xPos - xPosPrev + 0.5f))).array();
 				//   connection.sendUDP(horiData);
 
 				prevPointers.add(activeIndex, pointers.get(activeIndex));
