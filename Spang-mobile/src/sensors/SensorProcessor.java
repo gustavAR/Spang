@@ -6,6 +6,7 @@ import java.util.List;
 
 import network.IConnection;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.SensorManager;
 
 /**
@@ -13,8 +14,11 @@ import android.hardware.SensorManager;
  * @author Pontus Pall & Gustav Alm Rosenblad
  */
 public class SensorProcessor {
-	private static final int STANDARD_SAMPLING_RATE = 20;
+	private static final String  SAMPLING_RATE_NAME = "SAMPLING_RATE";
+	private static final int  DEFAULT_SAMPLING_RATE = 20;
+	public static final String PREFS_NAME = "PreferenceFile";
 	
+	private SharedPreferences settings;
 	private List<ISensor> sensors = new ArrayList<ISensor>();
 	private ByteBuffer encodedSensorInput; 
 	private IConnection connection;
@@ -27,7 +31,9 @@ public class SensorProcessor {
 		this.sensors = builder.build();
 		this.connection = connection;	
 		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
-		this.samplingRate = STANDARD_SAMPLING_RATE;
+		
+		this.settings = context.getSharedPreferences(PREFS_NAME, 0);
+		this.samplingRate = settings.getInt(SAMPLING_RATE_NAME, DEFAULT_SAMPLING_RATE);
 	}
 
 	/**
@@ -42,6 +48,7 @@ public class SensorProcessor {
 					try {
 						Thread.sleep(samplingRate);
 					} catch (InterruptedException e) {
+						
 						e.printStackTrace();
 					}
 				}
