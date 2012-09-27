@@ -51,7 +51,7 @@ public class MouseView extends AbstractSpangView{
 		this.stateMachine.registerState(MOUSEMOVING_STATE, new MouseMovingState());
 		this.stateMachine.registerState(SCROLLING_STATE, new ScrollingState());
 		this.stateMachine.registerState(TIMEOUT_STATE, new TimeoutState());
-		
+
 		this.stateMachine.changeState(MOUSEMOVING_STATE);
 
 		paint.setAntiAlias(true);
@@ -200,10 +200,11 @@ public class MouseView extends AbstractSpangView{
 			fingerOneID = event.getPointerId(0);
 			final int activeIndex = event.findPointerIndex(fingerOneID);
 
-			pointers.clear();
 			prevPointers.clear();
+			prevPointers.addAll(pointers);
+			pointers.clear();
+			
 			pointers.add(activeIndex, new Vector2(event.getX(activeIndex), event.getY(activeIndex)));
-			prevPointers.add(activeIndex, pointers.get(activeIndex));
 
 			Vector2 position = pointers.get(activeIndex);
 
@@ -223,10 +224,19 @@ public class MouseView extends AbstractSpangView{
 						.put((byte)14).putInt((int)radius).array();
 				connection.sendUDP(pressureData);
 
+				float y = prevPointers.get(activeIndex).getY();
+				float prevY = pointers.get(activeIndex).getY();
 				//Vertical Scroll
 				byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-						.put((byte)12).putInt((int)(20*(pointers.get(activeIndex).getY() - 
-								prevPointers.get(activeIndex).getY() + 0.5f))).array();
+						.put((byte)12).putInt(
+								(int) (20*
+										(
+												( y - prevY ) 
+												//+ 0.5f
+
+												)
+										)
+								).array();
 				connection.sendUDP(vertData);
 
 				//   Horizontal Scroll
@@ -246,6 +256,8 @@ public class MouseView extends AbstractSpangView{
 				break;
 
 			case MotionEvent.ACTION_POINTER_UP:
+				
+				
 				final int pointerIndex = (eventID & MotionEvent.ACTION_POINTER_INDEX_MASK) >> 
 				MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 				final int pointerID = event.getPointerId(pointerIndex);
@@ -255,8 +267,8 @@ public class MouseView extends AbstractSpangView{
 
 					fingerOneID = event.getPointerId(newPointerIndex);
 				}
-
-				stateMachine.changeState(TIMEOUT_STATE);
+				if(event.getPointerCount() <= 2)
+					stateMachine.changeState(TIMEOUT_STATE);
 				break;
 			} 
 
