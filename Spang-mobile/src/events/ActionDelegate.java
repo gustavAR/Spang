@@ -1,11 +1,16 @@
 package events;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class ActionDelegate {
 	private Set<Action> listeners;
 	private Object lock = new Object();
 			
+	public ActionDelegate(){
+		listeners = new HashSet<Action>();
+	}
+	
 	public void addAction(Action action) {
 		synchronized (lock) {
 			this.listeners.add(action);		

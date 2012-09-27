@@ -271,4 +271,12 @@ public class Client implements IClient {
 	public void removeRevicedListener(EventHandler<IClient, byte[]> listener) {
 		this.recivedEvent.removeAction(listener);
 	}	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public IConnection getConnection(){
+		return this.connection;
+	}
+	
 }

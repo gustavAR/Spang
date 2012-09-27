@@ -29,9 +29,9 @@ public class MouseActivity extends Activity {
         this.adress = intent.getStringExtra("connection");
         
 		Client client = new Client();
-
 		try {
-			this.connection= client.connectTo(InetAddress.getByName(adress), PORT);
+			client.connect(InetAddress.getByName(adress), PORT);
+			this.connection= client.getConnection();
 		} catch (UnknownHostException e) {
 			throw new NetworkException(e);
 		}

@@ -19,22 +19,22 @@ namespace Spang_PC_C_sharp
         {
             this.handlers = new Dictionary<byte, Action<BinaryReader>>();
        
-            this.handlers.Add(0, this.HandleTap);
-            this.handlers.Add(1, this.HandleLongTap);
-            this.handlers.Add(2, this.HandleTouchMove);
-            this.handlers.Add(3, this.HandleAccelerometerUpdate);
-            this.handlers.Add(4, this.HandleLuminanceUpdate);
-            this.handlers.Add(5, this.HandleGyroscopeUpdate);
-            this.handlers.Add(6, this.HandleMagneticFieldUpdate);
-            this.handlers.Add(7, this.HandleVolumeUp);
-            this.handlers.Add(8, this.HandleVolumeDown);
-            this.handlers.Add(9, this.HandleProximityUpdate);
-            this.handlers.Add(10, this.HandleNetworkedText);
-            this.handlers.Add(11, this.HandleVerticalScroll);
-            this.handlers.Add(12, this.HandleHorizontalScroll);
-            this.handlers.Add(13, this.HandlePressureUpdate);
-            this.handlers.Add(14, this.HandleOrientationUpdate);
-            this.handlers.Add(15, this.HandleGPSUpdate);
+            this.handlers.Add(1, this.HandleTap);
+            this.handlers.Add(2, this.HandleLongTap);
+            this.handlers.Add(3, this.HandleTouchMove);
+            this.handlers.Add(4, this.HandleAccelerometerUpdate);
+            this.handlers.Add(5, this.HandleLuminanceUpdate);
+            this.handlers.Add(6, this.HandleGyroscopeUpdate);
+            this.handlers.Add(7, this.HandleMagneticFieldUpdate);
+            this.handlers.Add(8, this.HandleVolumeUp);
+            this.handlers.Add(9, this.HandleVolumeDown);
+            this.handlers.Add(10, this.HandleProximityUpdate);
+            this.handlers.Add(11, this.HandleNetworkedText);
+            this.handlers.Add(12, this.HandleVerticalScroll);
+            this.handlers.Add(13, this.HandleHorizontalScroll);
+            this.handlers.Add(14, this.HandlePressureUpdate);
+            this.handlers.Add(15, this.HandleOrientationUpdate);
+            this.handlers.Add(16, this.HandleGPSUpdate);
         }
 
         public void DecodeMessage(byte[] message)

@@ -1,10 +1,15 @@
 package events;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class EventHandlerDelegate<S,A> {
 	private Set<EventHandler<S,A>> listeners;
 	private Object lock = new Object();
+	
+	public EventHandlerDelegate(){
+		listeners = new HashSet<EventHandler<S,A>>();
+	}
 			
 	public void addAction(EventHandler<S,A> action) {
 		synchronized (lock) {

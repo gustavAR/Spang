@@ -111,4 +111,8 @@ public interface IClient {
 	 * @param listener the listener.
 	 */
 	void removeRevicedListener(EventHandler<IClient, byte[]> listener);
+	/**
+	 * TODO: Temporary fix
+	 */
+	IConnection getConnection();
 }
