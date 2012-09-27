@@ -1,7 +1,6 @@
 package events;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Thread safe delegate. 
@@ -9,31 +8,23 @@ import java.util.Set;
  * @param <T>
  */
 public class Action1Delegate<T> {
-	private Set<Action1<T>> listeners;
-	private Object lock = new Object();
+	private CopyOnWriteArrayList<Action1<T>> listeners;
 			
 	public Action1Delegate(){
-		listeners = new HashSet<Action1<T>>();
+		listeners = new CopyOnWriteArrayList<Action1<T>>();
 	}
 	
 	public void addAction(Action1<T> action) {
-		synchronized (lock) {
 			this.listeners.add(action);		
-		}
 	}
 	
 	public void removeAction(Action1<T> action) {
-		synchronized (lock) {
 			this.listeners.remove(action);
-		}
-		
 	}
 	
 	public void invokeActions(T args) {
-		synchronized (lock) {
-			for (Action1<T> listener : this.listeners) {
-				listener.onAction(args);
-			}
-		}	
+		for (Action1<T> listener : this.listeners) {
+			listener.onAction(args);
+		}
 	}
 }

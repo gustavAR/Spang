@@ -1,34 +1,25 @@
 package events;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ActionDelegate {
-	private Set<Action> listeners;
-	private Object lock = new Object();
+	private CopyOnWriteArrayList<Action> listeners;
 			
-	public ActionDelegate(){
-		listeners = new HashSet<Action>();
+	public ActionDelegate() {
+		this.listeners = new CopyOnWriteArrayList<Action>();		
 	}
 	
 	public void addAction(Action action) {
-		synchronized (lock) {
-			this.listeners.add(action);		
-		}
+		this.listeners.add(action);		
 	}
 	
 	public void removeAction(Action action) {
-		synchronized (lock) {
-			this.listeners.remove(action);
-		}
-		
+		this.listeners.remove(action);		
 	}
 	
 	public void invokeActions() {
-		synchronized (lock) {
-			for (Action listener : this.listeners) {
-				listener.onAction();
-			}
-		}	
+		for (Action listener : this.listeners) {
+			listener.onAction();
+		}
 	}
 }

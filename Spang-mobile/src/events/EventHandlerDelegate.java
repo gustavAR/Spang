@@ -1,34 +1,25 @@
 package events;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EventHandlerDelegate<S,A> {
-	private Set<EventHandler<S,A>> listeners;
-	private Object lock = new Object();
+	private CopyOnWriteArrayList<EventHandler<S,A>> listeners;
 	
 	public EventHandlerDelegate(){
-		listeners = new HashSet<EventHandler<S,A>>();
+		listeners = new CopyOnWriteArrayList<EventHandler<S,A>>();
 	}
 			
 	public void addAction(EventHandler<S,A> action) {
-		synchronized (lock) {
-			this.listeners.add(action);		
-		}
+		this.listeners.add(action);		
 	}
 	
 	public void removeAction(EventHandler<S,A> action) {
-		synchronized (lock) {
-			this.listeners.remove(action);
-		}
-		
+		this.listeners.remove(action);
 	}
 	
 	public void invokeActions(S sender, A args) {
-		synchronized (lock) {
-			for (EventHandler<S,A> listener : this.listeners) {
-				listener.onAction(sender, args);
-			}
-		}	
+		for (EventHandler<S,A> listener : this.listeners) {
+			listener.onAction(sender, args);
+		}
 	}
 }
