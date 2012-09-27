@@ -26,12 +26,12 @@ public abstract class AbstractSpangView extends View {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_VOLUME_UP:
 			Log.d("Volume key:", "UP");
-			connection.sendUDP(new byte[]{(byte)7});
+			connection.sendUDP(new byte[]{(byte)8});
 			return true;
 
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
 			Log.d("Volume key:", "DOWN");
-			connection.sendUDP(new byte[]{(byte)8});
+			connection.sendUDP(new byte[]{(byte)9});
 			return true;
 		}	
 		return super.onKeyDown(keyCode, event);
