@@ -4,6 +4,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
+import network.exceptions.HostException;
+import network.exceptions.NetworkException;
+
 import events.Action;
 import events.Action1;
 import events.EventHandler;
@@ -11,6 +14,7 @@ import events.EventHandlerDelegate;
 
 public class Client implements IClient {
 
+	//Default time it takes for the connection to time out.
 	private static final int DEF_TIMEOUT = 10000;
 	
 	//The connection used to send and receive messages.
@@ -27,17 +31,19 @@ public class Client implements IClient {
 	private EventHandlerDelegate<IClient, byte[]> recivedEvent;
 	
 	//Event handler that raises the disconnected event.
-	private EventHandlerDelegate<IClient, DisconnectionCause> disconnectedEvent;
+	private EventHandlerDelegate<IClient, DCCause> disconnectedEvent;
 	
 	//Stores the connectionTimeout.
 	private int connectionTimeout;
 	
 	
-	
+	/**
+	 * Creates a new client.
+	 */
 	public Client() {
 		this.connectionEvent = new EventHandlerDelegate<IClient, Boolean>();
 		this.recivedEvent = new EventHandlerDelegate<IClient, byte[]>();
-		this.disconnectedEvent = new EventHandlerDelegate<IClient, DisconnectionCause>();
+		this.disconnectedEvent = new EventHandlerDelegate<IClient, DCCause>();
 		this.connectionTimeout = DEF_TIMEOUT;
 	}
 	
@@ -90,14 +96,15 @@ public class Client implements IClient {
 			InetAddress address = InetAddress.getByName(host);
 			this.connect(address, port);
 		} catch (UnknownHostException e) {
-			throw new NetworkException("Host name could not be resolved. name =" + host);			
+			throw new HostException("Host name could not be resolved. host =" + host);			
 		}		
 		
 	}
 	
 	private void connect(InetSocketAddress address, boolean reconnecting) {
+		//If we are connected it makes no since to connect again.
 		if(this.connection != null)
-			throw new IllegalArgumentException("We are already connected. Can't connect to a new connecting.");
+			throw new NetworkException("We are already connected. Can't connect to a new connecting.");
 		
 		this.connection = Connection.connectTO(address);
 		
@@ -107,7 +114,7 @@ public class Client implements IClient {
 	private void onConnected(boolean reconnecting) {
 		this.connection.setTimeout(this.connectionTimeout);
 		
-		this.connectionEvent.invokeActions(this, reconnecting);
+		this.connectionEvent.invoke(this, reconnecting);
 		this.startReciving();
 	}
 
@@ -120,15 +127,18 @@ public class Client implements IClient {
 		} else if(this.connection.isConnected()) {
 			return; //Nothing to do if we are already connected.
 		} else {
-			this.reconnectInternal(retries);
+			InetSocketAddress endpoint = this.connection.getRemoteEndPoint();
+			this.connection = null;
+			
+			this.reconnectInternal(retries, endpoint);
 		}
 	}
 
-	private void reconnectInternal(int retries) {
+	private void reconnectInternal(int retries, InetSocketAddress endpoint) {
 		for (int i = 0; i < retries; i++) {
 			try {
-				System.out.println("Trying to reconnect to " + this.connection.getRemoteEndPoint());	
-				this.connect(this.connection.getRemoteEndPoint(), true);
+				System.out.println("Trying to reconnect to " + endpoint);	
+				this.connect(endpoint, true);
 				
 			} catch(NetworkException e) {
 				System.out.println("Failed to reconnect " + i + " retrying...");
@@ -141,15 +151,15 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public void disconnect() {
-		this.onDisconnect(DisconnectionCause.LocalShutdown);
+		this.onDisconnect(DCCause.LocalShutdown);
 	}
 
 	
-	private void onDisconnect(DisconnectionCause cause) {
+	private void onDisconnect(DCCause cause) {
 		this.stopReciving();
 		this.connection.close();
 		
-		this.disconnectedEvent.invokeActions(this, cause);
+		this.disconnectedEvent.invoke(this, cause);
 	}
 
 
@@ -183,7 +193,7 @@ public class Client implements IClient {
 	}
 	
 	private void onTimeout() {
-		this.onDisconnect(DisconnectionCause.TCPTimeout);
+		this.onDisconnect(DCCause.TCPTimeout);
 	}
 
 	private void onRecived(byte[] message) {
@@ -192,7 +202,7 @@ public class Client implements IClient {
 		} else if(isSystemMessage(message)) {
 			this.handleSystemMessage(message);		
 		} else {
-			this.recivedEvent.invokeActions(this, message);
+			this.recivedEvent.invoke(this, message);
 		}	
 	}
 	
@@ -232,44 +242,44 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public void addConnectedListener(EventHandler<IClient, Boolean> listener) {
-		this.connectionEvent.addAction(listener);
+		this.connectionEvent.addHandler(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void removeConnectedListener(EventHandler<IClient, Boolean> listener) {
-		this.connectionEvent.removeAction(listener);
+		this.connectionEvent.removeHandler(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void addDisconnectedListener(
-			EventHandler<IClient, DisconnectionCause> listener) {
-		this.disconnectedEvent.addAction(listener);
+			EventHandler<IClient, DCCause> listener) {
+		this.disconnectedEvent.addHandler(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void removeDisconnectedListener(
-			EventHandler<IClient, DisconnectionCause> listener) {
-		this.disconnectedEvent.removeAction(listener);
+			EventHandler<IClient, DCCause> listener) {
+		this.disconnectedEvent.removeHandler(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void addRevicedListener(EventHandler<IClient, byte[]> listener) {
-		this.recivedEvent.addAction(listener);
+		this.recivedEvent.addHandler(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void removeRevicedListener(EventHandler<IClient, byte[]> listener) {
-		this.recivedEvent.removeAction(listener);
+		this.recivedEvent.removeHandler(listener);
 	}	
 	
 	/**
