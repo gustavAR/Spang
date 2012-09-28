@@ -81,8 +81,13 @@ public class TcpWorker extends ContinuousWorker {
 		} catch(NetworkException ne) {
 			//If the system failed to read for a reason that was not timeout
 			//the connection is no longer valid so we stop reading from it.
-			Logger.LogException(ne);
+			Logger.logException(ne);
 			this.StopWorking();
 		}
+	}
+
+	public void clearEventListeners() {
+		this.timeoutEvent.clear();
+		this.recivedEvent.clear();
 	}
 }

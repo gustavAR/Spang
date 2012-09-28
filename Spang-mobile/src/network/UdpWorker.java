@@ -51,8 +51,12 @@ public class UdpWorker extends ContinuousWorker{
 			byte[] bytes = this.connection.reciveTCP();
 			this.recivedEvent.invoke(bytes);				
 		} catch(NetworkException exe) {
-			Logger.LogException(exe);			
+			Logger.logException(exe);			
 			this.StopWorking();
 		}
+	}
+
+	public void clearEventListeners() {
+		this.recivedEvent.clear();
 	}	
 }

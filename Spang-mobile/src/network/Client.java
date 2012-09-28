@@ -233,7 +233,7 @@ public class Client implements IClient {
 		try {
 			this.connection.sendUDP(toSend);	
 		} catch(NetworkException e) {
-			Logger.LogException(e);		
+			Logger.logException(e);		
 			this.onDisconnect(DCCause.LocalNetworkCrash);
 		}
 	}
@@ -245,7 +245,7 @@ public class Client implements IClient {
 		try {
 			this.connection.sendTCP(toSend);
 		} catch(NetworkException e) {
-			Logger.LogException(e);
+			Logger.logException(e);
 			this.onDisconnect(DCCause.LocalNetworkCrash);
 		}
 	}
