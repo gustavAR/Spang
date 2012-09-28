@@ -6,8 +6,6 @@ package utils;
  *
  */
 public class Logger {
-		
-	
 	public static void LogException(Throwable throwable) {
 		//Tmp.
 		throwable.printStackTrace();
