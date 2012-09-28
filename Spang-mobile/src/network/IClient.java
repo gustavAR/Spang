@@ -3,6 +3,8 @@ package network;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import network.exceptions.NetworkException;
+
 import events.EventHandler;
 
 public interface IClient {
@@ -92,13 +94,13 @@ public interface IClient {
 	 * Adds a listener that will be notified when the client is disconnected.
 	 * @param listener the listener.
 	 */
-	void addDisconnectedListener(EventHandler<IClient, DisconnectionCause> listener);
+	void addDisconnectedListener(EventHandler<IClient, DCCause> listener);
 
 	/**
 	 * Remove a listener forcing it to stop listening to disconnected events.
 	 * @param listener the listener.
 	 */
-	void removeDisconnectedListener(EventHandler<IClient, DisconnectionCause> listener);
+	void removeDisconnectedListener(EventHandler<IClient, DCCause> listener);
 	
 	/**
 	 * Adds a listener that will be notified when the client receives messages.
@@ -111,6 +113,8 @@ public interface IClient {
 	 * @param listener the listener.
 	 */
 	void removeRevicedListener(EventHandler<IClient, byte[]> listener);
+	
+	
 	/**
 	 * TODO: Temporary fix
 	 */

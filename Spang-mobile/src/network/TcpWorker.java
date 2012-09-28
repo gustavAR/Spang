@@ -1,22 +1,17 @@
 package network;
 
+import utils.Logger;
+import network.exceptions.NetworkException;
+import network.exceptions.TimeoutException;
 import events.Action;
 import events.Action1;
 import events.Action1Delegate;
 import events.ActionDelegate;
 
 /**
- * Worker class that listens to incomming tcp messages on a connection.
- * NOTE: This class is designed to be excecuted by a background worker thread
- * since the run method uses blocking IO.
+ * Worker class that listens to incoming tcp messages on a connection.
  * 
- *  Correct Creation and usage is:
- *  {@code 
- *  	TcpWorker worker = new TcpWorker();
- *  	Thread thread = new Thread(worker);
- *  	thread.start();
- *  }
- *  
+ * @see ContinuousWorker
  * @author Lukas Kurtyan
  */
 public class TcpWorker extends ContinuousWorker {
@@ -42,19 +37,19 @@ public class TcpWorker extends ContinuousWorker {
 	}
 	
 	/**
-	 * Adds a listener that will be notified when a new message was recived.
+	 * Adds a listener that will be notified when a new message was received.
 	 * @param action the listener to add.
 	 */
 	public void addRecivedAction(Action1<byte[]> action) {
-		this.recivedEvent.addAction(action);		
+		this.recivedEvent.addListener(action);		
 	}
 
 	/**
-	 * Removes a listener so that it will no longer be notified when a message is recived.
+	 * Removes a listener so that it will no longer be notified when a message is received.
 	 * @param action the listener to remove.
 	 */
 	public void removeRecivedAction(Action1<byte[]> action) {
-		this.recivedEvent.removeAction(action);
+		this.recivedEvent.removeListener(action);
 	}
 	
 	/**
@@ -62,32 +57,32 @@ public class TcpWorker extends ContinuousWorker {
 	 * @param action the listener to add.
 	 */
 	public void addTimeoutAction(Action action) {
-		this.timeoutEvent.addAction(action);
+		this.timeoutEvent.addListener(action);
 	}
 	
 	/**
-	 * Removes a listener so that it will no longer be notified when a message is recived.
+	 * Removes a listener so that it will no longer be notified when a timeout occurs.
 	 * @param action the listener to remove.
 	 */
 	public void removeTimeoutAction(Action action) {
-		this.timeoutEvent.addAction(action);
+		this.timeoutEvent.addListener(action);
 	}
 		
 	@Override
 	protected void DoWork() {
 		try {
+			//Receives a message and raises an event notifying the listeners.						
 			byte[] bytes = this.connection.reciveTCP();
-			this.recivedEvent.invokeActions(bytes);			
-		} catch(NetworkException exe) {
-			if(this.stopWorking)
-				return;
-			
-			//TODO remove tmp syso.
-			System.out.println("Tcp recive timed out.");
-			System.out.println(exe.getMessage());
-			
+			this.recivedEvent.invoke(bytes);		
+		} catch(TimeoutException te) {
+			//On a timeout the network connection was lost so we stop working.
 			this.StopWorking();
-			this.timeoutEvent.invokeActions();
+			this.timeoutEvent.invoke();			
+		} catch(NetworkException ne) {
+			//If the system failed to read for a reason that was not timeout
+			//the connection is no longer valid so we stop reading from it.
+			Logger.LogException(ne);
+			this.StopWorking();
 		}
 	}
 }
