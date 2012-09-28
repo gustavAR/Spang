@@ -270,7 +270,10 @@ namespace Spang_PC_C_sharp
         {
             if (IsHeartbeat(bytes))
             {
+                ConsoleColor c = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine("Server got a heartbeat from {0}", connectionID);
+                Console.ForegroundColor = c;
                 return;
             }
             if (IsSystemMessage(bytes))
