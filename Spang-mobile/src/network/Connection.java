@@ -136,7 +136,7 @@ public class Connection implements IConnection {
 		try {
 			this.tcpSocket.setSoTimeout(value);
 		} catch (SocketException e) {
-			Logger.LogException(e);			
+			Logger.logException(e);			
 		}
 	}
 	
@@ -147,7 +147,7 @@ public class Connection implements IConnection {
 		try {
 			return this.tcpSocket.getSoTimeout();
 		} catch (SocketException e) {
-			Logger.LogException(e);
+			Logger.logException(e);
 			return 0;
 		}	
 	}
