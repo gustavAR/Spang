@@ -6,5 +6,9 @@ package events;
  *
  */
 public interface Action {
+	
+	/**
+	 * Invoked when the event calls the listener.
+	 */
 	public void onAction();
 }
