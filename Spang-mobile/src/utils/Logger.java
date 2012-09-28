@@ -6,8 +6,30 @@ package utils;
  *
  */
 public class Logger {
-	public static void LogException(Throwable throwable) {
-		//Tmp.
-		throwable.printStackTrace();
+	
+	private static ILogger logger;
+	
+	public static void setLogger(ILogger logger) {
+		Logger.logger = logger;
+	}
+	
+	public static void logException(Exception exe) {
+		logger.logException(exe);
+	}
+	
+	public static void logError(Error error) {
+		logger.logError(error);
+	}
+	
+	public static void logDebug(String message) {
+		logger.logDebugg(message);
+	}
+	
+	public static void logInfo(String message){
+		logger.logInfo(message);
+	}
+	
+	public static void logAssert(String message) {
+		logger.logAssert(message);
 	}
 }
