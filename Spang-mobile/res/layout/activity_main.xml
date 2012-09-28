@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/button1"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="54dp"
+        android:layout_marginBottom="123dp"
         android:ems="10"
         android:inputType="text"
         android:text="@string/default_ip" >
@@ -33,8 +33,18 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/editText1"
-        android:layout_marginRight="38dp"
+        android:layout_marginRight="32dp"
         android:onClick="sendText"
         android:text="TextSend" />
+
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText1"
+        android:layout_alignTop="@+id/editText1"
+        android:layout_marginTop="50dp"
+        android:ems="5"
+        android:inputType="number" />
 
 </RelativeLayout>
