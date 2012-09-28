@@ -25,7 +25,6 @@ import android.view.MotionEvent;
 public class MouseView extends AbstractSpangView{
 	private static final String MOUSEMOVING_STATE = "MOUSEMOVING_STATE";
 	private static final String SCROLLING_STATE = "SCROLLING_STATE";
-	private static final String TIMEOUT_STATE = "TIMEOUT_STATE";
 
 	private final Paint paint = new Paint();
 	private final boolean multiTouchEnabled = Integer.parseInt(Build.VERSION.SDK) >= Build.VERSION_CODES.CUPCAKE;
@@ -50,7 +49,6 @@ public class MouseView extends AbstractSpangView{
 		this.stateMachine = new InputStateMachine();
 		this.stateMachine.registerState(MOUSEMOVING_STATE, new MouseMovingState());
 		this.stateMachine.registerState(SCROLLING_STATE, new ScrollingState());
-		this.stateMachine.registerState(TIMEOUT_STATE, new TimeoutState());
 
 		this.stateMachine.changeState(MOUSEMOVING_STATE);
 
@@ -80,19 +78,6 @@ public class MouseView extends AbstractSpangView{
 	public boolean onTouchEvent(MotionEvent event) {
 		stateMachine.onTouchEvent(event);
 		return true; //TODO Is this ok?
-	}
-
-	private void inputTimer(final int milliseconds){
-		Runnable runnable = new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(milliseconds);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		new Thread(runnable).start();
 	}
 
 	private GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
@@ -268,26 +253,12 @@ public class MouseView extends AbstractSpangView{
 					fingerOneID = event.getPointerId(newPointerIndex);
 				}
 				if(event.getPointerCount() <= 2)
-					stateMachine.changeState(TIMEOUT_STATE);
+					stateMachine.changeState(MOUSEMOVING_STATE);
 				break;
 			} 
 
 			// Schedules a repaint.
 			invalidate();
-		}
-		/*	
-		@Override
-		protected void enter() {}
-
-		@Override
-		protected void exit() {} */
-	}
-
-	private class TimeoutState extends InputState {
-		@Override
-		public void onTouchEvent(MotionEvent event){
-			inputTimer(100);
-			stateMachine.changeState(MOUSEMOVING_STATE);
 		}
 		/*	
 		@Override

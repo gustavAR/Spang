@@ -52,7 +52,7 @@ public class TextSenderActivity extends Activity {
     	String toSend = text.getText().toString();
     	
     	ByteBuffer buffer = ByteBuffer.allocate(toSend.length() + 5).order(ByteOrder.LITTLE_ENDIAN);
-    	buffer.put((byte)10);
+    	buffer.put((byte)11);
     	
     	buffer.putInt(toSend.length());
     	try {
