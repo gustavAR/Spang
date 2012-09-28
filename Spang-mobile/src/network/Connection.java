@@ -1,7 +1,6 @@
 package network;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,11 +8,15 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
+
+import utils.Logger;
+
+import network.exceptions.NetworkException;
+import network.exceptions.TimeoutException;
 
 /**
  * A utility class implementing IConnection making it easier to send and receive data through a connection
@@ -45,7 +48,7 @@ public class Connection implements IConnection {
 		try {
 			this.udpSocket.send(packet);
 		} catch (IOException e) {
-			throw new IllegalArgumentException("The client could not send the data");
+			throw new NetworkException("The connection could not send the data", e);
 		}
 	}
 	
@@ -63,7 +66,7 @@ public class Connection implements IConnection {
 			stream.write(data);
 			stream.flush();
 		} catch (IOException e) {
-			throw new NetworkException(e);
+			throw new NetworkException("The connection could not send the data", e);
 		}
 	}
 	
@@ -72,14 +75,7 @@ public class Connection implements IConnection {
 	 */
 	public byte[] reciveUDP() {
 		DatagramPacket packet = new DatagramPacket(new byte[DATA_CAPACITY], DATA_CAPACITY);
-		try {
-			this.udpSocket.receive(packet);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		packet.getLength();
-		
+		this.reciveUdpPackage(packet);		
 		
 		byte[] copy = new byte[packet.getLength()];
 		for (int i = 0; i < copy.length; i++) {
@@ -89,23 +85,39 @@ public class Connection implements IConnection {
 		return copy;
 	}
 	
+	private void reciveUdpPackage(DatagramPacket packet) {
+		while(true) {		
+			try {
+				this.udpSocket.receive(packet);
+				return;
+			}catch(SocketTimeoutException ste) {
+				//Since udp is a connection-less protocol it should never timeout.
+				//But this particular java implementation does for some reason.
+				//We ignore it and simply try to receive the package again.
+			} catch (IOException e) {
+				throw new NetworkException("UDP read failed.", e);
+			}
+		}
+	}
+	
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	public byte[] reciveTCP() {
 		try {
-			InputStream stream = this.tcpSocket.getInputStream();
-			
+			InputStream stream = this.tcpSocket.getInputStream();			
 			int b1 = stream.read();
 			int b2 = stream.read();
 			int length = (b1 << 8) | b2;			
 			byte[] data = new byte[length];
-			
-			
+						
 			stream.read(data);
 			return data;
+		}catch(SocketTimeoutException ste) {
+			throw new TimeoutException("Tcp read timed out.", ste);			
 		} catch (IOException e) {
-			throw new NetworkException(e);
+			throw new NetworkException("Tcp read failed", e);
 		}
 	}
 	
@@ -124,8 +136,7 @@ public class Connection implements IConnection {
 		try {
 			this.tcpSocket.setSoTimeout(value);
 		} catch (SocketException e) {
-			//This exception should never be raised.
-			e.printStackTrace();
+			Logger.LogException(e);			
 		}
 	}
 	
@@ -136,8 +147,7 @@ public class Connection implements IConnection {
 		try {
 			return this.tcpSocket.getSoTimeout();
 		} catch (SocketException e) {
-			//This exception should never be raised.
-			e.printStackTrace();
+			Logger.LogException(e);
 			return 0;
 		}	
 	}
