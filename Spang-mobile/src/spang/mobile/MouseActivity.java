@@ -20,14 +20,14 @@ public class MouseActivity extends Activity {
 	private static final int PORT = 1337;
 	private String adress;
 	private IConnection connection;
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
 
-        this.adress = intent.getStringExtra("connection");
-        
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Intent intent = getIntent();
+
+		this.adress = intent.getStringExtra("connection");
+
 		Client client = new Client();
 		try {
 			client.connect(InetAddress.getByName(adress), PORT);
@@ -35,23 +35,23 @@ public class MouseActivity extends Activity {
 		} catch (UnknownHostException e) {
 			throw new NetworkException(e);
 		}
-        
-		
-        MouseView mView = new MouseView(this, null, this.connection);
-       
-        setContentView(mView);
-        mView.setFocusableInTouchMode(true);
-        if(!mView.requestFocus())
-        	throw new NotImplementedException();
-          
-    }
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_mouse, menu);
-        return true;
-    }
-    
-  
-    
+
+
+		MouseView mView = new MouseView(this, null, this.connection);
+
+		setContentView(mView);
+		mView.setFocusableInTouchMode(true);
+		if(!mView.requestFocus())
+			throw new NotImplementedException();
+
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_mouse, menu);
+		return true;
+	}
+
+
+
 }

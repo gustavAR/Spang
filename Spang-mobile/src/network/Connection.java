@@ -134,7 +134,7 @@ public class Connection implements IConnection {
 	 */
 	public void setTimeout(int value) {
 		try {
-			this.tcpSocket.setSoTimeout(value);
+			this.tcpSocket.setSoLinger(true, value);
 		} catch (SocketException e) {
 			Logger.logException(e);			
 		}
