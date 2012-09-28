@@ -4,6 +4,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
+import utils.Logger;
+
 import network.exceptions.HostException;
 import network.exceptions.NetworkException;
 
@@ -228,28 +230,38 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public void sendUDP(byte[] toSend) {
-		this.connection.sendUDP(toSend);		
+		try {
+			this.connection.sendUDP(toSend);	
+		} catch(NetworkException e) {
+			Logger.LogException(e);		
+			this.onDisconnect(DCCause.LocalNetworkCrash);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void sendTCP(byte[] toSend) {
-		this.connection.sendTCP(toSend);
+		try {
+			this.connection.sendTCP(toSend);
+		} catch(NetworkException e) {
+			Logger.LogException(e);
+			this.onDisconnect(DCCause.LocalNetworkCrash);
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void addConnectedListener(EventHandler<IClient, Boolean> listener) {
-		this.connectionEvent.addHandler(listener);
+		this.connectionEvent.addListener(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void removeConnectedListener(EventHandler<IClient, Boolean> listener) {
-		this.connectionEvent.removeHandler(listener);
+		this.connectionEvent.removeListener(listener);
 	}
 
 	/**
@@ -257,7 +269,7 @@ public class Client implements IClient {
 	 */
 	public void addDisconnectedListener(
 			EventHandler<IClient, DCCause> listener) {
-		this.disconnectedEvent.addHandler(listener);
+		this.disconnectedEvent.addListener(listener);
 	}
 
 	/**
@@ -265,21 +277,21 @@ public class Client implements IClient {
 	 */
 	public void removeDisconnectedListener(
 			EventHandler<IClient, DCCause> listener) {
-		this.disconnectedEvent.removeHandler(listener);
+		this.disconnectedEvent.removeListener(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void addRevicedListener(EventHandler<IClient, byte[]> listener) {
-		this.recivedEvent.addHandler(listener);
+		this.recivedEvent.addListener(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void removeRevicedListener(EventHandler<IClient, byte[]> listener) {
-		this.recivedEvent.removeHandler(listener);
+		this.recivedEvent.removeListener(listener);
 	}	
 	
 	/**
