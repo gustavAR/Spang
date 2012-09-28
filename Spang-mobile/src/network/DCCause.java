@@ -20,5 +20,16 @@ public enum DCCause {
 	/**
 	 * Connection was disconnected locally.
 	 */
-	LocalShutdown
+	LocalShutdown,
+	
+	/**
+	 * Connection was disconnected because the local connection crashed.
+	 */
+	LocalNetworkCrash,
+	
+	/**
+	 * Connection was disconnection because the remote endpoint crashed.
+	 * Note: This almost always shows itself as a TCPTimeout cause.
+	 */
+	RemoteNetworkCrash
 }
