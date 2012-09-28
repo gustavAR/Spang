@@ -8,7 +8,7 @@ import java.nio.ByteOrder;
 
 import network.Client;
 import network.IConnection;
-import network.NetworkException;
+import network.exceptions.NetworkException;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

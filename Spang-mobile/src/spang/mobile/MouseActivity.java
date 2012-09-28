@@ -5,8 +5,8 @@ import java.net.UnknownHostException;
 
 import network.Client;
 import network.IConnection;
-import network.NetworkException;
-import network.NotImplementedException;
+import network.exceptions.NetworkException;
+import network.exceptions.NotImplementedException;
 import android.app.Activity;
 import android.content.Intent;
 import android.media.AudioManager;
