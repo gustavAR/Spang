@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
@@ -47,6 +48,15 @@ public class MainActivity extends Activity {
 		intent.putExtra("connection", ip);
 		this.startActivity(intent);
 	}
-
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()){
+		case R.id.menu_settings: 
+			Intent intent = new Intent(this, PrefsActivity.class);
+			startActivity(intent);
+		}
+		return true;
+	}
 
 }

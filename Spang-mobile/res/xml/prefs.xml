@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+ <PreferenceCategory
+   android:summary="Sensor settings"
+   android:title="Accelerometer settings" >
+  <EditTextPreference
+     android:key="Sampling frequency"
+     android:summary="Please enter"
+     android:title="Sampling frequency" />
+
+  <CheckBoxPreference
+     android:key="checkBox"
+     android:summary="On/Off"
+     android:title="Activated" />
+ </PreferenceCategory>
+
+ <PreferenceCategory
+   android:summary="Username and password information"
+   android:title="Settings" >
+
+ </PreferenceCategory>
+ <PreferenceCategory></PreferenceCategory>
+</PreferenceScreen>
