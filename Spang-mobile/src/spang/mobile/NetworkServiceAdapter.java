@@ -1,5 +1,6 @@
 package spang.mobile;
 
+import network.IConnection;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -59,5 +60,23 @@ public class NetworkServiceAdapter implements  ServiceConnection {
 		if(this.isBound) {
 			this.serivce.sendTCP(message);
 		}
+	}
+
+	public void startService(Context context) {
+		Intent intent = new Intent(context, NetworkService.class);	
+		context.startService(intent);
+	}
+	
+	public void stopService(Context context) {
+		Intent intent = new Intent(context, NetworkService.class);	
+		context.stopService(intent);
+	}
+
+	public IConnection getConnection() {
+		return this.serivce.getConnection();
+	}
+
+	public boolean isConnected() {
+		return this.serivce.isConnected();
 	}
 }

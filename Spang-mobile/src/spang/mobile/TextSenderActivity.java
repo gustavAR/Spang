@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
 
 import network.Client;
 import network.IConnection;
+import network.*;
 import network.exceptions.NetworkException;
 import android.app.Activity;
 import android.content.Intent;
@@ -32,7 +33,7 @@ public class TextSenderActivity extends Activity {
         Intent intent = getIntent();
         this.adress = intent.getStringExtra("connection");
 
-		Client client = new Client();
+		Client client = new Client(new Connector());
 		try {
 			client.connect(InetAddress.getByName(adress), PORT);
 			this.connection= client.getConnection();

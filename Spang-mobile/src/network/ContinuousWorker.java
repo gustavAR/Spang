@@ -29,6 +29,10 @@ public abstract class ContinuousWorker implements Runnable {
 		this.stopWorking = true;
 	}
 	
+	
+	/**	
+	 * {@inheritDoc}
+	 */
 	public void run() {
 		while(!stopWorking) {
 			this.DoWork();			
