@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 
 import utils.Logger;
 
-import network.exceptions.HostException;
+import network.exceptions.InvalidEndpointException;
 import network.exceptions.NetworkException;
 
 import events.Action;
@@ -19,6 +19,7 @@ public class Client implements IClient {
 	//Default time it takes for the connection to time out.
 	private static final int DEF_TIMEOUT = 10000;
 	
+	private final IConnector connector;
 	//The connection used to send and receive messages.
 	private IConnection connection;
 	//Worker used to receive udp messages asynchronously.
@@ -42,7 +43,8 @@ public class Client implements IClient {
 	/**
 	 * Creates a new client.
 	 */
-	public Client() {
+	public Client(IConnector connector) {
+		this.connector = connector;
 		this.connectionEvent = new EventHandlerDelegate<IClient, Boolean>();
 		this.recivedEvent = new EventHandlerDelegate<IClient, byte[]>();
 		this.disconnectedEvent = new EventHandlerDelegate<IClient, DCCause>();
@@ -98,9 +100,12 @@ public class Client implements IClient {
 			InetAddress address = InetAddress.getByName(host);
 			this.connect(address, port);
 		} catch (UnknownHostException e) {
-			throw new HostException("Host name could not be resolved. host =" + host);			
-		}		
-		
+			String message = "Host name invalid name =" + host;
+			if(port < 0 || port > 0xFFFF) {
+				message += " Port invalid port=" + port;
+			}
+			throw new InvalidEndpointException(message);			
+		}				
 	}
 	
 	private void connect(InetSocketAddress address, boolean reconnecting) {
@@ -108,7 +113,7 @@ public class Client implements IClient {
 		if(this.connection != null)
 			throw new NetworkException("We are already connected. Can't connect to a new connecting.");
 		
-		this.connection = Connection.connectTO(address);
+		this.connection = this.connector.connect(address);
 		
 		this.onConnected(reconnecting);
 	}
@@ -119,7 +124,8 @@ public class Client implements IClient {
 		this.connectionEvent.invoke(this, reconnecting);
 		this.startReciving();
 	}
-
+	
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -188,7 +194,9 @@ public class Client implements IClient {
 
 	private void stopReciving() {
 		this.tcpWorker.StopWorking();
+		this.tcpWorker.clearEventListeners();
 		this.udpWorker.StopWorking();
+		this.udpWorker.clearEventListeners();
 		
 		this.tcpWorker = null;
 		this.udpWorker = null;
@@ -221,7 +229,7 @@ public class Client implements IClient {
 		return message[0] == 0;
 	}
 	
-	private void handleSystemMessage(byte[] message) {
+	private void handleSystemMessage(byte[] message) {		
 		//TODO implement this.		
 		System.out.println("Just recived a system message.");
 	}

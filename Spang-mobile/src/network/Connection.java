@@ -1,6 +1,5 @@
 package network;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,13 +9,10 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-import utils.Logger;
 
 import network.exceptions.NetworkException;
 import network.exceptions.TimeoutException;
+import utils.Logger;
 
 /**
  * A utility class implementing IConnection making it easier to send and receive data through a connection
@@ -115,7 +111,10 @@ public class Connection implements IConnection {
 			stream.read(data);
 			return data;
 		}catch(SocketTimeoutException ste) {
-			throw new TimeoutException("Tcp read timed out.", ste);			
+			throw new TimeoutException("Tcp read timed out.", ste);		
+		}catch(NegativeArraySizeException neg) {
+			//Sometimes when the socket times out the stream continues to read.
+			throw new TimeoutException("Tcp read timed out.", neg);		
 		} catch (IOException e) {
 			throw new NetworkException("Tcp read failed", e);
 		}
@@ -176,31 +175,5 @@ public class Connection implements IConnection {
 		} catch (IOException e) {
 			throw new NetworkException("Failed to close the connection!");			
 		}
-	}
-	
-	public static IConnection connectTO(InetSocketAddress address) {
-		try {
-			Socket tcpSocket = new Socket(address.getAddress(), address.getPort());						
-			int localPort = tcpSocket.getLocalPort();
-			
-			DatagramSocket udpSocket = new DatagramSocket(localPort);
-		
-			int udpPort = readOutgoingUdpPort(tcpSocket);
-			//Connects the udpSocket to the correct receiving UDP-connection.
-			udpSocket.connect(tcpSocket.getInetAddress(), udpPort);		
-			
-			return new Connection(tcpSocket, udpSocket);
-			
-		} catch(Exception e) {
-			throw new NetworkException("Could not connect to " + address.getAddress() + " at port" + address.getPort(), e);
-		}		
-	}
-	
-	private static int readOutgoingUdpPort(Socket tcpSocket) throws IOException {
-		InputStream stream = new DataInputStream(tcpSocket.getInputStream());
-		//The format of the sent integer is little-endian so we convert it using a ByteBuffer.
-		ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
-		stream.read(buffer.array(),0, 4);
-		return buffer.getInt();
 	}
 }
