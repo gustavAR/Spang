@@ -58,6 +58,11 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        <service
+            android:name=".KeyboardService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>
