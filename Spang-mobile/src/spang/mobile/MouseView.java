@@ -155,14 +155,6 @@ public class MouseView extends AbstractSpangView{
 				prevPointers.add(activeIndex, pointers.get(activeIndex));
 				break;
 
-//			case MotionEvent.ACTION_UP:
-//				fingerOneID = INVALID_POINTER_ID;
-//				break;
-//
-//			case MotionEvent.ACTION_CANCEL:
-//				fingerOneID = INVALID_POINTER_ID;
-//				break;
-
 			case MotionEvent.ACTION_POINTER_DOWN:
 				stateMachine.changeState(SCROLLING_STATE);
 				break;
@@ -214,14 +206,6 @@ public class MouseView extends AbstractSpangView{
 
 				prevPointers.add(activeIndex, pointers.get(activeIndex));
 				break;
-
-//			case MotionEvent.ACTION_UP:
-//				fingerOneID = INVALID_POINTER_ID;
-//				break;
-//
-//			case MotionEvent.ACTION_CANCEL:
-//				fingerOneID = INVALID_POINTER_ID;
-//				break;
 
 			case MotionEvent.ACTION_POINTER_UP:
 				final int pointerIndex = (eventID & MotionEvent.ACTION_POINTER_INDEX_MASK) >> 
