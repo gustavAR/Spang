@@ -20,8 +20,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
-
-
 @SuppressLint("NewApi")
 public class MouseView extends AbstractSpangView{
 	private static final String MOUSEMOVING_STATE = "MOUSEMOVING_STATE";
