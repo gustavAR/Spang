@@ -3,37 +3,49 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import network.IConnection;
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.os.IBinder;
+import android.preference.PreferenceManager;
 
 /**
  * Class used to communicate sensor input with other parts of the system.
  * @author Pontus Pall & Gustav Alm Rosenblad
  */
-public class SensorProcessor {
-	private static final String  SAMPLING_RATE_NAME = "SAMPLING_RATE";
-	private static final int  DEFAULT_SAMPLING_RATE = 20;
-	public static final String PREFS_NAME = "PreferenceFile";
-	
-	private SharedPreferences settings;
+public class SensorProcessor extends Service{
+
+	private static int DEFAULT_SAMPLINGRATE = 20;
+	private SharedPreferences preferences;
 	private List<ISensor> sensors = new ArrayList<ISensor>();
 	private ByteBuffer encodedSensorInput; 
 	private IConnection connection;
 	private SensorManager manager;
 	private int samplingRate;
 
-	public SensorProcessor(Context context, IConnection connection) {
-		this.manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE); 
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+
+		this.manager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE); 
+
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
 		SensorListBuilder builder = new SensorListBuilder(this.manager);
 		this.sensors = builder.build();
 		this.connection = connection;	
 		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
+
 		
-		this.settings = context.getSharedPreferences(PREFS_NAME, 0);
-		this.samplingRate = settings.getInt(SAMPLING_RATE_NAME, DEFAULT_SAMPLING_RATE);
+
 	}
 
 	/**
@@ -41,20 +53,21 @@ public class SensorProcessor {
 	 * with a specific sampling rate.
 	 */
 	public void startProcess() {
-		Runnable runnable = new Runnable() {
-			public void run() {
-				while(true){
-					processInput();
-					try {
-						Thread.sleep(samplingRate);
-					} catch (InterruptedException e) {
-						
-						e.printStackTrace();
-					}
+		Timer timer = new Timer();
+		for (final ISensor sensor : sensors) {
+			TimerTask task = new TimerTask() {
+
+				@Override
+				public void run() {	
+					processInput(sensor);
 				}
-			}
-		};
-		new Thread(runnable).start();
+			};
+			timer.scheduleAtFixedRate(task, 0, getSamplingRateBySensor(sensor));
+		}
+	}
+
+	private int getSamplingRateBySensor(ISensor sensor){	
+		return this.preferences.getInt(""+sensor.getSensorID(), DEFAULT_SAMPLINGRATE);
 	}
 
 	/**
@@ -78,19 +91,18 @@ public class SensorProcessor {
 	}
 
 	/**
-	 * Updates the value of getEncodedSensorInput();
+	 * Updates the value of getEncodedSensorInput() for the specified sensor
+	 * @param sensor 
 	 */
-	private void processInput() {
-		fillOutput();
+	private void processInput(ISensor sensor) {
+		fillOutput(sensor);
 		this.connection.sendUDP(encodedSensorInput.array());
 		encodedSensorInput.clear();
 	}
 
-	private void fillOutput() {
-		for (ISensor sensor : sensors) {
-			if(sensor.isRunning()) {
-				sensor.encode(this.encodedSensorInput);		
-			}
+	private void fillOutput(ISensor sensor) {	
+		if(sensor.isRunning()) {
+			sensor.encode(this.encodedSensorInput);		
 		}
 	}
 
@@ -121,5 +133,11 @@ public class SensorProcessor {
 	 */
 	public void setSamplingRate(int samplingRate) {
 		this.samplingRate = samplingRate;
+	}
+
+	@Override
+	public IBinder onBind(Intent arg0) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

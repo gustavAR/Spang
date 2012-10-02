@@ -60,7 +60,7 @@ public class MouseView extends AbstractSpangView{
 
 		this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
 
-		this.sp = new SensorProcessor(context, connection);
+		this.sp = new SensorProcessor();
 		this.sp.setActive(Sensor.TYPE_LINEAR_ACCELERATION, true);
 		this.sp.startProcess();
 	}

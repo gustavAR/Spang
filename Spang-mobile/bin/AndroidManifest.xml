@@ -58,6 +58,7 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        <activity android:name="PrefsActivity"></activity>
     </application>
 
 </manifest>
