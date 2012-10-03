@@ -20,13 +20,13 @@ public class TouchView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		int pointers = event.getPointerCount();
 		
-		packer.pack((byte)100); //Temporary ID for touch packets
-		packer.pack((byte)pointers);
+		packer.packByte((byte)100); //Temporary ID for touch packets
+		packer.packByte((byte)pointers);
 		for(int i = 0; i < pointers; i++) {
-			packer.pack(event.getX(i));
-			packer.pack(event.getY(i));
-			packer.pack(event.getPressure(i));	
-			packer.pack((event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> 
+			packer.packHalfFloat(event.getX(i));
+			packer.packHalfFloat(event.getY(i));
+			packer.packHalfFloat(event.getPressure(i));	
+			packer.packInt((event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> 
 			MotionEvent.ACTION_POINTER_INDEX_SHIFT);
 		}
 
