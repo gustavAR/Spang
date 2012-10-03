@@ -103,8 +103,6 @@ namespace Spang_PC_C_sharp
         private IConnection connection;
         //Worker that listens to udp messages.
         private UdpWorker uworker;
-        //Worker that listens to tcp messages.
-        private TcpWorker tworker;
 
         #region Connect
         /// <summary>
@@ -191,20 +189,16 @@ namespace Spang_PC_C_sharp
         /// </summary>
         private void Start()
         {
-            if (uworker != null && tworker != null)
+            if (uworker != null)
                 return; //We are already receiving.
 
             //Creates new workers and threads using them.
 
             this.uworker = new UdpWorker(this.connection);
             uworker.Recive += this.OnRecived;
-
-            this.tworker = new TcpWorker(this.connection);
-            tworker.Recive += this.OnRecived;
-            tworker.TimedOut += this.OnTimeout;
+            uworker.Timeout += this.OnTimeout;
 
             new Thread(uworker.DoWork).Start();
-            new Thread(tworker.DoWork).Start();
         }
 
         /// <summary>
@@ -212,16 +206,12 @@ namespace Spang_PC_C_sharp
         /// </summary>
         private void Stop()
         {
-            if (this.tworker != null || this.uworker != null)
+            if (this.uworker != null)
             {
                 
-                //Stops the threads reciveing messages.
-                this.tworker.Recive -= this.OnRecived;
-                this.tworker.TimedOut -= this.OnTimeout;
-                this.tworker.StopWorking();
                 this.uworker.Recive -= this.OnRecived;
+                this.uworker.Timeout -= this.OnTimeout;
                 this.uworker.StopWorking();
-                this.tworker = null;
                 this.uworker = null;
             }
         }
