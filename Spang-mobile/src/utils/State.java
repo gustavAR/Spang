@@ -1,4 +1,5 @@
-package spang.mobile;
+package utils;
+
 
 public abstract class State {
 	private StateMachine<? extends State> machine;

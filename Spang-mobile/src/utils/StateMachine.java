@@ -1,8 +1,9 @@
-package spang.mobile;
+package utils;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 /**
  * 
  * @author Lukas Kurtyan

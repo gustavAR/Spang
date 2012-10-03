@@ -1,4 +1,4 @@
-package spang.mobile;
+package utils;
 
 import android.view.MotionEvent;
 /**
@@ -15,5 +15,4 @@ public class InputState extends State{
 
 	@Override
 	protected void exit() {}
-
 }

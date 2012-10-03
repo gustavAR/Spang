@@ -1,4 +1,4 @@
-package spang.mobile;
+package utils;
 
 import android.view.MotionEvent;
 /**
