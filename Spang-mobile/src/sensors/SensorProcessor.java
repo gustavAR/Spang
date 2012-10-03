@@ -43,7 +43,7 @@ public class SensorProcessor extends Service{
 		this.connection = connection;	//TODO Huh? How should it really be initialized?
 		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
 
-		
+
 
 	}
 
@@ -57,8 +57,9 @@ public class SensorProcessor extends Service{
 			TimerTask task = new TimerTask() {
 
 				@Override
-				public void run() {	
-					processInput(sensor);
+				public void run() {
+					if(isSensorActivated(sensor))
+						processInput(sensor);
 				}
 			};
 			timer.scheduleAtFixedRate(task, 0, getSamplingRateBySensor(sensor));
@@ -66,7 +67,11 @@ public class SensorProcessor extends Service{
 	}
 
 	private int getSamplingRateBySensor(ISensor sensor){	
-		return this.preferences.getInt(""+sensor.getSensorID(), DEFAULT_SAMPLINGRATE);
+		return this.preferences.getInt("sampleRate"+sensor.getName(), DEFAULT_SAMPLINGRATE);
+	}
+
+	private boolean isSensorActivated(ISensor sensor){
+		return this.preferences.getBoolean("isActivated"+sensor.getName(), true);
 	}
 
 	/**

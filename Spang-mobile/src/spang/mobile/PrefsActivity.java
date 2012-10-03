@@ -37,13 +37,14 @@ public class PrefsActivity extends PreferenceActivity{
 				screen.addPreference(sensorCategory);
 				
 				CheckBoxPreference checkbox = new CheckBoxPreference(this);
-				checkbox.setKey(""+sensor.getSensorID());
+				checkbox.setKey("isActivated"+name);
 				checkbox.setTitle("Activated");
 				checkbox.setSummary("Power usage: "+sensor.getPowerUsage()+"mA");
 				
 				SeekBarPreference sampleRate = new SeekBarPreference(this, "Sample rate","Hz",1, 60);
 				sampleRate.setTitle("Sample rate");
 				sampleRate.setSummary("Current value: "+sampleRate.getProgress());
+				sampleRate.setKey("sampleRate"+name);
 				
 				sensorCategory.addPreference(checkbox);
 				sensorCategory.addPreference(sampleRate);
