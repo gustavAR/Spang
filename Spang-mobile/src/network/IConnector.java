@@ -10,8 +10,9 @@ public interface IConnector {
 	
 	/**
 	 * Connects to a remote endpoint.
-	 * @param the remote endpoint to connect to.
+	 * @param address the remote endpoint to connect to.
+	 * @param timeout the time the connector will try to connect.
 	 * @return a new IConnection object that connects the two remote points.
 	 */
-	IConnection connect(InetSocketAddress address);
+	IConnection connect(InetSocketAddress address, int timeout);
 }

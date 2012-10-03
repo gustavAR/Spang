@@ -1,10 +1,8 @@
 package network;
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Socket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -13,29 +11,38 @@ import network.exceptions.NetworkException;
 
 public class Connector implements IConnector {
 
-	public IConnection connect(InetSocketAddress address) {
+	/**
+	 * {@inheritDoc}
+	 */
+	public IConnection connect(InetSocketAddress address, int timeout) {
 		try {
-			Socket tcpSocket = new Socket(address.getAddress(), address.getPort());						
-			int localPort = tcpSocket.getLocalPort();
-			
-			DatagramSocket udpSocket = new DatagramSocket(localPort);
+			DatagramSocket socket = new DatagramSocket();
+			//Sends a empty message signaling that we want to connect.
+			DatagramPacket dpacket = new DatagramPacket(new byte[0], 0, address);
+			socket.send(dpacket);
+							
+			//Receives a callback message giving endpoint specific information.
+			int remotePort = this.readOutgoingUdpPort(socket);
+			//Uses the received information to connect.
+			socket.connect(new InetSocketAddress(address.getAddress(), remotePort));		
 		
-			int udpPort = readOutgoingUdpPort(tcpSocket);
-			//Connects the udpSocket to the correct receiving UDP-connection.
-			udpSocket.connect(tcpSocket.getInetAddress(), udpPort);		
-			
-			return new Connection(tcpSocket, udpSocket);
-			
-		} catch(Exception e) {
-			throw new NetworkException("Could not connect to " + address.getAddress() + " at port" + address.getPort(), e);
-		}		
+			return new Connection(socket);
+		} catch (IOException e) {
+			throw new NetworkException("Could not connect");
+		}
 	}
-	
-	private static int readOutgoingUdpPort(Socket tcpSocket) throws IOException {
-		InputStream stream = new DataInputStream(tcpSocket.getInputStream());
-		//The format of the sent integer is little-endian so we convert it using a ByteBuffer.
+
+	private int readOutgoingUdpPort(DatagramSocket socket) throws IOException {
+		//Recives connection information package.
+		DatagramPacket dpacket = new DatagramPacket(new byte[4], 4);
+		socket.receive(dpacket);
+		
+		//Parses the package using LittleEndian byte order.
 		ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
-		stream.read(buffer.array(),0, 4);
+		buffer.put(dpacket.getData());
+		buffer.rewind();
+		
+		
 		return buffer.getInt();
 	}
 }

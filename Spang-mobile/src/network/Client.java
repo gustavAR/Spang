@@ -4,11 +4,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
-import utils.Logger;
-
 import network.exceptions.InvalidEndpointException;
 import network.exceptions.NetworkException;
-
+import utils.Logger;
 import events.Action;
 import events.Action1;
 import events.EventHandler;
@@ -17,15 +15,19 @@ import events.EventHandlerDelegate;
 public class Client implements IClient {
 
 	//Default time it takes for the connection to time out.
-	private static final int DEF_TIMEOUT = 10000;
+	private static final int DEF_TIMEOUT = 5000;
 	
+	//Last connection connected to or null if we never connected.
+	private InetSocketAddress lastConnectedAddress;
+	
+	//Connector used to connect with.
 	private final IConnector connector;
+	
 	//The connection used to send and receive messages.
 	private IConnection connection;
+	
 	//Worker used to receive udp messages asynchronously.
 	private UdpWorker udpWorker;	
-	//Worker used to receive tcp messages asynchronously.
-	private TcpWorker tcpWorker;
 	
 	//Event handler that raises the connected event.
 	private EventHandlerDelegate<IClient, Boolean> connectionEvent;
@@ -82,7 +84,7 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public void connect(InetSocketAddress address) {
-		this.connect(address, false);
+		this.connect(address, this.connectionTimeout, false);
 	}
 
 	/**
@@ -108,20 +110,21 @@ public class Client implements IClient {
 		}				
 	}
 	
-	private void connect(InetSocketAddress address, boolean reconnecting) {
+	private void connect(InetSocketAddress address, int timeout, boolean reconnecting) {
 		//If we are connected it makes no since to connect again.
 		if(this.connection != null)
 			throw new NetworkException("We are already connected. Can't connect to a new connecting.");
 		
-		this.connection = this.connector.connect(address);
-		
+		this.connection = this.connector.connect(address, timeout);
+		this.lastConnectedAddress = address;
 		this.onConnected(reconnecting);
 	}
 
 	private void onConnected(boolean reconnecting) {
-		this.connection.setTimeout(this.connectionTimeout);
+		this.connection.setTimeout(this.connectionTimeout);				
+		this.connectionEvent.invoke(this, reconnecting);	
 		
-		this.connectionEvent.invoke(this, reconnecting);
+		//Starts a receiver thread to start receiving new messages.
 		this.startReciving();
 	}
 	
@@ -129,24 +132,21 @@ public class Client implements IClient {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void reconnect(int retries) {
-		if(this.connection == null) {
+	public void reconnect(int retries, int timeout) {
+		if(this.lastConnectedAddress == null) {
 			throw new IllegalArgumentException("Never been connected to anything so cannot reconnect");
-		} else if(this.connection.isConnected()) {
-			return; //Nothing to do if we are already connected.
 		} else {
-			InetSocketAddress endpoint = this.connection.getRemoteEndPoint();
-			this.connection = null;
-			
-			this.reconnectInternal(retries, endpoint);
+			this.reconnectInternal(retries, timeout, this.lastConnectedAddress);
 		}
 	}
 
-	private void reconnectInternal(int retries, InetSocketAddress endpoint) {
+	private void reconnectInternal(int retries, int timeout, InetSocketAddress endpoint) {
 		for (int i = 0; i < retries; i++) {
 			try {
 				System.out.println("Trying to reconnect to " + endpoint);	
-				this.connect(endpoint, true);
+				this.connect(endpoint, timeout, true);
+				System.out.println("Success!");	
+				return;
 				
 			} catch(NetworkException e) {
 				System.out.println("Failed to reconnect " + i + " retrying...");
@@ -166,39 +166,38 @@ public class Client implements IClient {
 	private void onDisconnect(DCCause cause) {
 		this.stopReciving();
 		this.connection.close();
+		this.connection = null;
 		
 		this.disconnectedEvent.invoke(this, cause);
 	}
 
 
 	private void startReciving() {
-		
-		this.tcpWorker = new TcpWorker(this.connection);
 		this.udpWorker = new UdpWorker(this.connection);
 		
-		this.tcpWorker.addRecivedAction(new Action1<byte[]>() {
+		this.udpWorker.addRecivedAction(new Action1<byte[]>() {
+			
 			public void onAction(byte[] obj) {
 				onRecived(obj);
 			}
 		});
 		
-		this.tcpWorker.addTimeoutAction(new Action() {			
+		this.udpWorker.addTimeoutAction(new Action() {			
 			public void onAction() {
 				onTimeout();
 			}
 		});
 		
-		new Thread(tcpWorker).start();
 		new Thread(udpWorker).start();
 	}
 
 	private void stopReciving() {
-		this.tcpWorker.StopWorking();
-		this.tcpWorker.clearEventListeners();
+		if(this.udpWorker == null)
+			return;
+		
 		this.udpWorker.StopWorking();
 		this.udpWorker.clearEventListeners();
 		
-		this.tcpWorker = null;
 		this.udpWorker = null;
 	}
 	
@@ -218,7 +217,7 @@ public class Client implements IClient {
 	
 	
 	private void sendHeartBeatResponse() {
-		this.sendTCP(new byte[0]);
+		this.send(new byte[0]);
 	}
 
 	private boolean isHeartbeat(byte[] message) {
@@ -237,9 +236,9 @@ public class Client implements IClient {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void sendUDP(byte[] toSend) {
+	public void send(byte[] toSend) {
 		try {
-			this.connection.sendUDP(toSend);	
+			this.connection.send(toSend);	
 		} catch(NetworkException e) {
 			Logger.logException(e);		
 			this.onDisconnect(DCCause.LocalNetworkCrash);
@@ -249,9 +248,9 @@ public class Client implements IClient {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void sendTCP(byte[] toSend) {
+	public void send(byte[] toSend, Protocol protocol) {
 		try {
-			this.connection.sendTCP(toSend);
+			this.connection.send(toSend, protocol);
 		} catch(NetworkException e) {
 			Logger.logException(e);
 			this.onDisconnect(DCCause.LocalNetworkCrash);
@@ -300,13 +299,13 @@ public class Client implements IClient {
 	 */
 	public void removeRevicedListener(EventHandler<IClient, byte[]> listener) {
 		this.recivedEvent.removeListener(listener);
-	}	
-	
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
-	public IConnection getConnection(){
-		return this.connection;
-	}
-	
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}	
 }

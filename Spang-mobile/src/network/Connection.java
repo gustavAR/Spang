@@ -1,75 +1,76 @@
 package network;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.PortUnreachableException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.HashMap;
+import java.util.Map;
 
 import network.exceptions.NetworkException;
 import network.exceptions.TimeoutException;
-import utils.Logger;
 
-/**
- * A utility class implementing IConnection making it easier to send and receive data through a connection
- * @author Lukas Kurtyan & Joakim Johansson
- *
- */
 public class Connection implements IConnection {
-
-	//The maximum size of a data packet;
+	
+	//The maximum size of incomming packages.
 	private static final int DATA_CAPACITY = 1024;
-
-	private DatagramSocket udpSocket;
-	private Socket tcpSocket;
 	
-	/**Constructor for Connection.
-	 * 
-	 */
-	public Connection(Socket tcpSocket, DatagramSocket udpSocket)  
-	{
-		this.tcpSocket = tcpSocket;
-		this.udpSocket = udpSocket;
-	}
+	//Are we connected?
+	private volatile boolean connected = false;
+	
+	//The socket used for any actual networking.
+	private final DatagramSocket socket;	
+	
+	
+	private final Map<Protocol, IProtocolHelper> protocols;
 	
 	/**
-	 * {@inheritDoc}
+	 * Creates a connection.
+	 * @param socket a connected socket. 
+	 * @throws IllegalArgumentException
 	 */
-	public void sendUDP(byte[] data) {
-		DatagramPacket packet = new DatagramPacket(data, data.length);
-		try {
-			this.udpSocket.send(packet);
-		} catch (IOException e) {
-			throw new NetworkException("The connection could not send the data", e);
-		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public void sendTCP(byte[] data) {
-		try {
-			OutputStream stream = this.tcpSocket.getOutputStream();
-			short length = (short)data.length;
+	public Connection(DatagramSocket socket) {
+		if(!socket.isConnected())
+			throw new IllegalArgumentException("Socket not connected!");
 			
-			stream.write((byte)((length >> 8) & 0xFF));
-			stream.write((byte)(length & 0xFF));
-			
-			stream.write(data);
-			stream.flush();
-		} catch (IOException e) {
-			throw new NetworkException("The connection could not send the data", e);
-		}
+		this.socket = socket;		
+		this.connected = true;	
+		
+		this.protocols = new HashMap<Protocol, IProtocolHelper>();
+		this.protocols.put(Protocol.Ordered, new OrderedProtocol());
+		this.protocols.put(Protocol.Unordered, new UnorderedProtocol());
+		this.protocols.put(Protocol.Reliable, new Reliable());
+		this.protocols.put(Protocol.ReliableOrdered, new ReliableOrderedProtocol());
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public byte[] reciveUDP() {
+	public void send(byte[] data) {
+		this.send(data, Protocol.Unordered);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void send(byte[] toSend, Protocol protocol) {
+		toSend = this.protocols.get(protocol).processSentMessage(toSend);
+		
+		DatagramPacket packet = new DatagramPacket(toSend, toSend.length);		
+		try {
+			this.socket.send(packet);			
+		} catch(IOException exe) {
+			throw new NetworkException("The connection could not send the data", exe);
+		}	
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public byte[] recive() {
 		DatagramPacket packet = new DatagramPacket(new byte[DATA_CAPACITY], DATA_CAPACITY);
 		this.reciveUdpPackage(packet);		
 		
@@ -81,99 +82,76 @@ public class Connection implements IConnection {
 		return copy;
 	}
 	
+	//Helper that exception checks the receive.
 	private void reciveUdpPackage(DatagramPacket packet) {
 		while(true) {		
 			try {
-				this.udpSocket.receive(packet);
+				this.socket.receive(packet);
 				return;
-			}catch(SocketTimeoutException ste) {
-				//Since udp is a connection-less protocol it should never timeout.
-				//But this particular java implementation does for some reason.
-				//We ignore it and simply try to receive the package again.
+			} catch(PortUnreachableException ppe) {
+				//Host timed out.				
+				throw new TimeoutException("UDP timeout");
+			} catch(SocketTimeoutException ste) {
+				//We timed out.
+				throw new TimeoutException("UDP timeout");
 			} catch (IOException e) {
+				//Some other error occurred.
 				throw new NetworkException("UDP read failed.", e);
+			} finally {
+				this.connected = false;
 			}
 		}
 	}
 	
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public byte[] reciveTCP() {
-		try {
-			InputStream stream = this.tcpSocket.getInputStream();			
-			int b1 = stream.read();
-			int b2 = stream.read();
-			int length = (b1 << 8) | b2;			
-			byte[] data = new byte[length];
-						
-			stream.read(data);
-			return data;
-		}catch(SocketTimeoutException ste) {
-			throw new TimeoutException("Tcp read timed out.", ste);		
-		}catch(NegativeArraySizeException neg) {
-			//Sometimes when the socket times out the stream continues to read.
-			throw new TimeoutException("Tcp read timed out.", neg);		
-		} catch (IOException e) {
-			throw new NetworkException("Tcp read failed", e);
-		}
-	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean isConnected() {
-		return this.tcpSocket.isConnected();
+		return this.connected;
 	}
 
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getTimeout() {
+		try {
+			return this.socket.getSoTimeout();
+		} catch (SocketException e) {
+			return 0; //Can never happen.
+		}
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setTimeout(int value) {
 		try {
-			this.tcpSocket.setSoLinger(true, value);
+			this.socket.setSoTimeout(value);
 		} catch (SocketException e) {
-			Logger.logException(e);			
+			//Can never happen.
 		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public int getTimeout() {
-		try {
-			return this.tcpSocket.getSoTimeout();
-		} catch (SocketException e) {
-			Logger.logException(e);
-			return 0;
-		}	
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	public InetSocketAddress getRemoteEndPoint() {
-		return (InetSocketAddress) this.tcpSocket.getRemoteSocketAddress();
+		return (InetSocketAddress) this.socket.getRemoteSocketAddress();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public InetSocketAddress getLocalEndPoint() {
-		return (InetSocketAddress) this.tcpSocket.getLocalSocketAddress();
+		return (InetSocketAddress) this.socket.getLocalSocketAddress();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public void close() {
-		try {
-			this.tcpSocket.close();
-			this.udpSocket.close();
-		} catch (IOException e) {
-			throw new NetworkException("Failed to close the connection!");			
-		}
+		this.socket.close();		
 	}
 }

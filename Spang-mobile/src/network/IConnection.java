@@ -2,6 +2,9 @@ package network;
 
 import java.net.InetSocketAddress;
 
+import network.exceptions.NetworkException;
+import network.exceptions.TimeoutException;
+
 /**
  * Interface to handle the connection at the most basic level.
  * 
@@ -11,32 +14,32 @@ import java.net.InetSocketAddress;
 public interface IConnection {
 		
 	/**
-	 * Sends the supplied data using the UDP-protocol. 
+	 * Sends the supplied data using the default Protocol.
 	 * @param data the data to be sent.
+	 * @throws NetworkException if the connection could not send the message.
 	 */
-	void sendUDP(byte[] data);
+	void send(byte[] data) throws NetworkException;
 	
+
 	/**
-	 * Sends the supplied data using the TCP-protocol.
-	 * @param data
+	 * Sends the supplied data with the specified protocol.
+	 * @param toSend data to send.
+	 * @param protocol the protocol to use.
+	 * @throws NetworkException if the connection could not send the message.
 	 */
-	void sendTCP(byte[] data);
+	void send(byte[] toSend, Protocol protocol) throws NetworkException;
 	
 	/**
 	 * Receives an array of byte data from the UDP-protocol.
 	 * @return the array of byte that was sent over the network.
+	 * @throws TimeoutException if the connection timed out.
+	 * @throws NetworkException if the connection is unable to send messages.
 	 */
-	byte[] reciveUDP();
-	
-	
-	/**
-	 * Receives an array of byte data from the TCP-protocol.
-	 * @return the array of byte that was sent over the network.
-	 */
-	byte[] reciveTCP();
-
+	byte[] recive() throws TimeoutException , NetworkException;
+		
 	/**
 	 * Is the connected connected.
+	 * Note: This is not reliable in all implementations. Since it might depend on old state.
 	 * @return connection status.
 	 */
 	boolean isConnected();
