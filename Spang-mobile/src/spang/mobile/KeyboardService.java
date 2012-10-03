@@ -128,19 +128,9 @@ implements OnKeyboardActionListener {
 				}
 			}
 			break;
-
-		case KeyEvent.KEYCODE_DEL:
-			// Special handling of the delete key: if we currently are
-			// composing text for the user, we want to modify that instead
-			// of let the application to the delete itself.
-
-
 		case KeyEvent.KEYCODE_ENTER:
 			// Let the underlying text editor always handle these.
 			return false;
-
-		default:
-			
 		}
 
 		return super.onKeyDown(keyCode, event);
@@ -221,9 +211,16 @@ implements OnKeyboardActionListener {
 		} else if (primaryCode == Keyboard.KEYCODE_CANCEL) {
 			handleClose();
 			return;
+		} else if (primaryCode == Keyboard.KEYCODE_MODE_CHANGE) {
+			handleCtrl();
+			return;
 		} else {
 			handleCharacter(primaryCode, keyCodes);
 		}
+	}
+
+	private void handleCtrl() {
+		//TODO
 	}
 
 	private void handleShift() {

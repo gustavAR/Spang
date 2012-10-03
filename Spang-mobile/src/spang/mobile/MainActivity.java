@@ -2,7 +2,6 @@ package spang.mobile;
 
 import utils.LogCatLogger;
 import utils.Logger;
-import android.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
@@ -95,6 +94,11 @@ public class MainActivity extends Activity {
 
 		Intent intent = new Intent(this, TextSenderActivity.class);
 		intent.putExtra("connection", ip);
+		this.startActivity(intent);
+	}
+	
+	public void showKeyboard(View view){
+		Intent intent = new Intent(this, KeyboardtestActivity.class);
 		this.startActivity(intent);
 	}
 

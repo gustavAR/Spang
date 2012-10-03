@@ -9,5 +9,6 @@
     <string name="default_ip">129.16.188.250</string>
     <string name="title_activity_text_sender">Send Text!</string>
     <string name="network_service_started">Service started</string>
-    
+    <string name="title_activity_keyboardtest">KeyboardtestActivity</string>
+
 </resources>
