@@ -30,7 +30,7 @@ public class TouchView extends View {
 			MotionEvent.ACTION_POINTER_INDEX_SHIFT);
 		}
 
-		service.sendUDP(packer.getPackedData());
+		service.send(packer.getPackedData());
 		return true;
 	}
 }
