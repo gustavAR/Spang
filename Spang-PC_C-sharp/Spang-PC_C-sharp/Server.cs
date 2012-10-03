@@ -66,26 +66,26 @@ namespace Spang_PC_C_sharp
         /// </summary>
         /// <param name="connectionID">ID of the client to send to.</param>
         /// <param name="toSend">The message to send.</param>
-        void sendUdp(int connectionID, byte[] toSend);
+        void Send(int connectionID, byte[] toSend);
 
         /// <summary>
         /// Sends a message to a client using the TCP-protocol.
         /// </summary>
         /// <param name="connectionID">ID of the client to send to.</param>
         /// <param name="toSend">The message to send.</param>
-        void sendTcp(int connectionID, byte[] toSend);
+        void Send(int connectionID, byte[] toSend, Protocol protocol);
         
         /// <summary>
         /// Sends a message to all connected clients. Using UDP-Protocol.
         /// </summary>
         /// <param name="toSend">The message to send.</param>
-        void sendToAllUdp(byte[] toSend);
+        void SendToAll(byte[] toSend);
 
         /// <summary>
         /// Sends a message to all connected clients. Using TCP-Protocol.
         /// </summary>
         /// <param name="toSend">The message to send.</param>
-        void sendToAllTcp(byte[] toSend);
+        void SendToAll(byte[] toSend, Protocol protocol);
     }
 
     class Server : IServer
@@ -110,17 +110,14 @@ namespace Spang_PC_C_sharp
             
             protected override void DoWorkInternal()
             {
-                listener.Start(Port);
                 //Recives a connection and adds it to the server.
-                var connection = listener.AcceptConnection();
+                var connection = listener.ReciveConnection(Port);
                 int id = this.server.GetAvaibleID();
                 var sConnection =  new ServerConnection(connection, this.server, id);
 
                 sConnection.ReciveTimeout = this.server.timeout;
                 sConnection.SendTimeout = this.server.timeout;
-                this.server.AddConnection(sConnection);
-
-                listener.Stop();
+                this.server.OnConnected(sConnection);
             }
         }
 
@@ -143,7 +140,7 @@ namespace Spang_PC_C_sharp
                     try
                     {
                         //Sends a heartbeat
-                        item.SendTCP(new byte[0]);
+                        item.Send(new byte[0], Protocol.Reliable);
                     }
                     catch
                     {
@@ -324,32 +321,29 @@ namespace Spang_PC_C_sharp
 
         #region Send
 
-        public void sendUdp(int connectionID, byte[] toSend)
+        public void Send(int connectionID, byte[] toSend)
         {
             IServerConnection connection = this.connections[connectionID];
-            connection.SendUDP(toSend);
+            connection.Send(toSend);
         }
 
-        public void sendTcp(int connectionID, byte[] toSend)
+        public void Send(int connectionID, byte[] toSend, Protocol protocol)
         {
             IServerConnection connection = this.connections[connectionID];
-            connection.SendTCP(toSend);
+            connection.Send(toSend, protocol);
         }
 
-        public void sendToAllUdp(byte[] toSend)
+        public void SendToAll(byte[] toSend, Protocol protocol)
         {
             foreach (var connection in this.connections.Values)
             {
-                connection.SendUDP(toSend);
+                connection.Send(toSend, protocol);
             }
         }
 
-        public void sendToAllTcp(byte[] toSend)
+        public void SendToAll(byte[] toSend)
         {
-            foreach (var connection in this.connections.Values)
-            {
-                connection.SendTCP(toSend);
-            }
+            this.SendToAll(toSend, Protocol.Fast);
         }
 
         #endregion
