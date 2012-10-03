@@ -5,5 +5,5 @@
     <item name="Accelerometer" 	type="integer">2</item>
     <item name="Gyroscope" 		type="integer">3</item>
     <item name="Luminance" 		type="integer">4</item>
-    <item name="Magnetic Field" type="integer">5</item>
+    <item name="MagneticField" type="integer">5</item>
 </resources>

@@ -64,7 +64,7 @@ containing a value of this type.
         public static final int Accelerometer=0x7f050002;
         public static final int Gyroscope=0x7f050003;
         public static final int Luminance=0x7f050004;
-        public static final int Magnetic Field=0x7f050005;
+        public static final int MagneticField=0x7f050005;
         public static final int Text=0x7f050001;
         public static final int Touch=0x7f050000;
     }
