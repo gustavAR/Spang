@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <int name="Touch">0</int>
-    <int name="Text">1</int>
-    <int name="Accelerometer">2</int>
-    <int name="Gyroscope">3</int>
-    <int name="Luminance">4</int>
-    <int name="Magnetic Field">5</int>
+    <item name="Touch" 			type="integer">0</item>
+    <item name="Text" 			type="integer">1</item>
+    <item name="Accelerometer" 	type="integer">2</item>
+    <item name="Gyroscope" 		type="integer">3</item>
+    <item name="Luminance" 		type="integer">4</item>
+    <item name="Magnetic Field" type="integer">5</item>
 </resources>
