@@ -5,16 +5,18 @@ package network;
  *
  *  This class and all sub-classes are designer to work in this way.
  *<pre>	//Creation
- *		ContinuousWorkerSub worker = new ContinuousWorkerSub();
+ *		AsyncWorkerSub worker = new AsyncWorkerSub();
  *  	Thread thread = new Thread(worker);
  *  	thread.start();
+ *  
  *  	//Termination
  *  	worker.stopWorking();
+ *  	  
  *</pre>
  *  
  * @author Lukas Kurtyan
  */
-public abstract class ContinuousWorker implements Runnable {
+public abstract class AsyncWorker implements Runnable {
 	protected volatile boolean stopWorking;
 	
 	/**
@@ -28,7 +30,6 @@ public abstract class ContinuousWorker implements Runnable {
 	public void StopWorking() {
 		this.stopWorking = true;
 	}
-	
 	
 	/**	
 	 * {@inheritDoc}

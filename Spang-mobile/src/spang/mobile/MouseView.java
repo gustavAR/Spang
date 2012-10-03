@@ -8,6 +8,8 @@ import java.util.Random;
 
 import network.IConnection;
 import sensors.SensorProcessor;
+import utils.InputState;
+import utils.InputStateMachine;
 import utils.Vector2;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,6 +17,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.hardware.Sensor;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -26,11 +29,13 @@ public class MouseView extends AbstractSpangView{
 	private static final String SCROLLING_STATE = "SCROLLING_STATE";
 
 	private final Paint paint = new Paint();
-	
+	private final boolean multiTouchEnabled = Integer.parseInt(Build.VERSION.SDK) >= Build.VERSION_CODES.CUPCAKE;
+
+	private float radius;
+
 	private List<Vector2> pointers = new ArrayList<Vector2>();
 	private List<Vector2> prevPointers = new ArrayList<Vector2>();
-	private List<Float> radiuses;
-	
+
 	private GestureDetector gestureDetector;
 
 	private SensorProcessor sp;
@@ -39,8 +44,6 @@ public class MouseView extends AbstractSpangView{
 	private int fingerOneID = INVALID_POINTER_ID;
 
 	private InputStateMachine stateMachine;
-
-	private Random rnd = new Random();
 
 	public MouseView(Context context, AttributeSet attrs, IConnection connection) {
 		super(context, attrs, connection);
@@ -59,30 +62,22 @@ public class MouseView extends AbstractSpangView{
 
 		this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
 
-		this.sp = new SensorProcessor(context, connection);
-		this.sp.setActive(Sensor.TYPE_LINEAR_ACCELERATION, true);
-		this.sp.startProcess();
+		//this.sp = new SensorProcessor(context, connection);
+		//this.sp.setActive(Sensor.TYPE_LINEAR_ACCELERATION, true);
+		//this.sp.startProcess();
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		for (Vector2 position : pointers) {
+			Random rnd = new Random();
 			paint.setARGB(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-			for (Float radius : radiuses) {
-				canvas.drawCircle(position.getX(), position.getY(), radius, paint);
-			}
+			canvas.drawCircle(position.getX(), position.getY(), radius, paint);
 		}
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		final int activeIndex = event.findPointerIndex(fingerOneID);
-
-		prevPointers.clear();
-		prevPointers.addAll(pointers);
-		pointers.clear();
-		pointers.add(activeIndex, new Vector2(event.getX(activeIndex), event.getY(activeIndex)));
-
 		stateMachine.onTouchEvent(event);
 		return true; //TODO Is this ok?
 	}
@@ -101,7 +96,7 @@ public class MouseView extends AbstractSpangView{
 
 		public void onLongPress(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onLongPress");
-			connection.sendUDP(new byte[]{(byte)2});
+			connection.send(new byte[]{(byte)2});
 		}
 
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
@@ -109,7 +104,7 @@ public class MouseView extends AbstractSpangView{
 			Log.d("MOTIONEVENT:", "dX = " + distanceX + "   dY = " + distanceY);
 			byte[] data = ByteBuffer.allocate(9).order(ByteOrder.LITTLE_ENDIAN)
 					.put((byte)3).putInt((int)(distanceX + 0.5f)).putInt((int)(distanceY + 0.5f)).array();
-			connection.sendUDP(data);
+			connection.send(data);
 			return true;
 		}
 
@@ -119,7 +114,7 @@ public class MouseView extends AbstractSpangView{
 
 		public boolean onSingleTapUp(MotionEvent e) {
 			Log.d("MOTIONEVENT:", "onSingleTapUp");
-			connection.sendUDP(new byte[]{(byte)1});
+			connection.send(new byte[]{(byte)1});
 			return true;
 		}
 	};
@@ -127,10 +122,16 @@ public class MouseView extends AbstractSpangView{
 	private class MouseMovingState extends InputState {
 		@Override
 		public void onTouchEvent(MotionEvent event){
+
 			gestureDetector.onTouchEvent(event);
 
 			fingerOneID = event.getPointerId(0);
 			final int activeIndex = event.findPointerIndex(fingerOneID);
+
+			pointers.clear();
+			prevPointers.clear();
+			pointers.add(activeIndex, new Vector2(event.getX(activeIndex), event.getY(activeIndex)));
+			prevPointers.add(activeIndex, pointers.get(activeIndex));
 
 			Vector2 position = pointers.get(activeIndex);
 
@@ -145,12 +146,20 @@ public class MouseView extends AbstractSpangView{
 					pointers.add(i, new Vector2(event.getX(i), event.getY(i)));
 				}
 
-				radiuses.add(activeIndex, event.getPressure()*100);
+				radius = event.getPressure()*100;
 				byte[] pressureData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-						.put((byte)14).putInt(radiuses.get(activeIndex).intValue()).array();
-				connection.sendUDP(pressureData);
+						.put((byte)14).putInt((int)radius).array();
+				connection.send(pressureData);
 
 				prevPointers.add(activeIndex, pointers.get(activeIndex));
+				break;
+
+			case MotionEvent.ACTION_UP:
+				fingerOneID = INVALID_POINTER_ID;
+				break;
+
+			case MotionEvent.ACTION_CANCEL:
+				fingerOneID = INVALID_POINTER_ID;
 				break;
 
 			case MotionEvent.ACTION_POINTER_DOWN:
@@ -164,6 +173,12 @@ public class MouseView extends AbstractSpangView{
 
 
 		}
+		/*	
+		@Override
+		protected void enter() {}
+
+		@Override
+		protected void exit() {} */
 	}
 	private class ScrollingState extends InputState {
 		@Override
@@ -171,6 +186,12 @@ public class MouseView extends AbstractSpangView{
 
 			fingerOneID = event.getPointerId(0);
 			final int activeIndex = event.findPointerIndex(fingerOneID);
+
+			prevPointers.clear();
+			prevPointers.addAll(pointers);
+			pointers.clear();
+
+			pointers.add(activeIndex, new Vector2(event.getX(activeIndex), event.getY(activeIndex)));
 
 			Vector2 position = pointers.get(activeIndex);
 
@@ -183,19 +204,27 @@ public class MouseView extends AbstractSpangView{
 			case MotionEvent.ACTION_MOVE:
 				for(int i = 0; i < event.getPointerCount(); i++) {
 					pointers.add(i, new Vector2(event.getX(i), event.getY(i)));
-					radiuses.add(i, event.getPressure()*100);
-					byte[] pressureData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
-							.put((byte)14).putInt(radiuses.get(i).intValue()).array();
-					connection.sendUDP(pressureData);
 				}
+
+				radius = event.getPressure()*100;
+				byte[] pressureData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
+						.put((byte)14).putInt((int)radius).array();
+				connection.send(pressureData);
 
 				float y = prevPointers.get(activeIndex).getY();
 				float prevY = pointers.get(activeIndex).getY();
 				//Vertical Scroll
 				byte[] vertData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
 						.put((byte)12).putInt(
-								(int) (20*(( y - prevY ) + 0.5f))).array();
-				connection.sendUDP(vertData);
+								(int) (20*
+										(
+												( y - prevY ) 
+												//+ 0.5f
+
+												)
+										)
+								).array();
+				connection.send(vertData);
 
 				//   Horizontal Scroll
 				//   byte[] horiData = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
@@ -205,7 +234,17 @@ public class MouseView extends AbstractSpangView{
 				prevPointers.add(activeIndex, pointers.get(activeIndex));
 				break;
 
+			case MotionEvent.ACTION_UP:
+				fingerOneID = INVALID_POINTER_ID;
+				break;
+
+			case MotionEvent.ACTION_CANCEL:
+				fingerOneID = INVALID_POINTER_ID;
+				break;
+
 			case MotionEvent.ACTION_POINTER_UP:
+
+
 				final int pointerIndex = (eventID & MotionEvent.ACTION_POINTER_INDEX_MASK) >> 
 				MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 				final int pointerID = event.getPointerId(pointerIndex);
@@ -223,7 +262,14 @@ public class MouseView extends AbstractSpangView{
 			// Schedules a repaint.
 			invalidate();
 		}
-	}
-}
+		/*	
+		@Override
+		protected void enter() {}
 
+		@Override
+		protected void exit() {} */
+	}
+
+
+}
 

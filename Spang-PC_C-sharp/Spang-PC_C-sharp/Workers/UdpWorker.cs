@@ -20,6 +20,11 @@ namespace Spang_PC_C_sharp
         public event Action<byte[]> Recive;
 
         /// <summary>
+        /// Invoked when a recived message times out.
+        /// </summary>
+        public event Action Timeout;
+
+        /// <summary>
         /// Creates a UdpWorker.
         /// </summary>
         /// <param name="connection">The connection used.</param>
@@ -33,10 +38,17 @@ namespace Spang_PC_C_sharp
             try
             {
                 //Recives and sends the udp message.
-                byte[] bytes = connection.ReciveUDP();
-                
+                byte[] bytes = connection.Receive();
+
                 if (this.Recive != null)
                     this.Recive(bytes);
+            }
+            catch (SocketException)
+            {
+                if (this.Timeout != null)
+                    this.Timeout();
+
+                this.StopWorking();
             }
             catch (Exception exe)
             {

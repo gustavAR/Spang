@@ -82,7 +82,7 @@ public class SensorProcessor {
 	 */
 	private void processInput() {
 		fillOutput();
-		this.connection.sendUDP(encodedSensorInput.array());
+		this.connection.send(encodedSensorInput.array());
 		encodedSensorInput.clear();
 	}
 

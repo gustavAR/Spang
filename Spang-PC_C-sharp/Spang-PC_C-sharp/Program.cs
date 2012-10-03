@@ -11,15 +11,12 @@ using System.Drawing;
 namespace Spang_PC_C_sharp
 {
     static class Program
-    {
-        private static int PORT = 1337;
-        
+    {        
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         static void Main()
         {
-
             IMessageDecoder messageHandler = new MessageDecoder();
             Phone phone = new Phone(messageHandler);
             DesktopController controller = new DesktopController(phone, new OsInterface());
@@ -29,11 +26,11 @@ namespace Spang_PC_C_sharp
 
             server.Start(1337);
 
-            server.Connected += (x, y) => Console.WriteLine("A connection was recived");
+            server.Connected += (x, y) => Console.WriteLine("A connection was recived");                  
             server.Recived += (x, message) =>
             {
                 Console.WriteLine("Recived message from {0} of length {1}", message.ID, message.Data.Length);
-                messageHandler.DecodeMessage(message.Data);
+             //   messageHandler.DecodeMessage(message.Data);
             };
             server.Dissconnected += (x, y) => Console.WriteLine("Oh no we dced ;(");
 

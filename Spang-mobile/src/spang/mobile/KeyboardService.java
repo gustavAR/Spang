@@ -12,7 +12,6 @@ import android.view.inputmethod.InputConnection;
 public class KeyboardService extends InputMethodService 
 implements OnKeyboardActionListener {
 
-
 	private int mLastDisplayWidth;
 	private boolean mCapsLock;
 	private long mLastShiftTime;

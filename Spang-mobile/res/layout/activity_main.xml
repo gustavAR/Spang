@@ -3,21 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="21dp"
-        android:onClick="sendData"
-        android:text="MouseInput" />
-
     <EditText
         android:id="@+id/editText1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button1"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="123dp"
         android:ems="10"
@@ -27,16 +16,6 @@
         <requestFocus />
     </EditText>
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/editText1"
-        android:layout_marginRight="32dp"
-        android:onClick="sendText"
-        android:text="TextSend" />
-
     <EditText
         android:id="@+id/editText2"
         android:layout_width="wrap_content"
@@ -45,6 +24,17 @@
         android:layout_alignTop="@+id/editText1"
         android:layout_marginTop="50dp"
         android:ems="5"
-        android:inputType="number" />
+        android:inputType="number"
+        android:text="@string/default_port" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="74dp"
+        android:onClick="sendData"
+        android:text="@string/button_send" />
 
 </RelativeLayout>
