@@ -57,4 +57,14 @@ public interface ISensor extends SensorEventListener {
 	 * @return the constant number of bytes needed to encode the values of the sensor. 
 	 */
 	public int getEncodedLength();
+	
+	/**
+	 * @return the name of the sensor in the device
+	 */
+	public String getName();
+	
+	/**
+	 * @return the power in mA used by this sensor while in use
+	 */
+	public float getPowerUsage();
 }

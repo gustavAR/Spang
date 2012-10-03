@@ -122,4 +122,18 @@ public class LinearAccelerationSensor implements ISensor {
 		buffer.put(encodeID)
 					.putFloat(this.values[0]).putFloat(this.values[1]).putFloat(this.values[2]);
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getName() {
+		return this.sensor.getName();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public float getPowerUsage() {
+		return this.sensor.getPower();
+	}
 }

@@ -34,7 +34,6 @@ public class LightSensor implements ISensor {
 		this.sensorManager = manager;
 		this.sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 		this.encodeID = encodeID;
-		
 		if(this.sensor == null) {
 			throw new NoSensorException("Device has no light-sensor");
 		}
@@ -129,5 +128,19 @@ public class LightSensor implements ISensor {
 	
 	public int getEncodedLength() {
 		return ENCODED_LENGTH;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getName() {
+		return this.sensor.getName();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public float getPowerUsage() {
+		return this.sensor.getPower();
 	}
 }

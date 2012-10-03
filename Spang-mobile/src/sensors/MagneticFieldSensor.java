@@ -132,4 +132,18 @@ public class MagneticFieldSensor implements ISensor {
 	public int getEncodedLength() {
 		return ENCODED_LENGTH;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getName() {
+		return this.sensor.getName();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public float getPowerUsage() {
+		return this.sensor.getPower();
+	}
 }

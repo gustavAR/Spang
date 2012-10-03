@@ -25,12 +25,19 @@ public class SensorListBuilder {
 	 */
 	public SensorListBuilder(SensorManager manager) {
 		this.manager = manager;
-	/*
+	
 		if(this.manager.getDefaultSensor(LinearAccelerationSensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(LinearAccelerationSensor.SENSOR_TYPE, new LinearAccelerationSensor(manager, (byte) 0x03));
+			sensorBindings.put(LinearAccelerationSensor.SENSOR_TYPE, new LinearAccelerationSensor(manager, (byte) 0x04));
+		
 		if(this.manager.getDefaultSensor(LightSensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(LightSensor.SENSOR_TYPE, new LightSensor(manager, (byte) 0x04));
-*/
+			sensorBindings.put(LightSensor.SENSOR_TYPE, new LightSensor(manager, (byte) 0x05));
+		
+		if(this.manager.getDefaultSensor(GyroscopeSensor.SENSOR_TYPE)!=null)
+			sensorBindings.put(GyroscopeSensor.SENSOR_TYPE, new GyroscopeSensor(manager, (byte) 0x06));
+		
+		if(this.manager.getDefaultSensor(MagneticFieldSensor.SENSOR_TYPE)!=null)
+			sensorBindings.put(MagneticFieldSensor.SENSOR_TYPE, new MagneticFieldSensor(manager, (byte) 0x07));
+		
 		//		sensorBindings.put(Sensor.TYPE_MAGNETIC_FIELD, new MagneticFieldSensor(context));
 		//		sensorBindings.put(Sensor.TYPE_GYROSCOPE, new GyroscopeSensor(context, (byte) 0x05));
 

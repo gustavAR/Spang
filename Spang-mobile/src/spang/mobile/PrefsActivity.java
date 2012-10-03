@@ -29,7 +29,7 @@ public class PrefsActivity extends PreferenceActivity{
 
 		for (ISensor sensor : sensors) {
 			if(sensor != null){
-				String name = sensor.getClass().getSimpleName();
+				String name = sensor.getName();
 				PreferenceCategory sensorCategory = new PreferenceCategory(this);
 				sensorCategory.setSummary(name);
 				sensorCategory.setTitle(name);
@@ -39,7 +39,7 @@ public class PrefsActivity extends PreferenceActivity{
 				CheckBoxPreference checkbox = new CheckBoxPreference(this);
 				checkbox.setKey(""+sensor.getSensorID());
 				checkbox.setTitle("Activated");
-				//checkbox.setSummary("Power usage: "+sensor.getPower()+"mA");
+				checkbox.setSummary("Power usage: "+sensor.getPowerUsage()+"mA");
 				
 				SeekBarPreference sampleRate = new SeekBarPreference(this, "Sample rate","Hz",1, 60);
 				sampleRate.setTitle("Sample rate");
