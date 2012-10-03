@@ -21,9 +21,7 @@ namespace Spang_PC_C_sharp
     {
         private readonly IConnection connection;
         private readonly Server server;
-     
         private UdpWorker uworker;
-        private TcpWorker tworker;
         
 
         public ServerConnection(IConnection connection, Server server, int id)
@@ -41,35 +39,26 @@ namespace Spang_PC_C_sharp
 
         public void StartAsyncRecive()
         {
-            if (uworker != null && tworker != null)
+            if (uworker != null)
                 return; //We are already receiving.
 
             //New worker objects are created and started.
 
             this.uworker = new UdpWorker(this);
             uworker.Recive += this.OnRecived;
-
-            this.tworker = new TcpWorker(this);
-            tworker.Recive += this.OnRecived;
-            tworker.TimedOut += this.OnTimeout;
+            uworker.Timeout += this.OnTimeout;
 
             new Thread(uworker.DoWork).Start();
-            new Thread(tworker.DoWork).Start();
         }
 
         public void StopAsyncRecive()
         {
-            if (this.tworker != null || this.uworker != null)
+            if (this.uworker != null)
             {
                 //Stops the worker threads.
                 this.uworker.Recive -= this.OnRecived;
-                this.tworker.Recive -= this.OnRecived;
-
-                this.tworker.TimedOut -= this.OnTimeout;
-
-                this.tworker.StopWorking();
+                this.uworker.Timeout -= this.OnTimeout;
                 this.uworker.StopWorking();
-                this.tworker = null;
                 this.uworker = null;
             }
         }
@@ -86,39 +75,24 @@ namespace Spang_PC_C_sharp
 
         #region IConnection Delegation
 
-        public void sendUdp(byte[] toSend)
-        {
-            this.connection.SendUDP(toSend);
-        }
-
-        public void sendTcp(byte[] toSend)
-        {
-            this.connection.SendTCP(toSend);
-        }
-
         public void Close()
         {
             this.connection.Close();
         }
 
-        public void SendUDP(byte[] data)
+        public void Send(byte[] data)
         {
-            this.connection.SendUDP(data);
+            this.connection.Send(data);
         }
 
-        public void SendTCP(byte[] data)
+        public void Send(byte[] data, Protocol protocol)
         {
-            this.connection.SendTCP(data);
+            this.connection.Send(data, protocol);
         }
 
-        public byte[] ReciveUDP()
+        public byte[] Receive()
         {
-            return this.connection.ReciveUDP();
-        }
-
-        public byte[] ReciveTCP()
-        {
-            return this.connection.ReciveTCP();
+            return this.connection.Receive();
         }
 
         public bool Connected

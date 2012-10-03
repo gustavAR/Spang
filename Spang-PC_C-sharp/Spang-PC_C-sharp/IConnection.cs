@@ -12,25 +12,20 @@ namespace Spang_PC_C_sharp
         /// Send a message using the UDP-protocoll.
         /// </summary>
         /// <param name="data">The Message</param>
-        void SendUDP(byte[] data);
+        void Send(byte[] data);
 
         /// <summary>
-        /// Send a message using the TCP-protocoll.
+        /// Sends a message using the given protocol.
         /// </summary>
-        /// <param name="data">The message</param>
-        void SendTCP(byte[] data);
+        /// <param name="data">The message.</param>
+        /// <param name="protocol">The used protocol.</param>
+        void Send(byte[] data, Protocol protocol); 
 
         /// <summary>
         /// Recives a UDP message.
         /// </summary>
         /// <returns>The message recived.</returns>
-        byte[] ReciveUDP();
-
-        /// <summary>
-        /// Recives a TCP message.
-        /// </summary>
-        /// <returns>The message recived.</returns>
-        byte[] ReciveTCP();
+        byte[] Receive();
 
         /// <summary>
         /// Gets or sets the time TCP recive will block.

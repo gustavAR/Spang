@@ -114,8 +114,8 @@ namespace Spang_PC_C_sharp
         {
             if (connection != null)
                 throw new ArgumentException("We are already connected. Can't connect while connected");
-
-            this.connection = Connection.ConnectTo(endpoint);
+            //TODO implement IConnector.
+            //this.connection = Connection.ConnectTo(endpoint);
 
             this.OnConnected(reconnected);
         }
@@ -343,7 +343,7 @@ namespace Spang_PC_C_sharp
         /// </summary>
         public void SendUDP(byte[] toSend)
         {
-            this.connection.SendUDP(toSend);
+            this.connection.Send(toSend);
         }
 
         /// <summary>
@@ -351,7 +351,7 @@ namespace Spang_PC_C_sharp
         /// </summary>
         public void SendTCP(byte[] toSend)
         {
-            this.connection.SendTCP(toSend);
+            this.connection.Send(toSend, Protocol.Reliable);
         }
 
         #endregion
