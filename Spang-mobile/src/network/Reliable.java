@@ -26,5 +26,4 @@ public class Reliable implements IProtocolHelper{
 	public Protocol getProtocol() {
 		throw new NotImplementedException();
 	}
-	
 }

@@ -25,6 +25,8 @@ public class UdpWorker extends AsyncWorker{
 	//Event raised when the connection timesout.
 	private ActionDelegate timeoutEvent;
 	
+	private ActionDelegate readCrash;
+	
 	/**
 	 * Creates a new UdpWorker.
 	 * @param connection the connection used.
@@ -32,6 +34,7 @@ public class UdpWorker extends AsyncWorker{
 	public UdpWorker(IConnection connection) {
 		this.connection = connection;
 		this.timeoutEvent = new ActionDelegate();
+		this.readCrash = new ActionDelegate();
 		this.recivedEvent = new Action1Delegate<byte[]>();
 	}
 	
@@ -68,6 +71,21 @@ public class UdpWorker extends AsyncWorker{
 		this.timeoutEvent.removeListener(action);
 	}
 	
+	/**
+	 * Adds a listener that will be notified when a connection crashes for a reason that is not timeout.
+	 * @param action the listener to add.
+	 */
+	public void addReadCrashAction(Action action) {
+		this.timeoutEvent.addListener(action);
+	}	
+	
+	/**
+	 * Removes a listener so that it will no longer be notified when a  connection crashes for a reason that is not timeout.
+	 * @param action the listener to remove.
+	 */
+	public void removeReadCrashAction(Action action) {
+		this.timeoutEvent.removeListener(action);
+	}
 		
 	@Override
 	protected void DoWork() {
@@ -81,6 +99,7 @@ public class UdpWorker extends AsyncWorker{
 		} catch(NetworkException exe) {
 			Logger.logException(exe);			
 			this.StopWorking();
+			this.readCrash.invoke();
 		}
 	}
 
