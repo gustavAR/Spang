@@ -11,7 +11,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -41,7 +40,7 @@ public class SensorProcessor extends Service{
 
 		SensorListBuilder builder = new SensorListBuilder(this.manager);
 		this.sensors = builder.build();
-		this.connection = connection;	
+		this.connection = connection;	//TODO Huh? How should it really be initialized?
 		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
 
 		
