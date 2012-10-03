@@ -42,8 +42,7 @@ public class NetworkedActivity extends Activity {
     protected void onStart() {
     	//Bind the service so we can use it.
     	Intent intent = new Intent(this, NetworkService.class);
-    	this.bindService(intent, connection, Context.BIND_WAIVE_PRIORITY);	
-    	
+    	this.bindService(intent, connection, Context.BIND_WAIVE_PRIORITY);	  	
     	super.onStart();
     }
     

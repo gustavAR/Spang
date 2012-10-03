@@ -9,6 +9,7 @@ import network.Protocol;
 import network.Connector;
 import network.exceptions.InvalidEndpointException;
 import network.exceptions.NetworkException;
+import utils.Logger;
 import utils.MessageBuffer;
 import android.app.Service;
 import android.content.Intent;
@@ -53,6 +54,7 @@ public class NetworkService extends Service {
 				
 		client.addDisconnectedListener(new EventHandler<IClient, DCCause>() {
 			public void onAction(IClient sender, DCCause cause) {
+				Logger.logInfo("Dced: " + cause);
 				//Interrupts the sender-thread so it understands that we have disconnected.
 				senderThread.interrupt();
 		
@@ -94,9 +96,7 @@ public class NetworkService extends Service {
 	@Override
 	public void onDestroy() {
 		Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show(); 
-
-		if(this.client.isConnected())
-			this.client.disconnect();
+		this.client.disconnect();
 
 		super.onDestroy();
 	}
