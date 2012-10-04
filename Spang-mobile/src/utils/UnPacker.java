@@ -18,6 +18,13 @@ public class UnPacker {
 		this.packedData = ByteBuffer.wrap(unpackdata);
 	}
 		
+	/**
+	 * Gets the number of bytes left of the packed data.
+	 * @return number of bytes left of packed data.
+	 */
+	public int remaining() {
+		return this.packedData.remaining();
+	}
 
 	/**
 	 * Unpacks a byte.

@@ -9,9 +9,12 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import network.exceptions.NetworkException;
 import network.exceptions.TimeoutException;
+import utils.Packer;
+import utils.UnPacker;
 
 public class Connection implements IConnection {
 	
@@ -25,7 +28,10 @@ public class Connection implements IConnection {
 	private final DatagramSocket socket;	
 	
 	
-	private final Map<Protocol, IProtocolHelper> protocols;
+	private final Map<Protocol, ProtocolManager> protocols;
+	
+	private final AccTimer timer;
+	
 	
 	/**
 	 * Creates a connection.
@@ -39,26 +45,44 @@ public class Connection implements IConnection {
 		this.socket = socket;		
 		this.connected = true;	
 		
-		this.protocols = new HashMap<Protocol, IProtocolHelper>();
-		this.protocols.put(Protocol.Ordered, new OrderedProtocol());
-		this.protocols.put(Protocol.Unordered, new UnorderedProtocol());
-		this.protocols.put(Protocol.Reliable, new Reliable());
-		this.protocols.put(Protocol.ReliableOrdered, new ReliableOrderedProtocol());
+		this.timer = new AccTimer();
+		
+		this.protocols = new HashMap<Protocol, ProtocolManager>();
+		
+		populateProtocolMap();
+		startResendMessageThread();
 	}
 	
+	private void startResendMessageThread() {
+		Thread thread = new Thread(this.timer);
+		thread.setDaemon(true);
+		thread.start();
+	}
+
+	private void populateProtocolMap() {
+		this.protocols.put(Protocol.Ordered, new OrderedProtocol());
+		this.protocols.put(Protocol.Unordered, new UnorderedProtocol());
+		this.protocols.put(Protocol.Reliable, new ReliableProtocol());
+		
+		//TODO Implement Reliable Ordered Protocol.
+		this.protocols.put(Protocol.ReliableOrdered, new ReliableProtocol());
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public void send(byte[] data) {
-		this.send(data, Protocol.Unordered);
+		this.send(data, Protocol.Ordered);
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	public void send(byte[] toSend, Protocol protocol) {
-		toSend = this.protocols.get(protocol).processSentMessage(toSend);
-		
+		this.protocols.get(protocol).sendMessage(toSend);	
+	}
+	
+	private void sendProtocol(byte[] toSend) {		
 		DatagramPacket packet = new DatagramPacket(toSend, toSend.length);		
 		try {
 			this.socket.send(packet);			
@@ -71,15 +95,32 @@ public class Connection implements IConnection {
 	 * {@inheritDoc}
 	 */
 	public byte[] recive() {
-		DatagramPacket packet = new DatagramPacket(new byte[DATA_CAPACITY], DATA_CAPACITY);
-		this.reciveUdpPackage(packet);		
-		
-		byte[] copy = new byte[packet.getLength()];
-		for (int i = 0; i < copy.length; i++) {
-			copy[i] = packet.getData()[i];
+		byte[] recived;
+		while(true) {
+			DatagramPacket packet = new DatagramPacket(new byte[DATA_CAPACITY], DATA_CAPACITY);
+			this.reciveUdpPackage(packet);		
+			
+			byte[] copy = new byte[packet.getLength()];
+			for (int i = 0; i < copy.length; i++) {
+				copy[i] = packet.getData()[i];
+			}
+			
+			//If copy is heartbeat.
+			if(copy.length == 0) {
+				recived = copy;
+				break;
+			}
+			
+			
+			//What protocol was the message sent with?
+			Protocol protocol = Protocol.fromID(copy[0]);
+			
+			recived = this.protocols.get(protocol).processRecivedMessage(copy);
+			if(recived.length > 0)
+				break;	
 		}
 		
-		return copy;
+		return recived;
 	}
 	
 	//Helper that exception checks the receive.
@@ -90,19 +131,25 @@ public class Connection implements IConnection {
 				return;
 			} catch(PortUnreachableException ppe) {
 				//Host timed out.				
+				this.disconnect();
 				throw new TimeoutException("UDP timeout");
 			} catch(SocketTimeoutException ste) {
-				//We timed out.
+				//We timed out.	
+				this.disconnect();
 				throw new TimeoutException("UDP timeout");
 			} catch (IOException e) {
-				//Some other error occurred.
+				//Some other error occurred.	
+				this.disconnect();
 				throw new NetworkException("UDP read failed.", e);
-			} finally {
-				this.connected = false;
 			}
 		}
 	}
 	
+
+	private void disconnect() {
+		this.connected = false;
+		this.timer.StopWorking();
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -153,5 +200,169 @@ public class Connection implements IConnection {
 	 */
 	public void close() {
 		this.socket.close();		
+	}
+	
+	
+	
+	private class MessageResendTimer {
+		private static final long TIMER_INTERVAL = 100000; //Resends after 100 milisec. 1000 00 nanoseconds
+		long targetTime;
+		int accnumber;
+		byte[] message;
+		
+		public void resend() {
+			Connection.this.sendProtocol(message);
+		}
+	}
+	
+	public class AccTimer extends AsyncWorker {
+		private Map<Integer, MessageResendTimer> resenders;
+		
+		public AccTimer() {
+			this.resenders = new ConcurrentHashMap<Integer, MessageResendTimer>();
+		}
+		
+		public void addResender(MessageResendTimer resender) {
+				resenders.put(resender.accnumber, resender);
+		}
+		
+		public void removeResender(int accNum) {
+				resenders.remove(accNum);
+		}
+		
+		private void updateAndSend() {
+    		for (MessageResendTimer resender : this.resenders.values()) {
+				long time = System.nanoTime();
+				if(resender.targetTime <= time) {
+					resender.targetTime += MessageResendTimer.TIMER_INTERVAL;
+					resender.resend();
+				}
+			}		
+		}			
+		
+		@Override
+		protected void DoWork() {
+			try {
+				Thread.sleep(1000);
+				this.updateAndSend();
+			} catch (InterruptedException e) {
+				this.StopWorking();
+			} catch(Exception exe) {
+				this.StopWorking();
+			}
+		} 
+	}
+	
+	
+	private abstract class ProtocolManager {
+		protected abstract int getHeaderLength();
+		protected abstract void fixMessage(Packer packer, byte[] message);
+		protected abstract byte[] processMessage(UnPacker unPacker);
+		
+		private void sendMessage(byte[] message) {
+			Packer packer = new Packer(message.length + getHeaderLength());
+			fixMessage(packer, message);
+			Connection.this.sendProtocol(packer.getPackedData());			
+		}
+		
+		private byte[] processRecivedMessage(byte[] recivedMessage) {
+			return this.processMessage(new UnPacker(recivedMessage));
+		}
+	}
+	
+	private class UnorderedProtocol extends ProtocolManager {
+
+		@Override
+		protected int getHeaderLength() {
+			return 1;
+		}
+
+		@Override
+		protected void fixMessage(Packer packer, byte[] message) {
+			packer.packByte(Protocol.Unordered.getID());
+			packer.packByteArray(message);
+		}
+
+		@Override
+		protected byte[] processMessage(UnPacker unPacker) {
+			unPacker.unpackByte(); //Remove id byte from message.
+			return unPacker.unpackByteArray(unPacker.remaining());
+		}
+	}
+	
+	private class OrderedProtocol extends ProtocolManager {
+		volatile int lastRecivedSequenceNumber;
+		volatile int sendReciveSequenceNumber;
+		
+		@Override
+		protected int getHeaderLength() {
+			return 5;
+		}
+
+		@Override
+		protected void fixMessage(Packer packer, byte[] message) {
+			packer.packByte(Protocol.Ordered.getID());
+			packer.packInt(sendReciveSequenceNumber++);
+			packer.packByteArray(message);
+		}
+
+		@Override
+		protected byte[] processMessage(UnPacker unPacker) {
+			unPacker.unpackByte();
+			int seqNum = unPacker.unpackInt();
+			if(seqNum < lastRecivedSequenceNumber) {
+				return new byte[0]; //Discard the message if it is old. 
+			} else {
+				lastRecivedSequenceNumber = seqNum;
+				return unPacker.unpackByteArray(unPacker.remaining());
+			}
+		}	
+	}
+	
+	private class ReliableProtocol extends ProtocolManager {
+		private final static int ACK_MESSAGE = 0x10;		
+		volatile int sendAccNum;
+		
+		
+		@Override
+		protected int getHeaderLength() {
+			return 5;
+		}
+
+		@Override
+		protected void fixMessage(Packer packer, byte[] message) {
+			int toSendAccNum = this.sendAccNum++;
+			packer.packByte(Protocol.Reliable.getID());
+			packer.packInt(toSendAccNum);
+			packer.packByteArray(message);
+			
+			MessageResendTimer timer = new MessageResendTimer();
+			timer.accnumber = toSendAccNum;
+			timer.message = packer.getPackedData();
+			timer.targetTime = System.nanoTime() + MessageResendTimer.TIMER_INTERVAL;		
+			
+			Connection.this.timer.addResender(timer);
+		}
+
+		@Override
+		protected byte[] processMessage(UnPacker unPacker) {
+			int flags = unPacker.unpackByte();		
+			int accnum = unPacker.unpackInt();
+			
+			if((flags & ACK_MESSAGE) == ACK_MESSAGE) {
+				Connection.this.timer.removeResender(accnum);
+				return new byte[0];
+			} else {		
+				sendAckMessage(accnum);				
+				return unPacker.unpackByteArray(unPacker.remaining());
+			}
+		}
+
+		private void sendAckMessage(int accnum) {
+			Packer packer = new Packer(5);
+			packer.packByte((byte)(Protocol.Reliable.getID() | ACK_MESSAGE));
+			packer.packInt(accnum);
+			Connection.this.sendProtocol(packer.getPackedData());
+		}
 	}
 }

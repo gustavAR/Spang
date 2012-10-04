@@ -18,7 +18,6 @@ public class Packer {
 	private static final int DOUBLE_SIZE = Double.SIZE/8;
 	private static final int DEFAULT_CAPACITY = 4;
 	
-	
 	private ByteBuffer internalBuffer;
 
 	public Packer() {

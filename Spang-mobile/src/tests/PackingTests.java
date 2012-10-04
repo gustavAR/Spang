@@ -151,4 +151,17 @@ public class PackingTests {
 		}
 	}
 	
+	@Test
+	public void canPackDoubleArray() {
+		double[] array = { 123123124E-123, 1231412445E123, 4218768761237862314E-246 };
+
+		Packer packer = new Packer();
+		packer.packDoubleArray(array);
+		UnPacker unpacker = new UnPacker(packer.getPackedData());
+
+		double[] result = unpacker.unpackDoubleArray(3);
+		for (int i = 0; i < result.length; i++) {
+			assertSame(array[0], result[0]);
+		}
+	}
 }
