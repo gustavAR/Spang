@@ -63,7 +63,13 @@ public class MainActivity extends Activity {
 		this.stopService(intent);
 	}
 	
-	
+
+	public void showKeyboard(View view){
+		Intent intent = new Intent(this, KeyboardtestActivity.class);
+		this.startActivity(intent);
+	}
+
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
