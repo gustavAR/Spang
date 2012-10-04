@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+File from which we can create an instance of the Keyboard class.
+
+Represents the view of the keyboard when shift is pressed.
+
+ATTENTION: All keycodes are unicode for ease of use,
+		   keys which are produced by modifiers 
+		   (for example the character "!" is produced by
+		   pressing shift and 1 at the same time)
+		   are represented by the base key without any modifiers
+		   (that would be 1 in our example).
+		   		   
+All special messages are implemented with negative numbers.
+-->
 <Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
     android:keyWidth="10%p"
     android:horizontalGap="0px"

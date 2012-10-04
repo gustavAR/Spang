@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+File from which we can create an instance of the Keyboard class.
+
+Represents the view of the keyboard when no modfier keys are pressed.
+
+ATTENTION: All keycodes are unicode for ease of use.
+		   
+All special messages are implemented with negative numbers.
+-->
 <Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
     android:keyWidth="10%p"
     android:horizontalGap="0px"
