@@ -13,6 +13,11 @@ import android.inputmethodservice.Keyboard;
  */
 public class ControlKeyboard extends Keyboard {
     
+	public static final int SHIFT_KEYCODE = -1;
+	public static final int CTRL_KEYCODE = -2;
+	public static final int HIDE_KEYBOARD_KEYCODE = -3;
+	public static final int ALTGR_KEYCODE = -4;
+	
 	Key ctrlKey;
 	Key altgrKey;
 	
@@ -29,10 +34,10 @@ public class ControlKeyboard extends Keyboard {
     protected Key createKeyFromXml(Resources res, Row parent, int x, int y, 
             XmlResourceParser parser) {
         Key key = new Key(res, parent, x, y, parser);
-        if (key.codes[0] == R.integer.ctrl)//is ctrl
+        if (key.codes[0] == CTRL_KEYCODE)//is ctrl
         {
         	this.ctrlKey = key;
-        } else if (key.codes[0] == R.integer.altgr)//is altgr
+        } else if (key.codes[0] == ALTGR_KEYCODE)//is altgr
         {
         	this.altgrKey = key;
         }

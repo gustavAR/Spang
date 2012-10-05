@@ -1,20 +1,30 @@
 package keyboard;
 
 import spang.mobile.R;
-import spang.mobile.R.layout;
-import spang.mobile.R.menu;
+import utils.Packer;
 import android.app.Activity;
+import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 
+/**
+ * This is just a test.
+ * It was needed since we have been unable to
+ * network the emulator to the computer.
+ * @author Gustav Alm Rosenblad
+ *
+ */
 public class KeyboardtestActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_keyboardtest);
+        CtrlKeyboardView cKV = new CtrlKeyboardView(this, null);
+        cKV.setId(R.layout.activity_keyboardtest);
+        cKV.setPacker(new Packer(1024));//TODO: This packer is just there so we don't crash.
+		setContentView(cKV);
     }
 
     @Override

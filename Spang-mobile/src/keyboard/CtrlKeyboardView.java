@@ -106,16 +106,16 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 				ByteBuffer.allocate(5).put((byte)15).putInt(primaryCode).array());*/
 		char character = (char)primaryCode;
 		switch (primaryCode){
-		case R.integer.shift:
+		case ControlKeyboard.SHIFT_KEYCODE:
 			this.shiftActive = !this.shiftActive;
 			break;
-		case R.integer.ctrl:
+		case ControlKeyboard.CTRL_KEYCODE:
 			this.ctrlActive = !this.ctrlActive;
 			break;
-		case R.integer.hide_keyboard:
+		case ControlKeyboard.HIDE_KEYBOARD_KEYCODE:
 			goBackToMain();
 			break;
-		case R.integer.altgr:
+		case ControlKeyboard.ALTGR_KEYCODE:
 			this.altgrActive = !this.altgrActive;
 			break;
 		default:
@@ -134,12 +134,12 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 
 	private String addModifierIDs(char character) {
 		String toSend = "";
-		if(this.shiftActive)
-			toSend += R.string.shift_network_id;
+		if(this.shiftActive)//These values will probably not even be used in the final implementation
+			toSend += "\\shift";//TODO: Replace these ugly hardcoded values
 		if(this.ctrlActive)
-			toSend += R.string.ctrl_network_id;
+			toSend += "\\ctrl";//TODO: Replace these ugly hardcoded values
 		if(this.altgrActive)
-			toSend += R.string.altgr_network_id;
+			toSend += "\\altgr";//TODO: Replace these ugly hardcoded values
 		toSend += character;
 		return toSend;
 	}
