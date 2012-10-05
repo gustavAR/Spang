@@ -42,12 +42,15 @@ public class MainActivity extends Activity {
 				intent.putExtra("PORT", port);
 				
 				MainActivity.this.stopService(intent);
-				MainActivity.this.startService(intent);				
+				MainActivity.this.startService(intent);	
 			}
 		});
 		
 		thread.start();
+
 		
+		Intent intent2 = new Intent(MainActivity.this, SensorProcessor.class);
+		MainActivity.this.startService(intent2);	
 		
 		Intent intent = new Intent(this, NetworkedActivity.class);
 		this.startActivity(intent);

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 
 import network.IConnection;
-import sensors.SensorProcessor;
 import utils.InputState;
 import utils.InputStateMachine;
 import utils.Vector2;

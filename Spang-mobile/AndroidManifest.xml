@@ -20,6 +20,10 @@
             android:name=".NetworkService"
             android:enabled="true" >
         </service>
+          <service
+            android:name=".SensorProcessor"
+            android:enabled="true" >
+        </service>
 
         <activity
             android:name=".MainActivity"
