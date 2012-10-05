@@ -1,10 +1,16 @@
-package spang.mobile;
+package keyboard;
 
+import spang.mobile.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.inputmethodservice.Keyboard;
 
+/**
+ * This keyboard will 
+ * @author Gustav Alm Rosenblad
+ *
+ */
 public class ControlKeyboard extends Keyboard {
     
 	Key ctrlKey;
@@ -23,20 +29,26 @@ public class ControlKeyboard extends Keyboard {
     protected Key createKeyFromXml(Resources res, Row parent, int x, int y, 
             XmlResourceParser parser) {
         Key key = new Key(res, parent, x, y, parser);
-        if (key.codes[0] == -2)//is ctrl
+        if (key.codes[0] == R.integer.ctrl)//is ctrl
         {
         	this.ctrlKey = key;
-        } else if (key.codes[0] == -4)//is altgr
+        } else if (key.codes[0] == R.integer.altgr)//is altgr
         {
         	this.altgrKey = key;
         }
         return key;
     }
     
+    /**
+     * @return the ctrl modifier key of this keyboard
+     */
 	public Key getCtrlKey() {
 		return ctrlKey;
 	}
 
+	/**
+     * @return the altgr modifier key of this keyboard
+     */
 	public Key getAltgrKey() {
 		return altgrKey;
 	}

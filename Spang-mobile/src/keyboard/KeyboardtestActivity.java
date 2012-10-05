@@ -1,5 +1,8 @@
-package spang.mobile;
+package keyboard;
 
+import spang.mobile.R;
+import spang.mobile.R.layout;
+import spang.mobile.R.menu;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;

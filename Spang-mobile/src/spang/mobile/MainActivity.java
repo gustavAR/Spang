@@ -1,5 +1,6 @@
 package spang.mobile;
 
+import keyboard.KeyboardtestActivity;
 import utils.LogCatLogger;
 import utils.Logger;
 import android.app.Activity;

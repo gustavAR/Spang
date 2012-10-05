@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+The integer values are the keycodes for modifiers and special keys.
+
+The strings are the identificators which we add to the character
+every time we send a character over the network.
+-->
+<resources>
+    <item name="shift" type="integer">-1</item>
+    <item name="ctrl" type="integer">-2</item>
+    <item name="hide_keyboard" type="integer">-3</item>
+    <item name="altgr"  type="integer">-4</item>
+    <string name="shift_network_id">\shift</string>
+    <string name="ctrl_network_id">\ctrl</string>
+    <string name="altgr_network_id">\altgr</string>
+</resources>

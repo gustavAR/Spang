@@ -54,20 +54,24 @@ containing a value of this type.
         public static final int sym_keyboard_space=0x7f020007;
     }
     public static final class id {
-        public static final int button1=0x7f090003;
+        public static final int button1=0x7f090001;
         public static final int button3=0x7f090004;
-        public static final int editText1=0x7f090001;
-        public static final int editText2=0x7f090002;
+        public static final int editText1=0x7f090002;
+        public static final int editText2=0x7f090003;
         public static final int keyboard=0x7f090000;
         public static final int menu_settings=0x7f090005;
     }
     public static final class integer {
-        public static final int Accelerometer=0x7f050002;
-        public static final int Gyroscope=0x7f050003;
-        public static final int Luminance=0x7f050004;
-        public static final int MagneticField=0x7f050005;
-        public static final int Text=0x7f050001;
-        public static final int Touch=0x7f050000;
+        public static final int Accelerometer=0x7f050006;
+        public static final int Gyroscope=0x7f050007;
+        public static final int Luminance=0x7f050008;
+        public static final int MagneticField=0x7f050009;
+        public static final int Text=0x7f050005;
+        public static final int Touch=0x7f050004;
+        public static final int altgr=0x7f050003;
+        public static final int ctrl=0x7f050001;
+        public static final int hide_keyboard=0x7f050002;
+        public static final int shift=0x7f050000;
     }
     public static final class layout {
         public static final int activity_keyboardtest=0x7f030000;
@@ -88,19 +92,22 @@ containing a value of this type.
         public static final int activity_text_sender=0x7f080004;
     }
     public static final class string {
-        public static final int app_name=0x7f060000;
-        public static final int button_send=0x7f060005;
-        public static final int default_ip=0x7f060007;
-        public static final int default_port=0x7f060008;
-        public static final int hello_world=0x7f060001;
-        public static final int menu_settings=0x7f060002;
-        public static final int network_service_started=0x7f06000a;
-        public static final int title_activity_keyboardtest=0x7f06000c;
-        public static final int title_activity_main=0x7f060003;
-        public static final int title_activity_mouse=0x7f060006;
-        public static final int title_activity_networked=0x7f06000b;
-        public static final int title_activity_prefs=0x7f060004;
-        public static final int title_activity_text_sender=0x7f060009;
+        public static final int altgr_network_id=0x7f060002;
+        public static final int app_name=0x7f060003;
+        public static final int button_send=0x7f060008;
+        public static final int ctrl_network_id=0x7f060001;
+        public static final int default_ip=0x7f06000a;
+        public static final int default_port=0x7f06000b;
+        public static final int hello_world=0x7f060004;
+        public static final int menu_settings=0x7f060005;
+        public static final int network_service_started=0x7f06000d;
+        public static final int shift_network_id=0x7f060000;
+        public static final int title_activity_keyboardtest=0x7f06000f;
+        public static final int title_activity_main=0x7f060006;
+        public static final int title_activity_mouse=0x7f060009;
+        public static final int title_activity_networked=0x7f06000e;
+        public static final int title_activity_prefs=0x7f060007;
+        public static final int title_activity_text_sender=0x7f06000c;
     }
     public static final class style {
         public static final int AppTheme=0x7f070000;

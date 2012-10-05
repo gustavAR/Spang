@@ -67,7 +67,7 @@
         </activity>
         
         <activity
-            android:name=".KeyboardtestActivity"
+            android:name="keyboard.KeyboardtestActivity"
             android:label="@string/title_activity_keyboardtest" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
