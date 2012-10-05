@@ -343,7 +343,7 @@ namespace Spang_PC_C_sharp
 
         public void SendToAll(byte[] toSend)
         {
-            this.SendToAll(toSend, Protocol.Fast);
+            this.SendToAll(toSend, Protocol.Unordered);
         }
 
         #endregion
