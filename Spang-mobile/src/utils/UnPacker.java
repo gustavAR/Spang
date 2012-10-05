@@ -174,8 +174,6 @@ public class UnPacker {
 		return array;
 	}
 	
-
-
 	public String unpackString() {
 		int length = this.unpackInt();
 		byte[] bytes = this.unpackByteArray(length);

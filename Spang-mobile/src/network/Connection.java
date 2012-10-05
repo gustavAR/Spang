@@ -111,7 +111,6 @@ public class Connection implements IConnection {
 				break;
 			}
 			
-			
 			//What protocol was the message sent with?
 			Protocol protocol = Protocol.fromID(copy[0]);
 			
