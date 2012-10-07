@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading;
 using System.Drawing;
 
+using System.Drawing.Imaging;
+
 namespace Spang_PC_C_sharp
 {
     static class Program
@@ -17,6 +19,24 @@ namespace Spang_PC_C_sharp
         /// </summary>
         static void Main()
         {
+            #region Generate and show QR
+
+            //Find our local IP-address
+            IPHostEntry host;
+            string localIP = "";
+            host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    localIP = ip.ToString();
+                }
+            }
+
+            QRCodeGenerator.ShowQRCode(localIP + "/" + 1337, 120, 120, ImageFormat.Png);//120 are ok dimensions
+
+            #endregion
+
             IMessageDecoder messageHandler = new MessageDecoder();
             Phone phone = new Phone(messageHandler);
             DesktopController controller = new DesktopController(phone, new OsInterface());
