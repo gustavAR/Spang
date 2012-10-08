@@ -13,5 +13,6 @@
     <string name="network_service_started">Service started</string>
     <string name="title_activity_networked">NetworkedActivity</string>
     <string name="title_activity_keyboardtest">KeyboardtestActivity</string>
+    <string name="title_activity_computer">ComputerActivity</string>
 
 </resources>

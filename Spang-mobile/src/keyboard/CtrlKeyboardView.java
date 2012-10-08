@@ -1,5 +1,6 @@
 package keyboard;
 
+import spang.mobile.NetworkService;
 import spang.mobile.R;
 import utils.Packer;
 import android.app.Activity;
@@ -27,9 +28,8 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 * the one we show.
 	 */
 	ControlKeyboard ctrlKeyboard;
-	/**
-	 * Packs the values which will be sent.
-	 */
+	
+	NetworkService network;
 	Packer packer;
 
 	private boolean ctrlActive; //Is ctrl currently pressed?
@@ -41,19 +41,13 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 * @param context
 	 * @param attrs
 	 */
-	public CtrlKeyboardView(Context context, AttributeSet attrs) {
+	public CtrlKeyboardView(Context context, AttributeSet attrs, NetworkService networkService ) {
 		super(context, attrs);
 		this.ctrlKeyboard = new ControlKeyboard(context, R.xml.unicodeqwerty);
 		this.setKeyboard(ctrlKeyboard);
 		this.setOnKeyboardActionListener(this);
-	}
-	
-	/**
-	 * Must be called before using the keyboard.
-	 * @param packer Packer used to send all keyboardpresses
-	 */
-	public void setPacker(Packer packer){
-		this.packer = packer;
+		this.packer = new Packer();
+		this.network = networkService;
 	}
 
 	/**
@@ -119,7 +113,10 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 			this.altgrActive = !this.altgrActive;
 			break;
 		default:
-			this.packer.pack(addModifierIDs(character));
+			this.packer.packByte((byte)this.getContext().getResources().getInteger(R.integer.Text));
+			this.packer.packString(addModifierIDs(character));
+			this.network.send(this.packer.getPackedData());
+			this.packer.clear();
 			resetModifiers();
 			Log.i("CHAR", "" + (char)primaryCode);
 			}

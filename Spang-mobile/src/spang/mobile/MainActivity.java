@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
 		thread.start();
 		
 		
-		Intent intent = new Intent(this, NetworkedActivity.class);
+		Intent intent = new Intent(this, ComputerActivity.class);
 		this.startActivity(intent);
 	}
 	
@@ -63,13 +63,6 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(this, NetworkService.class);
 		this.stopService(intent);
 	}
-	
-
-	public void showKeyboard(View view){
-		Intent intent = new Intent(this, KeyboardtestActivity.class);
-		this.startActivity(intent);
-	}
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

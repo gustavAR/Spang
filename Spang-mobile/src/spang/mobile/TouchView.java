@@ -25,7 +25,7 @@ public class TouchView extends View {
 			pointers = 0;
 		
 		
-		packer.packByte((byte)0); //Temporary ID for touch packets
+		packer.packByte((byte)this.getContext().getResources().getInteger(R.integer.Touch));
 		packer.packByte((byte)pointers);
 		for(int i = 0; i < pointers; i++) {
 			packer.packShort((short)event.getX(i));

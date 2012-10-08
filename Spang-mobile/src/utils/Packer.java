@@ -71,9 +71,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packByte(byte b) {
-		if(internalBuffer.remaining() < 1) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(1);
 		
 		internalBuffer.put(b);
 		return this;
@@ -85,9 +83,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packByteArray(byte[] bytes) {
-		if(this.internalBuffer.remaining() < bytes.length) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(bytes.length);
 		
 		this.internalBuffer.put(bytes);		
 		return this;
@@ -99,9 +95,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packShort(short s) {
-		if(internalBuffer.remaining() < SHORT_SIZE) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(SHORT_SIZE);
 		
 		internalBuffer.putShort(s);
 		return this;
@@ -113,9 +107,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packShortArray(short[] shorts) {
-		if(internalBuffer.remaining() < SHORT_SIZE * shorts.length) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(shorts.length * SHORT_SIZE);
 		
 		for (int i = 0; i < shorts.length; i++) {
 			this.internalBuffer.putShort(shorts[i]);
@@ -129,9 +121,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packInt(int i) {
-		if(internalBuffer.remaining() < INT_SIZE) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(INT_SIZE);
 		
 		internalBuffer.putInt(i);
 		return this;
@@ -143,9 +133,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packIntArray(int[] ints) {
-		if(internalBuffer.remaining() < INT_SIZE * ints.length) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(ints.length * INT_SIZE);
 		
 		for (int i = 0; i < ints.length; i++) {
 			this.internalBuffer.putInt(ints[i]);
@@ -161,9 +149,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packLong(long l) {
-		if(internalBuffer.remaining() < LONG_SIZE) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(LONG_SIZE);
 		
 		internalBuffer.putLong(l);
 		return this;
@@ -175,9 +161,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packLongArray(long[] longs) {
-		if(internalBuffer.remaining() < LONG_SIZE * longs.length) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(longs.length * LONG_SIZE);
 		
 		for (int i = 0; i < longs.length; i++) {
 			this.internalBuffer.putLong(longs[i]);
@@ -193,9 +177,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packHalfFloat(float f) {
-		if(internalBuffer.remaining() < FLOAT_SIZE / 2) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(FLOAT_SIZE / 2);
 		//Converting to 
 		int halfFloat = fromFloat(f);
 		internalBuffer.put((byte)((halfFloat >>> 8) &  0xFF));
@@ -209,9 +191,8 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packHalfFloatArray(float[] f) {
-		if(internalBuffer.remaining() < FLOAT_SIZE / 2 * f.length) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(f.length * FLOAT_SIZE / 2);
+		
 		
 		for (int i = 0; i < f.length; i++) {
 			int halfFloat = fromFloat(f[i]);
@@ -227,9 +208,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packFloat(float f) {
-		if(internalBuffer.remaining() < FLOAT_SIZE) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(FLOAT_SIZE);
 		
 		internalBuffer.putFloat(f);
 		return this;
@@ -241,9 +220,7 @@ public class Packer {
 	 * @return this packer.
 	 */
 	public Packer packFloatArray(float[] floats) {
-		if(internalBuffer.remaining() < FLOAT_SIZE * floats.length) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(floats.length * DOUBLE_SIZE);
 		
 		for (int i = 0; i < floats.length; i++) {
 			this.internalBuffer.putFloat(floats[i]);
@@ -257,9 +234,7 @@ public class Packer {
 	 * @return a double.
 	 */
 	public Packer packDouble(double d) {
-		if(internalBuffer.remaining() < DOUBLE_SIZE) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(DOUBLE_SIZE);
 		
 		internalBuffer.putDouble(d);
 		return this;
@@ -267,13 +242,11 @@ public class Packer {
 	
 	/**
 	 * Packs an array of shorts
-	 * @param shorts the array to pack.
+	 * @param d the array to pack.
 	 * @return this packer.
 	 */
 	public Packer packDoubleArray(double[] d) {
-		if(internalBuffer.remaining() < DOUBLE_SIZE * d.length) {
-			this.increaseSize();
-		}
+		this.reziseIfNeeded(d.length * DOUBLE_SIZE);
 		
 		for (int i = 0; i < d.length; i++) {
 			this.internalBuffer.putDouble(d[i]);
@@ -292,15 +265,20 @@ public class Packer {
 	public Packer packString(String s) {
 		try {
 			byte[] array = s.getBytes("UTF-8");
-			if(internalBuffer.remaining() < array.length + 4) {
-				this.increaseSize();
-			}
+			this.reziseIfNeeded(array.length + INT_SIZE);
 			internalBuffer.putInt(s.length());
 			internalBuffer.put(array);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return this;
+	}
+	
+	
+	private void reziseIfNeeded(int neededRemainingSize) {
+		while(this.internalBuffer.remaining() < neededRemainingSize) {
+			this.increaseSize();
+		}
 	}
 	
 	//Public Domain http://stackoverflow.com/questions/6162651/half-precision-floating-point-in-java

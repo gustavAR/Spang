@@ -69,11 +69,17 @@ namespace Spang_PC_C_sharp
                 UnPacker unPacker = new UnPacker(message.Data);
                 bytesRecived += unPacker.remaining();
                 while(unPacker.remaining() > 0) {
-                if (unPacker.UnpackByte() == 0)
+                    int id = unPacker.UnpackByte();
+                    if (id == 0)
                     {
-                      //  Console.WriteLine("Recived mouse event!");
+                        //  Console.WriteLine("Recived mouse event!");
                         TouchEvent e = decoder.DecodeTouch(unPacker);
                         stateMachine.Update(e);
+                    }
+                    else if(id == 1)
+                    {
+                        String s = unPacker.UnpackString();
+                        controller.NetworkedText(s);
                     }
                 }
             };

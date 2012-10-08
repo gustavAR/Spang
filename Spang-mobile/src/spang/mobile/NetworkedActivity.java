@@ -5,39 +5,26 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.view.Menu;
 
 /**
  * Class that interfaces against the Network Service.
  * @author Lukas Kuryan.
  *
  */
-public class NetworkedActivity extends Activity {
+public abstract class NetworkedActivity extends Activity {
 	
 	private NetworkService network;	
 
 	/**
 	 * Gets the active NetworkService.
+	 * NOTE: This will return null before onNetworkServiceConnected is called!
 	 * @return a NetworkService.
 	 */
-	public NetworkService getNetworkService() {
+	public NetworkService getNetworkService() {		
 		return this.network;
 	}
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_networked);
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_networked, menu);
-        return true;
-    }
-    
     @Override
     protected void onStart() {
     	//Bind the service so we can use it.
@@ -58,17 +45,15 @@ public class NetworkedActivity extends Activity {
 		
 		public void onServiceDisconnected(ComponentName name) {
 			network = null;
+			NetworkedActivity.this.onNetworkServiceConnected();
 		}
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			network = ((NetworkService.NetworkBinder)service).getService();
-					
-			//TODO remove testing code!.
-			TouchView view = new TouchView(NetworkedActivity.this, network);
-			setContentView(view);
-			view.setFocusableInTouchMode(true);
-			view.requestFocus();
+			NetworkedActivity.this.onNetworkServiceConnected();
 		}
 	};
-    
+	
+	protected abstract void onNetworkServiceConnected();
+	protected abstract void onNetworkSerivceDissconnected();
 }
