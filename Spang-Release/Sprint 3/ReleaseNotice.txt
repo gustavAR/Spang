@@ -1,0 +1,10 @@
+Release notice
+
+Features (not currently in main branch): 
+QR-code generation and reading
+Activate/deactivate sensors
+Mouse input decoding on PC
+New network protocol. 
+
+Etc.
+Added requirements doc
