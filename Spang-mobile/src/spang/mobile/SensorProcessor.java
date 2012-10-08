@@ -8,6 +8,7 @@ import java.util.TimerTask;
 
 import sensors.ISensor;
 import sensors.SensorListBuilder;
+import utils.Packer;
 
 import network.IConnection;
 import android.app.Service;
@@ -135,7 +136,8 @@ public class SensorProcessor extends Service{
 
 	private void fillOutput(ISensor sensor) {	
 	//	if(sensor.isRunning()) {
-			sensor.encode(this.encodedSensorInput);		
+			
+		sensor.encode(this.encodedSensorInput);		
 	//	}
 	}
 

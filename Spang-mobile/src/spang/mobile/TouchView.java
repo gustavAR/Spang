@@ -19,7 +19,7 @@ public class TouchView extends View {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int pointers = event.getPointerCount();
-		
+/*		
 		packer.pack((byte)100); //Temporary ID for touch packets
 		packer.pack((byte)pointers);
 		for(int i = 0; i < pointers; i++) {
@@ -29,7 +29,7 @@ public class TouchView extends View {
 			packer.pack((event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> 
 			MotionEvent.ACTION_POINTER_INDEX_SHIFT);
 		}
-
+*/
 		service.send(packer.getPackedData());
 		return true;
 	}
