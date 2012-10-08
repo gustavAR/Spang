@@ -59,11 +59,6 @@
             android:enabled="true"
             android:exported="false" >
         </service>
-        <service
-            android:name=".KeyboardService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
 
         <activity
             android:name=".NetworkedActivity"
@@ -74,6 +69,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name="keyboard.KeyboardtestActivity"
+            android:label="@string/title_activity_keyboardtest" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="spang.mobile.MainActivity" />
+        </activity>
     </application>
-
 </manifest>

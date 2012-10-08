@@ -3,30 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="123dp"
-        android:ems="10"
-        android:inputType="text"
-        android:text="@string/default_ip" >
-
-        <requestFocus />
-    </EditText>
-
-    <EditText
-        android:id="@+id/editText2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText1"
-        android:layout_alignTop="@+id/editText1"
-        android:layout_marginTop="50dp"
-        android:ems="5"
-        android:inputType="number"
-        android:text="@string/default_port" />
-
     <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
@@ -36,5 +12,37 @@
         android:layout_marginBottom="74dp"
         android:onClick="sendData"
         android:text="@string/button_send" />
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:ems="10"
+        android:inputType="text"
+        android:text="@string/default_ip" />
+
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText1"
+        android:layout_below="@+id/editText1"
+        android:ems="5"
+        android:inputType="number"
+        android:text="@string/default_port" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:onClick="showKeyboard"
+        android:text="Keyboardtest" />
 
 </RelativeLayout>

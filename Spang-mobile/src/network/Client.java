@@ -188,6 +188,13 @@ public class Client implements IClient {
 			}
 		});
 		
+		this.udpWorker.addReadCrashAction(new Action() {
+			
+			public void onAction() {
+				onReadCrash();
+			}
+		});
+		
 		new Thread(udpWorker).start();
 	}
 
@@ -204,6 +211,11 @@ public class Client implements IClient {
 	private void onTimeout() {
 		this.onDisconnect(DCCause.TCPTimeout);
 	}
+	
+	protected void onReadCrash() {
+		this.onDisconnect(DCCause.LocalNetworkCrash);
+	}
+
 
 	private void onRecived(byte[] message) {
 		if(isHeartbeat(message)) { 
@@ -305,7 +317,6 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public void close() {
-		// TODO Auto-generated method stub
-		
+		this.connection.close();
 	}	
 }

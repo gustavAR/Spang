@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+File from which we can create an instance of the Keyboard class.
+
+Represents the view of the keyboard when shift is pressed.
+
+ATTENTION: All keycodes are unicode for ease of use,
+		   keys which are produced by modifiers 
+		   (for example the character "!" is produced by
+		   pressing shift and 1 at the same time)
+		   are represented by the base key without any modifiers
+		   (that would be 1 in our example).
+		   		   
+All special messages are implemented with negative numbers.
+-->
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+    android:keyWidth="10%p"
+    android:horizontalGap="0px"
+    android:verticalGap="0px"
+    android:keyHeight="10%p"
+    >
+
+        <Row android:rowEdgeFlags="top">
+        <Key android:codes="-3" android:keyIcon="@drawable/sym_keyboard_done" 
+                android:keyWidth="20%p" android:keyEdgeFlags="left"/>
+    </Row>
+    
+    <Row>
+        <Key android:codes="49" android:keyLabel="!" android:keyEdgeFlags="left"/>
+        <Key android:codes="50" android:keyLabel="&quot;"/>
+        <Key android:codes="51" android:keyLabel="#"/>
+        <Key android:codes="52" android:keyLabel="¤"/>
+        <Key android:codes="53" android:keyLabel="%"/>
+        <Key android:codes="54" android:keyLabel="&amp;"/>
+        <Key android:codes="55" android:keyLabel="/"/>
+        <Key android:codes="56" android:keyLabel="("/>
+        <Key android:codes="57" android:keyLabel=")"/>
+        <Key android:codes="48" android:keyLabel="=" android:keyEdgeFlags="right"/>
+    </Row>
+    
+        <Row>
+        <Key android:codes="113" android:keyLabel="Q" android:keyEdgeFlags="left"/>
+        <Key android:codes="119" android:keyLabel="W"/>
+        <Key android:codes="101" android:keyLabel="E"/>
+        <Key android:codes="114" android:keyLabel="R"/>
+        <Key android:codes="116" android:keyLabel="T"/>
+        <Key android:codes="121" android:keyLabel="Y"/>
+        <Key android:codes="117" android:keyLabel="U"/>
+        <Key android:codes="105" android:keyLabel="I"/>
+        <Key android:codes="111" android:keyLabel="O"/>
+        <Key android:codes="112" android:keyLabel="P" android:keyEdgeFlags="right"/>
+    </Row>
+    
+    <Row>
+        <Key android:codes="97" android:keyLabel="A" android:horizontalGap="5%p" 
+                android:keyEdgeFlags="left"/>
+        <Key android:codes="115" android:keyLabel="S"/>
+        <Key android:codes="100" android:keyLabel="D"/>
+        <Key android:codes="102" android:keyLabel="F"/>
+        <Key android:codes="103" android:keyLabel="G"/>
+        <Key android:codes="104" android:keyLabel="H"/>
+        <Key android:codes="106" android:keyLabel="J"/>
+        <Key android:codes="107" android:keyLabel="K"/>
+        <Key android:codes="108" android:keyLabel="L" android:keyEdgeFlags="right"/>
+    </Row>
+    
+    <Row>
+        <Key android:codes="-1" android:keyIcon="@drawable/sym_keyboard_shift" 
+                android:keyWidth="15%p" android:isModifier="true"
+                android:isSticky="true" android:keyEdgeFlags="left"/>
+        <Key android:codes="122" android:keyLabel="Z"/>
+        <Key android:codes="120" android:keyLabel="X"/>
+        <Key android:codes="99" android:keyLabel="C"/>
+        <Key android:codes="118" android:keyLabel="V"/>
+        <Key android:codes="98" android:keyLabel="B"/>
+        <Key android:codes="110" android:keyLabel="N"/>
+        <Key android:codes="109" android:keyLabel="M"/>
+        <Key android:codes="-5" android:keyIcon="@drawable/sym_keyboard_delete" 
+                android:keyWidth="15%p" android:keyEdgeFlags="right"
+                android:isRepeatable="true"/>
+    </Row>
+    
+    <Row android:rowEdgeFlags="bottom">
+        <Key android:codes="-2" android:keyLabel="ctrl" android:isModifier="true"
+                android:isSticky="true" android:keyWidth="20%p" android:keyEdgeFlags="left"/>
+        <Key android:codes="-4" android:keyLabel="altgr" android:isModifier="true"
+                android:isSticky="true" android:keyWidth="15%p"/>
+        <Key android:codes="32" android:keyIcon="@drawable/sym_keyboard_space" 
+                android:keyWidth="30%p" android:isRepeatable="true"/>
+        <Key android:codes="46,44" android:keyLabel=". ,"
+                android:keyWidth="15%p"/>
+        <Key android:codes="10" android:keyIcon="@drawable/sym_keyboard_return" 
+                android:keyWidth="20%p" android:keyEdgeFlags="right"/>
+    </Row>
+</Keyboard>
+    

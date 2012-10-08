@@ -54,11 +54,12 @@ containing a value of this type.
         public static final int sym_keyboard_space=0x7f020007;
     }
     public static final class id {
-        public static final int button1=0x7f090002;
-        public static final int editText1=0x7f090000;
-        public static final int editText2=0x7f090001;
-        public static final int keyboard=0x7f090003;
-        public static final int menu_settings=0x7f090004;
+        public static final int button1=0x7f090001;
+        public static final int button3=0x7f090004;
+        public static final int editText1=0x7f090002;
+        public static final int editText2=0x7f090003;
+        public static final int keyboard=0x7f090000;
+        public static final int menu_settings=0x7f090005;
     }
     public static final class integer {
         public static final int Accelerometer=0x7f050002;
@@ -69,19 +70,22 @@ containing a value of this type.
         public static final int Touch=0x7f050000;
     }
     public static final class layout {
-        public static final int activity_main=0x7f030000;
-        public static final int activity_mouse=0x7f030001;
-        public static final int activity_networked=0x7f030002;
-        public static final int activity_text_sender=0x7f030003;
-        public static final int input=0x7f030004;
-        public static final int sample_custom_keyboard_view=0x7f030005;
-        public static final int sample_network_view=0x7f030006;
+        public static final int activity_keyboardtest=0x7f030000;
+        public static final int activity_main=0x7f030001;
+        public static final int activity_mouse=0x7f030002;
+        public static final int activity_networked=0x7f030003;
+        public static final int activity_text_sender=0x7f030004;
+        public static final int input=0x7f030005;
+        public static final int sample_ctrl_keyboard_view=0x7f030006;
+        public static final int sample_custom_keyboard_view=0x7f030007;
+        public static final int sample_network_view=0x7f030008;
     }
     public static final class menu {
-        public static final int activity_main=0x7f080000;
-        public static final int activity_mouse=0x7f080001;
-        public static final int activity_networked=0x7f080002;
-        public static final int activity_text_sender=0x7f080003;
+        public static final int activity_keyboardtest=0x7f080000;
+        public static final int activity_main=0x7f080001;
+        public static final int activity_mouse=0x7f080002;
+        public static final int activity_networked=0x7f080003;
+        public static final int activity_text_sender=0x7f080004;
     }
     public static final class string {
         public static final int app_name=0x7f060000;
@@ -91,6 +95,7 @@ containing a value of this type.
         public static final int hello_world=0x7f060001;
         public static final int menu_settings=0x7f060002;
         public static final int network_service_started=0x7f06000a;
+        public static final int title_activity_keyboardtest=0x7f06000c;
         public static final int title_activity_main=0x7f060003;
         public static final int title_activity_mouse=0x7f060006;
         public static final int title_activity_networked=0x7f06000b;
@@ -101,32 +106,35 @@ containing a value of this type.
         public static final int AppTheme=0x7f070000;
     }
     public static final class xml {
-        public static final int prefs=0x7f040000;
-        public static final int qwerty=0x7f040001;
+        public static final int method=0x7f040000;
+        public static final int prefs=0x7f040001;
+        public static final int unicodealtgr=0x7f040002;
+        public static final int unicodeqwerty=0x7f040003;
+        public static final int unicodeshifted=0x7f040004;
     }
     public static final class styleable {
-        /** Attributes that can be used with a CustomKeyboardView.
+        /** Attributes that can be used with a CtrlKeyboardView.
            <p>Includes the following attributes:</p>
            <table>
            <colgroup align="left" />
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
-           <tr><td><code>{@link #CustomKeyboardView_exampleColor spang.mobile:exampleColor}</code></td><td></td></tr>
-           <tr><td><code>{@link #CustomKeyboardView_exampleDimension spang.mobile:exampleDimension}</code></td><td></td></tr>
-           <tr><td><code>{@link #CustomKeyboardView_exampleDrawable spang.mobile:exampleDrawable}</code></td><td></td></tr>
-           <tr><td><code>{@link #CustomKeyboardView_exampleString spang.mobile:exampleString}</code></td><td></td></tr>
+           <tr><td><code>{@link #CtrlKeyboardView_exampleColor spang.mobile:exampleColor}</code></td><td></td></tr>
+           <tr><td><code>{@link #CtrlKeyboardView_exampleDimension spang.mobile:exampleDimension}</code></td><td></td></tr>
+           <tr><td><code>{@link #CtrlKeyboardView_exampleDrawable spang.mobile:exampleDrawable}</code></td><td></td></tr>
+           <tr><td><code>{@link #CtrlKeyboardView_exampleString spang.mobile:exampleString}</code></td><td></td></tr>
            </table>
-           @see #CustomKeyboardView_exampleColor
-           @see #CustomKeyboardView_exampleDimension
-           @see #CustomKeyboardView_exampleDrawable
-           @see #CustomKeyboardView_exampleString
+           @see #CtrlKeyboardView_exampleColor
+           @see #CtrlKeyboardView_exampleDimension
+           @see #CtrlKeyboardView_exampleDrawable
+           @see #CtrlKeyboardView_exampleString
          */
-        public static final int[] CustomKeyboardView = {
+        public static final int[] CtrlKeyboardView = {
             0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003
         };
         /**
           <p>This symbol is the offset where the {@link spang.mobile.R.attr#exampleColor}
-          attribute's value can be found in the {@link #CustomKeyboardView} array.
+          attribute's value can be found in the {@link #CtrlKeyboardView} array.
 
 
           <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
@@ -138,10 +146,10 @@ theme attribute (in the form
 containing a value of this type.
           @attr name android:exampleColor
         */
-        public static final int CustomKeyboardView_exampleColor = 2;
+        public static final int CtrlKeyboardView_exampleColor = 2;
         /**
           <p>This symbol is the offset where the {@link spang.mobile.R.attr#exampleDimension}
-          attribute's value can be found in the {@link #CustomKeyboardView} array.
+          attribute's value can be found in the {@link #CtrlKeyboardView} array.
 
 
           <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
@@ -154,10 +162,10 @@ theme attribute (in the form
 containing a value of this type.
           @attr name android:exampleDimension
         */
-        public static final int CustomKeyboardView_exampleDimension = 1;
+        public static final int CtrlKeyboardView_exampleDimension = 1;
         /**
           <p>This symbol is the offset where the {@link spang.mobile.R.attr#exampleDrawable}
-          attribute's value can be found in the {@link #CustomKeyboardView} array.
+          attribute's value can be found in the {@link #CtrlKeyboardView} array.
 
 
           <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
@@ -166,10 +174,10 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
 "<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
           @attr name android:exampleDrawable
         */
-        public static final int CustomKeyboardView_exampleDrawable = 3;
+        public static final int CtrlKeyboardView_exampleDrawable = 3;
         /**
           <p>This symbol is the offset where the {@link spang.mobile.R.attr#exampleString}
-          attribute's value can be found in the {@link #CustomKeyboardView} array.
+          attribute's value can be found in the {@link #CtrlKeyboardView} array.
 
 
           <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
@@ -180,6 +188,11 @@ theme attribute (in the form
 containing a value of this type.
           @attr name android:exampleString
         */
-        public static final int CustomKeyboardView_exampleString = 0;
+        public static final int CtrlKeyboardView_exampleString = 0;
+        /** Attributes that can be used with a CustomKeyboardView.
+         */
+        public static final int[] CustomKeyboardView = {
+            
+        };
     };
 }
