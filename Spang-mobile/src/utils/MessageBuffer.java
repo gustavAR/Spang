@@ -24,7 +24,7 @@ public class MessageBuffer {
 				return;
 			}
 			
-			if(this.messagePacker.packedSize() + message.length < this.messageLength) {
+			if(this.messagePacker.getPackedSize() + message.length < this.messageLength) {
 				this.packMessage(message);
 			} else {
 				addPackedMessage();
@@ -44,7 +44,7 @@ public class MessageBuffer {
 	}
 
 	private void packMessage(byte[] message) {
-		this.messagePacker.pack(message);
+		this.messagePacker.packByteArray(message);
 	}
 	
 	private void addPackedMessage() {
@@ -56,7 +56,7 @@ public class MessageBuffer {
 	public List<byte[]> getNewMessages() {	
 		synchronized (lock) {
 			//Pack the final message.
-			if(this.messagePacker.packedSize() > 0) {
+			if(this.messagePacker.getPackedSize() > 0) {
 				this.addPackedMessage();
 			}
 	

@@ -64,7 +64,7 @@ public class NetworkedActivity extends Activity {
 			network = ((NetworkService.NetworkBinder)service).getService();
 					
 			//TODO remove testing code!.
-			NetworkView view = new NetworkView(NetworkedActivity.this, network);
+			TouchView view = new TouchView(NetworkedActivity.this, network);
 			setContentView(view);
 			view.setFocusableInTouchMode(true);
 			view.requestFocus();

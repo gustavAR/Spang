@@ -5,11 +5,10 @@ using System.Text;
 
 namespace Spang_PC_C_sharp
 {
-    [Flags]
-    enum Protocol
+    class TouchEvent
     {
-        Unordered = 0x01,
-        Ordered = 0x02,
-        Reliable = 0x04
+        public List<Vector3> Pointers { get; set; }
+
+        public static TouchEvent Empty { get; set; }
     }
 }
