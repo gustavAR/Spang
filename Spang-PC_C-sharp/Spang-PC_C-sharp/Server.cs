@@ -273,11 +273,8 @@ namespace Spang_PC_C_sharp
                 Console.ForegroundColor = c;
                 return;
             }
-            if (IsSystemMessage(bytes))
-            {
-                HandleSystemMessage(bytes);
-                return;
-            }
+
+
             RecivedEventArgs eventArgs = new RecivedEventArgs(connectionID, bytes);
             if (this.Recived != null)
                 this.Recived(this, eventArgs);
@@ -286,16 +283,6 @@ namespace Spang_PC_C_sharp
         private bool IsHeartbeat(byte[] recived)
         {
             return recived.Length == 0;
-        }
-
-        private void HandleSystemMessage(byte[] recived)
-        {
-            Console.WriteLine("Just recieved a system message of length " + (recived.Length - 1));
-        }
-
-        private bool IsSystemMessage(byte[] recived)
-        {
-            return recived[0] == 0;
         }
 
         internal void OnDissconnected(IServerConnection connection, DisconnectCause cause)

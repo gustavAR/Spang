@@ -318,6 +318,5 @@ namespace Spang_PC_C_sharp
 
             public ReliableProtocol(Connection connection) : base(connection) { }
         }
-
     }
 }
