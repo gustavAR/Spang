@@ -20,17 +20,21 @@ public class TouchView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		int pointers = event.getPointerCount();
 		
-		packer.packByte((byte)100); //Temporary ID for touch packets
+		int eventID = event.getAction()  & MotionEvent.ACTION_MASK;
+		if(eventID == MotionEvent.ACTION_UP)
+			pointers = 0;
+		
+		
+		packer.packByte((byte)0); //Temporary ID for touch packets
 		packer.packByte((byte)pointers);
 		for(int i = 0; i < pointers; i++) {
-			packer.packHalfFloat(event.getX(i));
-			packer.packHalfFloat(event.getY(i));
-			packer.packHalfFloat(event.getPressure(i));	
-			packer.packInt((event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> 
-			MotionEvent.ACTION_POINTER_INDEX_SHIFT);
+			packer.packShort((short)event.getX(i));
+			packer.packShort((short)event.getY(i));
+			packer.packByte((byte)(event.getPressure(i) * 256));	
 		}
 
 		service.send(packer.getPackedData());
+		packer.clear();
 		return true;
 	}
 }

@@ -26,7 +26,7 @@ import events.EventHandler;
 public class NetworkService extends Service {
 	
 	//Interval in wich to send buffered messages.
-	private long MESSAGE_SEND_INTERVALL = 1000 / 10;
+	private long MESSAGE_SEND_INTERVALL = 1000 / 20;
 	
 	//The client used to send messages over the network
 	private IClient client;
