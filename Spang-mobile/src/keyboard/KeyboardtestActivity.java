@@ -1,9 +1,10 @@
 package keyboard;
 
+import spang.mobile.NetworkService;
+import spang.mobile.NetworkedActivity;
 import spang.mobile.R;
 import utils.Packer;
 import android.app.Activity;
-import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,15 +17,11 @@ import android.view.MotionEvent;
  * @author Gustav Alm Rosenblad
  *
  */
-public class KeyboardtestActivity extends Activity {
+public class KeyboardtestActivity extends NetworkedActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        CtrlKeyboardView cKV = new CtrlKeyboardView(this, null);
-        cKV.setId(R.layout.activity_keyboardtest);
-        cKV.setPacker(new Packer(1024));//TODO: This packer is just there so we don't crash.
-		setContentView(cKV);
     }
 
     @Override
@@ -33,15 +30,17 @@ public class KeyboardtestActivity extends Activity {
         return true;
     }
 
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-    
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-    	return super.onTouchEvent(event);
-    }
+	@Override
+	protected void onNetworkServiceConnected() {
+        CtrlKeyboardView cKV = new CtrlKeyboardView(this, null, this.getNetworkService());
+        cKV.setId(R.layout.activity_keyboardtest);
+		setContentView(cKV);
+	}
+
+	@Override
+	protected void onNetworkSerivceDissconnected() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

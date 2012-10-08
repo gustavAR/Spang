@@ -20,7 +20,6 @@ public interface IConnection {
 	 */
 	void send(byte[] data) throws NetworkException;
 	
-
 	/**
 	 * Sends the supplied data with the specified protocol.
 	 * @param toSend data to send.

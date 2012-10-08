@@ -4,150 +4,282 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ * Helper class that makes it easy to pack primitive data into a byte array.
+ *  
+ * 
+ * @author Lukas Kurtyan & Pontus Pall
+ */
 public class Packer {
 	private static final int INT_SIZE = Integer.SIZE/8;
 	private static final int SHORT_SIZE = Short.SIZE/8;
 	private static final int LONG_SIZE = Long.SIZE/8;
 	private static final int FLOAT_SIZE = Float.SIZE/8;
 	private static final int DOUBLE_SIZE = Double.SIZE/8;
+	private static final int DEFAULT_CAPACITY = 4;
 	
-	private ByteBuffer packet;
+	private ByteBuffer internalBuffer;
+
+	public Packer() {
+		this(DEFAULT_CAPACITY);
+	}
 	
 	public Packer(int capacity) {
-		this.packet = ByteBuffer.allocate(capacity).order(ByteOrder.LITTLE_ENDIAN);
+		this.internalBuffer = ByteBuffer.allocate(capacity).order(ByteOrder.LITTLE_ENDIAN);
 	}
 
+
+	/**
+	 * Gets all the packed data.
+	 * @return packed data.
+	 */
 	public byte[] getPackedData() {
-		byte[] array = new byte[packet.position()];
+		byte[] array = new byte[internalBuffer.position()];
 		
-		packet.rewind();
-		packet.get(array);
+		internalBuffer.rewind();
+		internalBuffer.get(array);
 		
 		return array;
 	}
 
 
+	/**
+	 * Clears all packed data.
+	 */
 	public void clear() {
-		packet.clear();
+		internalBuffer.clear();
 	}
 	
-	public int packedSize() {
-		return this.packet.position();
+	/**
+	 * Gets the current size of the packed data.
+	 * @return packed size.
+	 */
+	public int getPackedSize() {
+		return this.internalBuffer.position();
 	}
 
 	private void increaseSize() {
-		ByteBuffer buffer = ByteBuffer.allocate(this.packet.capacity() * 2).order(ByteOrder.LITTLE_ENDIAN);
-		buffer.put(this.packet.array(), 0, this.packet.position());
-		this.packet = buffer;
+		//Doubles the size of the bytebuffer.
+		ByteBuffer buffer = ByteBuffer.allocate(this.internalBuffer.capacity() * 2).order(ByteOrder.LITTLE_ENDIAN);
+		buffer.put(this.internalBuffer.array(), 0, this.internalBuffer.position());
+		this.internalBuffer = buffer;
 	}
 
-	
-	public void pack(byte b) {
-		if(packet.remaining() < 1) {
-			this.increaseSize();
-		}
+	/**
+	 * Packs a single byte.
+	 * @param b the byte to pack
+	 * @return this packer.
+	 */
+	public Packer packByte(byte b) {
+		this.reziseIfNeeded(1);
 		
-		packet.put(b);
+		internalBuffer.put(b);
+		return this;
 	}
-	
 
-	public void pack(byte[] message) {
-		this.packet.put(message);		
-	}
-	
-	public void pack(int i) {
-		if(packet.remaining() < INT_SIZE) {
-			this.increaseSize();
-		}
+	/**
+	 * Packs an array of bytes.
+	 * @param bytes bytes to pack.
+	 * @return this packer.
+	 */
+	public Packer packByteArray(byte[] bytes) {
+		this.reziseIfNeeded(bytes.length);
 		
-		packet.putInt(i);
+		this.internalBuffer.put(bytes);		
+		return this;
 	}
 	
-	public void pack(short s) {
-		if(packet.remaining() < SHORT_SIZE) {
-			this.increaseSize();
-		}
+	/**
+	 * Packs a single short
+	 * @param s short to pack.
+	 * @return this packer.
+	 */
+	public Packer packShort(short s) {
+		this.reziseIfNeeded(SHORT_SIZE);
 		
-		packet.putShort(s);
+		internalBuffer.putShort(s);
+		return this;
 	}
-	
-	public void pack(long l) {
-		if(packet.remaining() < LONG_SIZE) {
-			this.increaseSize();
-		}
+
+	/**
+	 * Packs an array of shorts
+	 * @param shorts the array to pack.
+	 * @return this packer.
+	 */
+	public Packer packShortArray(short[] shorts) {
+		this.reziseIfNeeded(shorts.length * SHORT_SIZE);
 		
-		packet.putLong(l);
+		for (int i = 0; i < shorts.length; i++) {
+			this.internalBuffer.putShort(shorts[i]);
+		}
+		return this;
 	}
 	
-	public void packHalfFloat(float f) {
-		if(packet.remaining() < FLOAT_SIZE / 2) {
-			this.increaseSize();
+	/**
+	 * Packs a single int.
+	 * @param i the int to pack.
+	 * @return this packer.
+	 */
+	public Packer packInt(int i) {
+		this.reziseIfNeeded(INT_SIZE);
+		
+		internalBuffer.putInt(i);
+		return this;
+	}
+	
+	/**
+	 * Packs an array of ints
+	 * @param ints the array to pack.
+	 * @return this packer.
+	 */
+	public Packer packIntArray(int[] ints) {
+		this.reziseIfNeeded(ints.length * INT_SIZE);
+		
+		for (int i = 0; i < ints.length; i++) {
+			this.internalBuffer.putInt(ints[i]);
 		}
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Packs a single long.
+	 * @param i the long to pack.
+	 * @return this packer.
+	 */
+	public Packer packLong(long l) {
+		this.reziseIfNeeded(LONG_SIZE);
+		
+		internalBuffer.putLong(l);
+		return this;
+	}
+	
+	/**
+	 * Packs an array of longs
+	 * @param longs the array to pack.
+	 * @return this packer.
+	 */
+	public Packer packLongArray(long[] longs) {
+		this.reziseIfNeeded(longs.length * LONG_SIZE);
+		
+		for (int i = 0; i < longs.length; i++) {
+			this.internalBuffer.putLong(longs[i]);
+		}
+		return this;
+	}
+	
+	/**
+	 * Packs a half float value.
+	 * NOTE: The precision of this format is horrible but it saves alot of space.
+	 * Use this when saving space is are more important then precision.
+	 * @param f the float to pack.
+	 * @return this packer.
+	 */
+	public Packer packHalfFloat(float f) {
+		this.reziseIfNeeded(FLOAT_SIZE / 2);
 		//Converting to 
 		int halfFloat = fromFloat(f);
-		packet.put((byte)((halfFloat >>> 8)&  0xFF));
-		packet.put((byte)((halfFloat) &  0xFF));
+		internalBuffer.put((byte)((halfFloat >>> 8) &  0xFF));
+		internalBuffer.put((byte)((halfFloat) &  0xFF));
+		return this;
 	}
 	
-	
-	public void pack(float f) {
-		if(packet.remaining() < FLOAT_SIZE) {
-			this.increaseSize();
-		}
+	/**
+	 * Packs an array of half floats
+	 * @param f the array to pack.
+	 * @return this packer.
+	 */
+	public Packer packHalfFloatArray(float[] f) {
+		this.reziseIfNeeded(f.length * FLOAT_SIZE / 2);
 		
-		packet.putFloat(f);
-	}
-	
-	public void pack(double d) {
-		if(packet.remaining() < DOUBLE_SIZE) {
-			this.increaseSize();
-		}
 		
-		packet.putDouble(d);
+		for (int i = 0; i < f.length; i++) {
+			int halfFloat = fromFloat(f[i]);
+			internalBuffer.put((byte)((halfFloat >>> 8) &  0xFF));
+			internalBuffer.put((byte)((halfFloat) &  0xFF));	
+		}
+		return this;
 	}
 	
-	public void pack(String s) {
+	/**
+	 * Packs a single float.
+	 * @param f the float to pack.
+	 * @return this packer.
+	 */
+	public Packer packFloat(float f) {
+		this.reziseIfNeeded(FLOAT_SIZE);
+		
+		internalBuffer.putFloat(f);
+		return this;
+	}
+	
+	/**
+	 * Packs an array of floats
+	 * @param floats the array to pack.
+	 * @return this packer.
+	 */
+	public Packer packFloatArray(float[] floats) {
+		this.reziseIfNeeded(floats.length * DOUBLE_SIZE);
+		
+		for (int i = 0; i < floats.length; i++) {
+			this.internalBuffer.putFloat(floats[i]);
+		}
+		return this;
+	}
+	
+	/**
+	 * Packs a single double.
+	 * @param d the double to pack.
+	 * @return a double.
+	 */
+	public Packer packDouble(double d) {
+		this.reziseIfNeeded(DOUBLE_SIZE);
+		
+		internalBuffer.putDouble(d);
+		return this;
+	}
+	
+	/**
+	 * Packs an array of shorts
+	 * @param d the array to pack.
+	 * @return this packer.
+	 */
+	public Packer packDoubleArray(double[] d) {
+		this.reziseIfNeeded(d.length * DOUBLE_SIZE);
+		
+		for (int i = 0; i < d.length; i++) {
+			this.internalBuffer.putDouble(d[i]);
+		}
+		return this;
+	}
+	
+	/**
+	 * Packs a string.
+	 * The string is packed in the format:
+	 * LENGTH: 32bit Integer.
+	 * DATA: String of Size LENGTH in UTF-8 Format.
+	 * @param s the string to pack.
+	 * @return a string.
+	 */
+	public Packer packString(String s) {
 		try {
 			byte[] array = s.getBytes("UTF-8");
-			if(packet.remaining() < array.length + 4) {
-				this.increaseSize();
-			}
-			packet.putInt(s.length());
-			packet.put(array);
+			this.reziseIfNeeded(array.length + INT_SIZE);
+			internalBuffer.putInt(s.length());
+			internalBuffer.put(array);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+		return this;
 	}
 	
 	
-	// Public Domain http://stackoverflow.com/questions/6162651/half-precision-floating-point-in-java
-	private static float toFloat( int hbits )
-	{
-	    int mant = hbits & 0x03ff;            // 10 bits mantissa
-	    int exp =  hbits & 0x7c00;            // 5 bits exponent
-	    if( exp == 0x7c00 )                   // NaN/Inf
-	        exp = 0x3fc00;                    // -> NaN/Inf
-	    else if( exp != 0 )                   // normalized value
-	    {
-	        exp += 0x1c000;                   // exp - 15 + 127
-	        if( mant == 0 && exp > 0x1c400 )  // smooth transition
-	            return Float.intBitsToFloat( ( hbits & 0x8000 ) << 16
-	                                            | exp << 13 | 0x3ff );
-	    }
-	    else if( mant != 0 )                  // && exp==0 -> subnormal
-	    {
-	        exp = 0x1c400;                    // make it normal
-	        do {
-	            mant <<= 1;                   // mantissa * 2
-	            exp -= 0x400;                 // decrease exp by 1
-	        } while( ( mant & 0x400 ) == 0 ); // while not normal
-	        mant &= 0x3ff;                    // discard subnormal bit
-	    }                                     // else +/-0 -> +/-0
-	    return Float.intBitsToFloat(          // combine all parts
-	        ( hbits & 0x8000 ) << 16          // sign  << ( 31 - 15 )
-	        | ( exp | mant ) << 13 );         // value << ( 23 - 10 )
+	private void reziseIfNeeded(int neededRemainingSize) {
+		while(this.internalBuffer.remaining() < neededRemainingSize) {
+			this.increaseSize();
+		}
 	}
-	
 	
 	//Public Domain http://stackoverflow.com/questions/6162651/half-precision-floating-point-in-java
 	private static int fromFloat( float fval )

@@ -3,5 +3,5 @@
         android:title="@string/menu_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
-    <item android:id="@+id/Keyboard" android:title="Show Keyboard" android:onClick="onShowKeyboard"></item>
+    <item android:id="@+id/Keyboard" android:title="Open Keyboard" android:onClick="onShowKeyboard" android:showAsAction="never"></item>
 </menu>

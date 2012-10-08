@@ -31,7 +31,7 @@ namespace Spang_PC_C_sharp
             phone.NetworkedText += NetworkedText;
         }
 
-        private void LeftClick()
+        public void LeftClick()
         {
             os.SendMouseEvent(MouseEvent.LeftDown);
             os.SendMouseEvent(MouseEvent.LeftUp);
@@ -41,6 +41,16 @@ namespace Spang_PC_C_sharp
         {
             os.SendMouseEvent(MouseEvent.RightDown);
             os.SendMouseEvent(MouseEvent.RightUp);
+        }
+
+        public void mouseDown()
+        {
+            os.SendMouseEvent(MouseEvent.LeftDown);
+        }
+
+        public void mouseUp()
+        {
+            os.SendMouseEvent(MouseEvent.LeftUp);
         }
 
         public void VerticalScroll(int delta)

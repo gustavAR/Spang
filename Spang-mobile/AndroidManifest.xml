@@ -8,7 +8,7 @@
     <uses-sdk
         android:minSdkVersion="5"
         android:targetSdkVersion="15" />
-    
+
     <uses-permission android:name="android.permission.INTERNET" >
     </uses-permission>
 
@@ -30,7 +30,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
         <activity
             android:name=".MouseActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -39,12 +38,10 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
         </activity>
-        
         <activity
             android:name=".PrefsActivity"
             android:label="@string/title_activity_prefs" >
         </activity>
-        
         <activity
             android:name=".TextSenderActivity"
             android:label="@string/title_activity_text_sender" >
@@ -65,7 +62,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
         <activity
             android:name="keyboard.KeyboardtestActivity"
             android:label="@string/title_activity_keyboardtest" >
@@ -73,5 +69,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="spang.mobile.MainActivity" />
         </activity>
+        <activity
+            android:name=".ComputerActivity"
+            android:label="@string/title_activity_computer" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
+
 </manifest>

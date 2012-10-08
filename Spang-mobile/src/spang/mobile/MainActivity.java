@@ -50,8 +50,8 @@ public class MainActivity extends Activity {
 
 		thread.start();
 
+		Intent intent = new Intent(this, ComputerActivity.class);
 
-		Intent intent = new Intent(this, NetworkedActivity.class);
 		this.startActivity(intent);
 	}
 
@@ -93,7 +93,6 @@ public class MainActivity extends Activity {
 			startActivity(marketIntent);
 		}
 	}
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
