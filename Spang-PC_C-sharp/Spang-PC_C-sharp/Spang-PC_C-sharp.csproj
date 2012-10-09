@@ -40,6 +40,9 @@
     <Reference Include="CoreAudioApi">
       <HintPath>..\external dll\CoreAudioApi.dll</HintPath>
     </Reference>
+    <Reference Include="InputSimulator">
+      <HintPath>..\external dll\InputSimulator\InputSimulator.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
@@ -80,18 +83,19 @@
     <Compile Include="Protocol.cs" />
     <Compile Include="QRCodeGenerator.cs" />
     <Compile Include="Server.cs" />
-    <Compile Include="Touch\States\DownState.cs" />
-    <Compile Include="Touch\States\DownAfterTapState.cs" />
-    <Compile Include="Touch\States\JustTappedState.cs" />
-    <Compile Include="Touch\States\MoveState.cs" />
-    <Compile Include="Touch\States\MultiDownState.cs" />
-    <Compile Include="Touch\States\MultiMoveState.cs" />
-    <Compile Include="Touch\States\NullState.cs" />
-    <Compile Include="Touch\TouchDecoder.cs" />
-    <Compile Include="Touch\TouchEvent.cs" />
-    <Compile Include="Touch\TouchManager.cs" />
-    <Compile Include="Touch\TouchState.cs" />
-    <Compile Include="Touch\TouchStateMachine.cs" />
+    <Compile Include="Touch API\States\DownState.cs" />
+    <Compile Include="Touch API\States\MarkingState.cs" />
+    <Compile Include="Touch API\States\JustTappedState.cs" />
+    <Compile Include="Touch API\States\MoveState.cs" />
+    <Compile Include="Touch API\States\MultiDownState.cs" />
+    <Compile Include="Touch API\States\MultiMoveState.cs" />
+    <Compile Include="Touch API\States\NullState.cs" />
+    <Compile Include="Touch API\Touch.cs" />
+    <Compile Include="Touch API\TouchDecoder.cs" />
+    <Compile Include="Touch API\TouchEvent.cs" />
+    <Compile Include="Touch API\TouchManager.cs" />
+    <Compile Include="Touch API\TouchState.cs" />
+    <Compile Include="Touch API\TouchStateMachine.cs" />
     <Compile Include="UnPacker.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />

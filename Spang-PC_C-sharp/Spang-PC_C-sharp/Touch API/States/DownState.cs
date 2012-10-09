@@ -8,17 +8,17 @@ using System.Diagnostics;
 
 namespace Spang_PC_C_sharp.TouchManager.States
 {
-    class DownState0 : TouchState
+    class DownState : TouchState
     {
         private static TimeSpan tapTime = TimeSpan.FromMilliseconds(400);
         private static TimeSpan longTapTime = TimeSpan.FromMilliseconds(2200);
 
         private Timer longTapTimer;
         private Stopwatch tapWatch;
-        private Vector3 startPointer;
+        private Touch startPointer;
 
 
-        public DownState0(TouchStateMachine machine, TouchEventManager manager)
+        public DownState(TouchStateMachine machine, TouchEventManager manager)
             : base(machine, manager) 
         {
             this.tapWatch = new Stopwatch();
@@ -28,11 +28,13 @@ namespace Spang_PC_C_sharp.TouchManager.States
 
         internal override void Enter(TouchEvent touchEvent)
         {
-            this.startPointer = touchEvent.Pointers[0];
+            this.startPointer = touchEvent.Touches[0];
             this.longTapTimer.AutoReset = false;
             longTapTimer.Elapsed += (s, e) =>
             {
                 this.manager.OnLongTap();
+                this.manager.OnDown();
+                this.machine.ChangeState(new MarkingState(this.machine, this.manager), new TouchEvent(this.startPointer));
             };
 
             longTapTimer.Start();
@@ -47,7 +49,7 @@ namespace Spang_PC_C_sharp.TouchManager.States
 
         internal override void Update(TouchEvent touchEvent)
         {
-            if (touchEvent.Pointers.Count == 0)
+            if (touchEvent.Touches.Count == 0)
             {
                 if (this.tapWatch.Elapsed <= tapTime)
                 {
@@ -58,10 +60,10 @@ namespace Spang_PC_C_sharp.TouchManager.States
                     TransitionToNullState(touchEvent);
                 }
             }
-            else if (touchEvent.Pointers.Count == 1)
+            else if (touchEvent.Touches.Count == 1)
             {
-                Vector3 pointer = touchEvent.Pointers[0];
-                if (Moved(pointer))
+                Touch pointer = touchEvent.Touches[0];
+                if (Moved(pointer.Location))
                 {
                     TransitionToMoveState(touchEvent, pointer);
                 }
@@ -72,16 +74,16 @@ namespace Spang_PC_C_sharp.TouchManager.States
             }
         }
 
-        private bool Moved(Vector3 pointer)
+        private bool Moved(Vector2 pointer)
         {
-            return Math.Abs(pointer.X - this.startPointer.X) > 5 ||
-                   Math.Abs(pointer.Y - this.startPointer.Y) > 5;
+            return Math.Abs(pointer.X - this.startPointer.Location.X) > 5 ||
+                   Math.Abs(pointer.Y - this.startPointer.Location.Y) > 5;
 
         }
 
         private void TranstionToMultiDownState(TouchEvent touchEvent)
         {
-            this.machine.ChangeState(new MultiMoveState(this.machine, this.manager), touchEvent);
+            this.machine.ChangeState(new MultiDownState(this.machine, this.manager), touchEvent);
         }
 
         private void TransitionToNullState(TouchEvent touchEvent)
@@ -95,9 +97,10 @@ namespace Spang_PC_C_sharp.TouchManager.States
             this.machine.ChangeState(new JustTappedState(this.machine, this.manager), touchEvent);
         }
 
-        private void TransitionToMoveState(TouchEvent touchEvent, Vector3 pointer)
+        private void TransitionToMoveState(TouchEvent touchEvent, Touch pointer)
         {
-            this.manager.OnMove((int)(this.startPointer.X - pointer.X), (int)(this.startPointer.Y - pointer.Y));
+            this.manager.OnMove((int)(this.startPointer.Location.X - pointer.Location.X), 
+                                (int)(this.startPointer.Location.Y - pointer.Location.Y));
             this.machine.ChangeState(new MoveState(this.machine, this.manager), touchEvent);
         }
     }

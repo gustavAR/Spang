@@ -36,7 +36,7 @@ namespace Spang_PC_C_sharp.TouchManager.States
         internal override void Update(TouchEvent touchEvent)
         {
             this.manager.OnDown();
-            this.machine.ChangeState(new DownAfterTapState(this.machine, this.manager), touchEvent);
+            this.machine.ChangeState(new MarkingState(this.machine, this.manager), touchEvent);
         }
     }
 }

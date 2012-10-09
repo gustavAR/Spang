@@ -6,18 +6,18 @@ using System.Diagnostics;
 
 namespace Spang_PC_C_sharp.TouchManager.States
 {
-    class DownAfterTapState : TouchState
+    class MarkingState : TouchState
     {
-        private Vector3 prevPointer;
+        private Touch prevPointer;
 
-        public DownAfterTapState(TouchStateMachine touchStateMachine, TouchEventManager touchEventManager)
+        public MarkingState(TouchStateMachine touchStateMachine, TouchEventManager touchEventManager)
             : base(touchStateMachine, touchEventManager)
         {
         }
 
         internal override void Enter(TouchEvent touchEvent)
         {
-            this.prevPointer = touchEvent.Pointers[0];
+            this.prevPointer = touchEvent.Touches[0];
         }
 
         internal override void Exit(TouchEvent touchEvent)
@@ -26,18 +26,23 @@ namespace Spang_PC_C_sharp.TouchManager.States
 
         internal override void Update(TouchEvent touchEvent)
         {
-            if (touchEvent.Pointers.Count > 0)
+            if (touchEvent.Touches.Count > 0)
             {
-                Vector3 currPointer = touchEvent.Pointers[0];
-                this.manager.OnMove((int)(this.prevPointer.X - currPointer.X),
-                                    (int)(this.prevPointer.Y - currPointer.Y));
-                this.prevPointer = currPointer;
+                Move(touchEvent);
             }
             else
             {
                 this.manager.OnUp();
                 this.machine.ChangeState(new NullState(this.machine, this.manager), touchEvent);
             }
+        }
+
+        private void Move(TouchEvent touchEvent)
+        {
+            Touch currPointer = touchEvent.Touches[0];
+            this.manager.OnMove((int)(this.prevPointer.Location.X - currPointer.Location.X),
+                                (int)(this.prevPointer.Location.Y - currPointer.Location.Y));
+            this.prevPointer = currPointer;
         }
     }
 }

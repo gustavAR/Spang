@@ -20,13 +20,13 @@ namespace Spang_PC_C_sharp.TouchManager.States
 
         internal override void Update(TouchEvent touchEvent)
         {
-            if (touchEvent.Pointers.Count == 1)
+            if (touchEvent.Touches.Count == 1)
             {
-                this.machine.ChangeState(new DownState0(this.machine, this.manager), touchEvent);
+                this.machine.ChangeState(new DownState(this.machine, this.manager), touchEvent);
             }
             else
             {
-                this.machine.ChangeState(new MultiMoveState(this.machine, this.manager), touchEvent);
+                this.machine.ChangeState(new MultiDownState(this.machine, this.manager), touchEvent);
             }
         }
     }

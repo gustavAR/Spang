@@ -17,6 +17,7 @@ namespace Spang_PC_C_sharp
         public event Action<int> MultiTap;
         public event Action<int, int, int> MulitiMove;
 
+        public event Action<int> Pinch;
 
         internal void OnTap()
         {
@@ -58,6 +59,12 @@ namespace Spang_PC_C_sharp
         {
             if (this.MulitiMove != null)
                 this.MulitiMove(count, dx,dy);
+        }
+
+        internal void OnPinch(int delta)
+        {
+            if (this.Pinch != null)
+                this.Pinch(delta);
         }
     }
 }
