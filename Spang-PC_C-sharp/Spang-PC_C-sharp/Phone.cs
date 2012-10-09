@@ -316,14 +316,14 @@ namespace Spang_PC_C_sharp
 
         #region Gravity
 
-        private Vector2 gravity;
-        public Vector2 Gravity
+        private Vector3 gravity;
+        public Vector3 Gravity
         {
             get { return this.gravity; }
 
             set
             {
-                Vector2 temp = this.gravity;
+                Vector3 temp = this.gravity;
                 this.gravity = value;
                 if (temp != this.gravity)
                     this.OnGravityChanged(temp, this.gravity);
@@ -331,8 +331,8 @@ namespace Spang_PC_C_sharp
             }
         }
 
-        public event Action<Vector2, Vector2> GravityChanged;
-        private void OnGravityChanged(Vector2 old, Vector2 current)
+        public event Action<Vector3, Vector3> GravityChanged;
+        private void OnGravityChanged(Vector3 old, Vector3 current)
         {
             if (this.GravityChanged != null)
                 this.GravityChanged(old, current);

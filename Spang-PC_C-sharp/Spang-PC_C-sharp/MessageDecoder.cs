@@ -127,7 +127,7 @@ namespace Spang_PC_C_sharp
 
         private void HandleGravityUpdate(BinaryReader reader)
         {
-            this.phone.Gravity = reader.ReadSingle();
+            this.phone.Gravity = ReadVector3(reader);
         }
 
         private void HandleHumidityUpdate(BinaryReader reader)
