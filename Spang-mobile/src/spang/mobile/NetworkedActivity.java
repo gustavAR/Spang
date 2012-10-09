@@ -110,7 +110,7 @@ public abstract class NetworkedActivity extends Activity {
 
 	protected  void onDisconnected(DCCause cause) {		
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("We disconnection! Cause: " + cause);
+		builder.setMessage("We disconnected! Cause: " + cause);
 		builder.setTitle("Disconnected");
 
 		builder.setPositiveButton("Reconnect?", new OnClickListener() {
@@ -118,9 +118,9 @@ public abstract class NetworkedActivity extends Activity {
 				NetworkedActivity.this.network.reconnectAsync(5, 1000, new Action1<Boolean>() {	
 					public void onAction(Boolean success) {
 						if(success) {
-							Toast.makeText(NetworkedActivity.this, "´Connected!", Toast.LENGTH_SHORT).show();
+							Toast.makeText(NetworkedActivity.this, "Connected!", Toast.LENGTH_SHORT).show();
 						} else {
-							Toast.makeText(NetworkedActivity.this, "´Failed to connect!", Toast.LENGTH_SHORT).show();
+							builder.setMessage("Failed to connect!");							
 							builder.show();
 						}
 					}

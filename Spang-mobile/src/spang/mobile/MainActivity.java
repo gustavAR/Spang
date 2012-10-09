@@ -80,16 +80,18 @@ public class MainActivity extends Activity {
 		EditText number = (EditText)this.findViewById(R.id.editText2);
 		final int port = Integer.parseInt(number.getText().toString());
 		
-		//Notify users that we are making a connection attempt
+		//Notify users that we are making a connection attempt.
 		Toast.makeText(this, "Connecting...!", Toast.LENGTH_SHORT).show();
 		service.connectAsync(ip, port, new Action1<Boolean>() {
 			
 			public void onAction(Boolean success) {
 				if(success) {
+					//Notify users of success
 					Toast.makeText(MainActivity.this, "Connected!",Toast.LENGTH_SHORT).show();	
 					Intent intent = new Intent(MainActivity.this, ComputerActivity.class);
 					MainActivity.this.startActivity(intent);				
 				} else {
+					//Notify users of failure
 					Toast.makeText(MainActivity.this, "Failed to connect!",Toast.LENGTH_SHORT).show();							
 				}
 			}
