@@ -1,7 +1,6 @@
 package spang.mobile;
 
 import network.DCCause;
-import network.IClient;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -14,7 +13,6 @@ import android.os.IBinder;
 import android.widget.Toast;
 import events.Action;
 import events.Action1;
-import events.EventHandler;
 
 /**
  * Class that interfaces against the Network Service.

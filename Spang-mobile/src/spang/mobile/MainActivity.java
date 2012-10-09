@@ -1,6 +1,5 @@
 package spang.mobile;
 
-import events.Action1;
 import keyboard.KeyboardtestActivity;
 import utils.LogCatLogger;
 import utils.Logger;
@@ -10,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
@@ -18,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+import events.Action1;
 
 public class MainActivity extends Activity {
 	
@@ -64,8 +63,6 @@ public class MainActivity extends Activity {
 		this.unbindService(connection);
 	}
 
-	
-
 	@Override 
 	protected void onDestroy() {
 		super.onDestroy();
@@ -83,7 +80,7 @@ public class MainActivity extends Activity {
 		EditText number = (EditText)this.findViewById(R.id.editText2);
 		final int port = Integer.parseInt(number.getText().toString());
 		
-
+		//Notify users that we are making a connection attempt
 		Toast.makeText(this, "Connecting...!", Toast.LENGTH_SHORT).show();
 		service.connectAsync(ip, port, new Action1<Boolean>() {
 			

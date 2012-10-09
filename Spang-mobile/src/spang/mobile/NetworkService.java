@@ -24,13 +24,25 @@ import events.ActionDelegate;
 import events.EventHandler;
 
 /**
- * This is a service which provides applications with the 
- * ability to connect and send messages over the network.
+ * This service enables the android application to 
+ * connect, send messages and receive messages through the
+ * network API. It acts as a client and can only connect to 
+ * remote connections not host connections itself. 
+ * 
+ * The service is designed in a way that makes all callbacks 
+ * and events happen on the UI thread. This makes it safe 
+ * to change any UI elements in response to any event that 
+ * can happen in the service.
+ * 
+ * IMPORTANT: The service must be started on the UI thread 
+ * using Activity.startService(intent); if this is not done 
+ * the service will fail to start.
+ * 
  * @author Gustav Alm Rosenblad & Lukas Kurtyan
  */
 public class NetworkService extends Service {
 	
-	//Default Interval in which to send buffered messages.
+	//Default Interval in which to send buffered messages. (in milliseconds)
 	private int DEF_MESSAGE_SEND_INTERVALL = 1000 / 20;
 	
 	//The client used to send messages over the network
@@ -150,7 +162,7 @@ public class NetworkService extends Service {
 				} catch(NetworkException e) {
 					return; //We cannot fix what ever caused the connection problem in this thread so we exit.
 				} catch (InterruptedException e) {
-					return;
+					return; //We were interupted we should exit.
 				}
 			}
 		});
@@ -169,7 +181,8 @@ public class NetworkService extends Service {
 	}
 
 	/**
-	 * Sets the default protocol that will be used when messages are sent.
+	 * Sets the default protocol that will be used when messages are sent,
+	 * @see send(byte[])
 	 * @param protocol the protocol.
 	 * @throws NullPointerException if protocol is null.
 	 */
@@ -198,7 +211,9 @@ public class NetworkService extends Service {
 		return this.messageSendInterval;
 	}
 	
+
 	private void addListeners() {
+		
 		client.addDisconnectedListener(new EventHandler<IClient, DCCause>() {
 			public void onAction(IClient sender, DCCause cause) {
 				//Interrupts the sender-thread so it does not try to send messages over the bad connection.
@@ -207,7 +222,7 @@ public class NetworkService extends Service {
 				//If we timed out or crashed we reconnect.
 				if(cause == DCCause.Timeout || cause == DCCause.LocalNetworkCrash || cause == DCCause.RemoteNetworkCrash) {		
 					try {
-						sender.reconnect(5, 1000);	
+						sender.reconnect(3, 1000);	
 						startSendThread();
 					} catch(NetworkException e) {
 						//If we could not reconnect we notify any listeners about this.
