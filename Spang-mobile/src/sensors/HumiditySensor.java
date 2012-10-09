@@ -1,9 +1,6 @@
 package sensors;
 
-import java.nio.ByteBuffer;
-
 import utils.Packer;
-
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
