@@ -47,6 +47,9 @@ public class SensorListBuilder {
 		if(this.manager.getDefaultSensor(AirPressureSensor.SENSOR_TYPE)!=null)
 			sensorBindings.put(AirPressureSensor.SENSOR_TYPE, new AirPressureSensor(manager, (byte) 0xe));
 		
+		if(this.manager.getDefaultSensor(GravitySensor.SENSOR_TYPE)!=null)
+			sensorBindings.put(GravitySensor.SENSOR_TYPE, new GravitySensor(manager, (byte) 0x12));
+		
 
 	}
 

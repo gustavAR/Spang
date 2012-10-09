@@ -313,5 +313,31 @@ namespace Spang_PC_C_sharp
         }
 
         #endregion
+
+        #region Gravity
+
+        private Vector2 gravity;
+        public Vector2 Gravity
+        {
+            get { return this.gravity; }
+
+            set
+            {
+                Vector2 temp = this.gravity;
+                this.gravity = value;
+                if (temp != this.gravity)
+                    this.OnGravityChanged(temp, this.gravity);
+
+            }
+        }
+
+        public event Action<Vector2, Vector2> GravityChanged;
+        private void OnGravityChanged(Vector2 old, Vector2 current)
+        {
+            if (this.GravityChanged != null)
+                this.GravityChanged(old, current);
+        }
+
+        #endregion
     }
 }
