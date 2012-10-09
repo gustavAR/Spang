@@ -18,6 +18,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.widget.Toast;
+import events.Action1;
 import events.EventHandler;
 import events.EventHandlerDelegate;
 
@@ -334,6 +335,28 @@ public class NetworkService extends Service implements IClient {
 		this.client.connect(host, port);
 		this.startSendThread();
 	}
+	
+	public void connectAsync(final String host, final int port, final Action1<Boolean> callback) {
+		new Thread(new Runnable() {
+			boolean success;					
+			public void run() {
+				try {
+					NetworkService.this.connect(host, port);
+					success = true;
+				} catch(NetworkException exe) {
+					success = false;
+				} finally {
+					NetworkService.this.handler.post(new Runnable() {
+						public void run() {
+							callback.onAction(success);
+						}
+					});			
+				}
+			}
+		}).start();
+	}
+	
+	
 
 	/**
 	 * {@inheritDoc}
