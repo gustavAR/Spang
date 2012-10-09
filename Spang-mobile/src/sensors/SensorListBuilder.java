@@ -42,7 +42,10 @@ public class SensorListBuilder {
 			sensorBindings.put(ProximitySensor.SENSOR_TYPE, new ProximitySensor(manager, (byte) 0xa));
 		
 		if(this.manager.getDefaultSensor(HumiditySensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(HumiditySensor.SENSOR_TYPE, new HumiditySensor(manager, (byte) 0xa));
+			sensorBindings.put(HumiditySensor.SENSOR_TYPE, new HumiditySensor(manager, (byte) 0x11));
+		
+		if(this.manager.getDefaultSensor(AirPressureSensor.SENSOR_TYPE)!=null)
+			sensorBindings.put(AirPressureSensor.SENSOR_TYPE, new AirPressureSensor(manager, (byte) 0xe));
 		
 
 	}
