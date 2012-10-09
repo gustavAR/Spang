@@ -75,7 +75,6 @@ namespace Spang_PC_C_sharp
 
         private IPEndPoint ReciveConnectionRequest(int port)
         {
-
             UdpClient listener = new UdpClient(new IPEndPoint(IPAddress.Any, 1337));
             IPEndPoint endpoint = new IPEndPoint(IPAddress.Any, port);
             listener.Receive(ref endpoint);

@@ -5,8 +5,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import network.exceptions.NetworkException;
 import utils.UnPacker;
@@ -20,7 +18,7 @@ public class Connector implements IConnector {
 		try {
 			DatagramSocket socket = new DatagramSocket();
 			// It should take no longer then 500 miliseconds to connect if it does we try again.
-			//socket.setSoTimeout(20000);
+			socket.setSoTimeout(timeout);
 			
 			sendConnectionRequest(address, socket);				
 			reciveConnectionInformation(address, socket);		

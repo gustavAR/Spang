@@ -12,6 +12,9 @@ namespace Spang_PC_C_sharp
 {
     class Connection : IConnection
     {
+        private const int ACK_BIT = 0x01;
+        private const int SHUTDOWN_BIT = 0x20;
+
         private readonly int port;
         private readonly IPEndPoint remote;
         private readonly UdpClient client;
@@ -55,28 +58,44 @@ namespace Spang_PC_C_sharp
                 byte[] recived = client.Receive(ref ep);
 
                 if (recived.Length == 0)
-                    return recived;
+                    continue;
 
-                Protocol protocol = protocolFromID((recived[0]));
+                if (IsShutdownMessage(recived))
+                {
+                    Console.WriteLine("The remote endpoint shutdown the connection!");
+                    //10053 symbolizes a remote host shutdown.
+                    throw new SocketException(10053);
 
-                recived = this.protocols[protocol].processRecivedMessage(recived);
-                if (recived != null)
-                    return recived;
+                }
 
+                Protocol protocol;
+                if (protocolFromID((recived[0]), out protocol))
+                {
+                    recived = this.protocols[protocol].processRecivedMessage(recived);
+                    if (recived != null)
+                        return recived;
+                }
             }
         }
 
-        private Protocol protocolFromID(int id)
+        private bool IsShutdownMessage(byte[] recived)
+        {
+            return recived.Length == 1 &&
+                   (recived[0] & SHUTDOWN_BIT) == SHUTDOWN_BIT; 
+        }
+
+        private bool protocolFromID(int id, out Protocol prot)
         {
             foreach (var protocol in this.protocols.Keys)
             {
                 if ((((int)protocol) & id) == (int)protocol)
                 {
-                    return protocol;
+                    prot = protocol;
+                    return true;
                 }
             }
-
-            throw new ArgumentException();
+            prot = Protocol.Unordered;
+            return false;
         }
 
         public int ReciveTimeout
@@ -169,10 +188,10 @@ namespace Spang_PC_C_sharp
             {
                 try
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(10);
                     updateAndSend();
                 }
-                catch (Exception exe)
+                catch (Exception)
                 {
                     this.StopWorking();
                 }
@@ -196,7 +215,7 @@ namespace Spang_PC_C_sharp
             {
                 Packer packer = new Packer(message.Length + getHeaderLength());
                 fixMessage(packer, message);
-                this.connection.SendInternal(packer.getPackedData());
+                this.connection.SendInternal(packer.GetPackedData());
             }
 
             public byte[] processRecivedMessage(byte[] recivedMessage)
@@ -285,7 +304,7 @@ namespace Spang_PC_C_sharp
 
                 MessageResendTimer timer = new MessageResendTimer();
                 timer.accnumber = toSendAccNum;
-                timer.message = packer.getPackedData();
+                timer.message = packer.GetPackedData();
                 timer.stopWatch.Start();
 
                 connection.reliableTimer.addResender(timer);
@@ -311,9 +330,9 @@ namespace Spang_PC_C_sharp
             private void sendAckMessage(int accnum)
             {
                 Packer packer = new Packer(5);
-                packer.Pack((byte)(((int)Protocol.Reliable) | ACK_MESSAGE));
+                packer.Pack((byte)(((int)Protocol.Reliable) | ACK_BIT));
                 packer.Pack(accnum);
-                this.connection.SendInternal(packer.getPackedData());
+                this.connection.SendInternal(packer.GetPackedData());
             }
 
             public ReliableProtocol(Connection connection) : base(connection) { }

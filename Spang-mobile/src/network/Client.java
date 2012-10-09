@@ -7,13 +7,15 @@ import java.net.UnknownHostException;
 import network.exceptions.InvalidEndpointException;
 import network.exceptions.NetworkException;
 import utils.Logger;
-import events.Action;
 import events.Action1;
 import events.EventHandler;
 import events.EventHandlerDelegate;
 
 public class Client implements IClient {
 
+	//Default interval in which to send heart-beat callback to a server.
+	private static final int DEF_HEARTBEAT_INTERVAL = 1000;
+	
 	//Default time it takes for the connection to time out.
 	private static final int DEF_TIMEOUT = 5000;
 	
@@ -41,6 +43,12 @@ public class Client implements IClient {
 	//Stores the connectionTimeout.
 	private int connectionTimeout;
 	
+	//Stores the interval that heart-beats will be sent in.
+	private int heartBeatInterval;
+	
+	//Stores the time the last message was sent.
+	private long lastMessageSent;
+	
 	
 	/**
 	 * Creates a new client.
@@ -51,6 +59,7 @@ public class Client implements IClient {
 		this.recivedEvent = new EventHandlerDelegate<IClient, byte[]>();
 		this.disconnectedEvent = new EventHandlerDelegate<IClient, DCCause>();
 		this.connectionTimeout = DEF_TIMEOUT;
+		this.heartBeatInterval = DEF_HEARTBEAT_INTERVAL;
 	}
 	
 	/**
@@ -78,6 +87,14 @@ public class Client implements IClient {
 		if(this.connection != null)
 			this.connection.setTimeout(value);
 		
+	}
+	
+	public int getHearthBeatInterval() {
+		return this.heartBeatInterval;		
+	}
+	
+	public void setHeartBeatInterval(int value) {
+		this.heartBeatInterval = value;
 	}
 
 	/**
@@ -128,7 +145,6 @@ public class Client implements IClient {
 		this.startReciving();
 	}
 	
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -150,19 +166,26 @@ public class Client implements IClient {
 				
 			} catch(NetworkException e) {
 				System.out.println("Failed to reconnect " + i + " retrying...");
-			}
-			
+			}		
 		}
+		
+		//If we failed to reconnect
+		if(this.connection == null)
+			throw new NetworkException("Failed to reconnect!");
+		
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void disconnect() {
+		if(this.connection == null) {
+			return;
+		}
+		
 		this.onDisconnect(DCCause.LocalShutdown);
 	}
 
-	
 	private void onDisconnect(DCCause cause) {
 		this.stopReciving();
 		this.connection.close();
@@ -170,7 +193,6 @@ public class Client implements IClient {
 		
 		this.disconnectedEvent.invoke(this, cause);
 	}
-
 
 	private void startReciving() {
 		this.udpWorker = new UdpWorker(this.connection);
@@ -181,17 +203,10 @@ public class Client implements IClient {
 				onRecived(obj);
 			}
 		});
-		
-		this.udpWorker.addTimeoutAction(new Action() {			
-			public void onAction() {
-				onTimeout();
-			}
-		});
-		
-		this.udpWorker.addReadCrashAction(new Action() {
-			
-			public void onAction() {
-				onReadCrash();
+				
+		this.udpWorker.addReciveFailedListener(new Action1<DCCause>() {
+			public void onAction(DCCause obj) {
+				onDisconnect(obj);
 			}
 		});
 		
@@ -201,35 +216,33 @@ public class Client implements IClient {
 	private void stopReciving() {
 		if(this.udpWorker == null)
 			return;
-		
-		this.udpWorker.StopWorking();
+
 		this.udpWorker.clearEventListeners();
+		this.udpWorker.StopWorking();
 		
 		this.udpWorker = null;
 	}
-	
-	private void onTimeout() {
-		this.onDisconnect(DCCause.TCPTimeout);
-	}
-	
-	protected void onReadCrash() {
-		this.onDisconnect(DCCause.LocalNetworkCrash);
-	}
-
 
 	private void onRecived(byte[] message) {
 		if(isHeartbeat(message)) { 
-			this.sendHeartBeatResponse();
+			if(shouldSendHeartbeatCallback())
+				this.sendHeartBeatResponse();
+			
 		} else if(isSystemMessage(message)) {
 			this.handleSystemMessage(message);		
 		} else {
 			this.recivedEvent.invoke(this, message);
 		}	
 	}
-	
-	
+		
+	private boolean shouldSendHeartbeatCallback() {
+		return System.currentTimeMillis() > this.lastMessageSent + this.heartBeatInterval;
+	}
+
 	private void sendHeartBeatResponse() {
-		this.send(new byte[0]);
+		//Since it is not important that every hearthbeat  makes it we 
+		//may send it using the unordered fast protocol.
+		this.send(new byte[0], Protocol.Unordered);
 	}
 
 	private boolean isHeartbeat(byte[] message) {
@@ -249,12 +262,7 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public void send(byte[] toSend) {
-		try {
-			this.connection.send(toSend);	
-		} catch(NetworkException e) {
-			Logger.logException(e);		
-			this.onDisconnect(DCCause.LocalNetworkCrash);
-		}
+		this.send(toSend, Protocol.Unordered);
 	}
 
 	/**
@@ -263,6 +271,7 @@ public class Client implements IClient {
 	public void send(byte[] toSend, Protocol protocol) {
 		try {
 			this.connection.send(toSend, protocol);
+			this.lastMessageSent = System.currentTimeMillis();
 		} catch(NetworkException e) {
 			Logger.logException(e);
 			this.onDisconnect(DCCause.LocalNetworkCrash);

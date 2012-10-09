@@ -4,58 +4,66 @@ import keyboard.KeyboardtestActivity;
 import utils.LogCatLogger;
 import utils.Logger;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
-
+	
+	private NetworkService service;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		Intent intent = new Intent(MainActivity.this, NetworkService.class);
+		this.startService(intent);	
+
 		Logger.setLogger(new LogCatLogger());
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;		
 	}
-
-	public void sendData(View view){
-
-		EditText text = (EditText)this.findViewById(R.id.editText1);
-		final String ip = text.getText().toString();
-
-		EditText number = (EditText)this.findViewById(R.id.editText2);
-		final int port = Integer.parseInt(number.getText().toString());
-
-		Thread thread = new Thread(new Runnable() {
-
-			public void run() {	
-				Intent intent = new Intent(MainActivity.this, NetworkService.class);
-				intent.putExtra("HOST", ip);
-				intent.putExtra("PORT", port);
-
-				MainActivity.this.stopService(intent);
-				MainActivity.this.startService(intent);				
-			}
-		});
-
-		thread.start();
-
-		Intent intent = new Intent(this, ComputerActivity.class);
-
-		this.startActivity(intent);
+	
+    private ServiceConnection connection = new ServiceConnection() {
+		
+		public void onServiceDisconnected(ComponentName name) {
+			service = null;
+		}
+		
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			MainActivity.this.service = ((NetworkService.NetworkBinder)service).getService();
+		}
+	};
+	
+	@Override 
+	protected void onStart() {
+		super.onStart();
+		Intent intent = new Intent(this, NetworkService.class);		
+		this.bindService(intent, connection, Context.BIND_WAIVE_PRIORITY);	
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		this.unbindService(connection);
 	}
 
-
+	
 
 	@Override 
 	protected void onDestroy() {
@@ -64,7 +72,49 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(this, NetworkService.class);
 		this.stopService(intent);
 	}
+	
+	private class ConnectNetworkTask extends AsyncTask<Object, Void, Boolean> {
 
+		@Override
+		protected Boolean doInBackground(Object... params) {
+			String ip = (String)params[0];
+			int port = (Integer)params[1];
+			
+			try {	
+				MainActivity.this.service.connect(ip, port);
+				return true;
+			} catch(Exception e) {
+				return false;
+			}
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if(result) {
+				Toast.makeText(MainActivity.this, "Connection Sucessful!", Toast.LENGTH_SHORT).show();
+				Intent intent = new Intent(MainActivity.this, ComputerActivity.class);
+				MainActivity.this.startActivity(intent);
+			} else {
+				Toast.makeText(MainActivity.this, "Connection Failed!!", Toast.LENGTH_SHORT).show();
+			}
+		}
+		
+	}
+	
+
+	public void sendData(View view){
+
+		EditText text = (EditText)this.findViewById(R.id.editText1);
+		final String ip = text.getText().toString();
+
+		EditText number = (EditText)this.findViewById(R.id.editText2);
+		final int port = Integer.parseInt(number.getText().toString());
+		
+
+		Toast.makeText(this, "Connecting...!", Toast.LENGTH_SHORT).show();
+		new ConnectNetworkTask().execute(ip, port);
+	}
+	
 	public void showKeyboard(View view){
 		Intent intent = new Intent(this, KeyboardtestActivity.class);
 		this.startActivity(intent);
@@ -103,6 +153,8 @@ public class MainActivity extends Activity {
 		}
 		return true;
 	}
+	
+	
 
 	/**
 	 * This is called when we get a result from another activity.
@@ -114,7 +166,6 @@ public class MainActivity extends Activity {
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == 0) {
 			if (resultCode == android.app.Activity.RESULT_OK) {

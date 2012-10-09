@@ -38,7 +38,7 @@ public enum Protocol {
 		this.orderID = orderID;
 	}
 	
-	public byte getID() {
+	public byte getBit() {
 		return this.orderID;
 	}
 

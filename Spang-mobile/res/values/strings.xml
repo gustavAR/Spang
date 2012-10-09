@@ -14,5 +14,6 @@
     <string name="title_activity_networked">NetworkedActivity</string>
     <string name="title_activity_keyboardtest">KeyboardtestActivity</string>
     <string name="title_activity_computer">ComputerActivity</string>
+    <string name="title_activity_connection">ConnectionActivity</string>
 
 </resources>

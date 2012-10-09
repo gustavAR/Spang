@@ -51,4 +51,9 @@ public class ComputerActivity extends NetworkedActivity {
 		Intent intent = new Intent(this, KeyboardtestActivity.class);
 		this.startActivity(intent);
 	}
+
+	@Override
+	protected void onMessageRecived(byte[] message) {
+		//Don't rly care tbh :O
+	}
 }

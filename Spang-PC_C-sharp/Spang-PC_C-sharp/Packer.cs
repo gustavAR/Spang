@@ -21,7 +21,7 @@ namespace Spang_PC_C_sharp
             writer = new BinaryWriter(data);
         }
 
-        public byte[] getPackedData() 
+        public byte[] GetPackedData() 
         {
             byte[] copy = new byte[data.Position];
             this.data.Position = 0;

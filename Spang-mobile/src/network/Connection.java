@@ -12,11 +12,29 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import network.exceptions.NetworkException;
+import network.exceptions.RemoteCrashException;
+import network.exceptions.RemoteShutdownException;
 import network.exceptions.TimeoutException;
 import utils.Packer;
 import utils.UnPacker;
 
+/**
+ * Standard implementation of the connection interface.
+ * This class represents a connection between two endpoints.
+ * The implementation is based on {@link java.net.DatagramSocket;}
+ * 
+ * This class should never be instantiated using the new keyword. Instead
+ * the Connector class should be used {@link network.Connector}.
+ * @author Lukas Kurtyan
+ *
+ */
 public class Connection implements IConnection {
+	
+	//Bit symbolizing message acknowledgment used by Reliable and OrderedReliable protocols.
+	private final static int ACK_BIT = 0x10;		
+	
+	//Bit symbolizing that the remote endpoint closed the connection.
+	private final static int SHUTDOWN_BIT = 0x20;
 	
 	//The maximum size of incomming packages.
 	private static final int DATA_CAPACITY = 1024;
@@ -27,9 +45,10 @@ public class Connection implements IConnection {
 	//The socket used for any actual networking.
 	private final DatagramSocket socket;	
 	
-	
+	//Map between protocols and their protocol manager.
 	private final Map<Protocol, ProtocolManager> protocols;
 	
+	//Timer used to resend messages that has yet to be acknowledged by the remote endpoint.
 	private final AccTimer timer;
 	
 	
@@ -43,10 +62,8 @@ public class Connection implements IConnection {
 			throw new IllegalArgumentException("Socket not connected!");
 			
 		this.socket = socket;		
-		this.connected = true;	
-		
+		this.connected = true;		
 		this.timer = new AccTimer();
-		
 		this.protocols = new HashMap<Protocol, ProtocolManager>();
 		
 		populateProtocolMap();
@@ -82,13 +99,24 @@ public class Connection implements IConnection {
 		this.protocols.get(protocol).sendMessage(toSend);	
 	}
 	
-	private void sendProtocol(byte[] toSend) {		
+	
+	private void sendInternal(byte[] toSend) {		
+		//Create a new packet to send.
 		DatagramPacket packet = new DatagramPacket(toSend, toSend.length);		
 		try {
+			//Send the packet.
 			this.socket.send(packet);			
 		} catch(IOException exe) {
 			throw new NetworkException("The connection could not send the data", exe);
 		}	
+	}
+	
+	private void sendShutdownMessage() {
+		//Pack a shutdown message.
+		Packer packer = new Packer(1);
+		packer.packByte((byte)(SHUTDOWN_BIT));	
+		//Send it.
+		this.sendInternal(packer.getPackedData());
 	}
 	
 	/**
@@ -97,29 +125,62 @@ public class Connection implements IConnection {
 	public byte[] recive() {
 		byte[] recived;
 		while(true) {
+			//Create a new packet for the next incomming message.
 			DatagramPacket packet = new DatagramPacket(new byte[DATA_CAPACITY], DATA_CAPACITY);
+			//Receive the message.
 			this.reciveUdpPackage(packet);		
+						
+			//Copy the received data. 
+			byte[] copy = copyPacketData(packet);
 			
-			byte[] copy = new byte[packet.getLength()];
-			for (int i = 0; i < copy.length; i++) {
-				copy[i] = packet.getData()[i];
+			//If the message is a shutdown message we can no longer be receiving so we throw an 
+			//Exception notifying the calling code that the connection is no longer valid.
+			if(isShutDownMessage(copy)) {
+				throw new RemoteShutdownException("The remote host shut down the connection.");
 			}
 			
-			//If copy is heartbeat.
-			if(copy.length == 0) {
-				recived = copy;
-				break;
-			}
+			//Extract the protocol that the data was sent with.
+			Protocol protocol = extractProtocol(copy);
+	
+			//If the protocol is null something is wrong with the message so we simply discard it.
+			if(protocol == null)
+				continue;
 			
-			//What protocol was the message sent with?
-			Protocol protocol = Protocol.fromID(copy[0]);
-			
+			//Process the received data by protocol specific processing.
 			recived = this.protocols.get(protocol).processRecivedMessage(copy);
-			if(recived.length > 0)
+			if(recived != null)
 				break;	
 		}
 		
 		return recived;
+	}
+
+	private boolean isShutDownMessage(byte[] copy) {
+		return copy.length == 1 &&
+			   (copy[0] & SHUTDOWN_BIT) == SHUTDOWN_BIT;
+	}
+
+	private Protocol extractProtocol(byte[] copy) {
+		if(copy.length == 0) {
+			//If a message is sent without a protocol we return null to symbolize that the message is invalid.
+			return null;
+		} else {
+			try {
+				//Try to extract a protocol form the id byte.
+				return Protocol.fromID(copy[0]);
+			} catch(IllegalArgumentException e) {
+				//If the protocol byte is invalid we return null to symbolize that the message is invalid.
+				return null;
+			}
+		}
+	}
+	
+	private byte[] copyPacketData(DatagramPacket packet) {
+		byte[] copy = new byte[packet.getLength()];
+		for (int i = 0; i < copy.length; i++) {
+			copy[i] = packet.getData()[i];
+		}
+		return copy;
 	}
 	
 	//Helper that exception checks the receive.
@@ -131,7 +192,7 @@ public class Connection implements IConnection {
 			} catch(PortUnreachableException ppe) {
 				//Host timed out.				
 				this.disconnect();
-				throw new TimeoutException("UDP timeout");
+				throw new RemoteCrashException("UDP timeout");
 			} catch(SocketTimeoutException ste) {
 				//We timed out.	
 				this.disconnect();
@@ -198,6 +259,10 @@ public class Connection implements IConnection {
 	 * {@inheritDoc}
 	 */
 	public void close() {
+		if(this.connected) {
+			this.sendShutdownMessage();
+			this.connected = false;
+		}
 		this.socket.close();		
 	}
 	
@@ -210,7 +275,7 @@ public class Connection implements IConnection {
 		byte[] message;
 		
 		public void resend() {
-			Connection.this.sendProtocol(message);
+			Connection.this.sendInternal(message);
 		}
 	}
 	
@@ -261,7 +326,7 @@ public class Connection implements IConnection {
 		private void sendMessage(byte[] message) {
 			Packer packer = new Packer(message.length + getHeaderLength());
 			fixMessage(packer, message);
-			Connection.this.sendProtocol(packer.getPackedData());			
+			Connection.this.sendInternal(packer.getPackedData());			
 		}
 		
 		private byte[] processRecivedMessage(byte[] recivedMessage) {
@@ -278,7 +343,7 @@ public class Connection implements IConnection {
 
 		@Override
 		protected void fixMessage(Packer packer, byte[] message) {
-			packer.packByte(Protocol.Unordered.getID());
+			packer.packByte(Protocol.Unordered.getBit());
 			packer.packByteArray(message);
 		}
 
@@ -300,7 +365,7 @@ public class Connection implements IConnection {
 
 		@Override
 		protected void fixMessage(Packer packer, byte[] message) {
-			packer.packByte(Protocol.Ordered.getID());
+			packer.packByte(Protocol.Ordered.getBit());
 			packer.packInt(sendReciveSequenceNumber++);
 			packer.packByteArray(message);
 		}
@@ -310,7 +375,7 @@ public class Connection implements IConnection {
 			unPacker.unpackByte();
 			int seqNum = unPacker.unpackInt();
 			if(seqNum < lastRecivedSequenceNumber) {
-				return new byte[0]; //Discard the message if it is old. 
+				return null; //Discard the message if it is old. 
 			} else {
 				lastRecivedSequenceNumber = seqNum;
 				return unPacker.unpackByteArray(unPacker.remaining());
@@ -319,7 +384,6 @@ public class Connection implements IConnection {
 	}
 	
 	private class ReliableProtocol extends ProtocolManager {
-		private final static int ACK_MESSAGE = 0x10;		
 		volatile int sendAccNum;
 		
 		
@@ -331,7 +395,7 @@ public class Connection implements IConnection {
 		@Override
 		protected void fixMessage(Packer packer, byte[] message) {
 			int toSendAccNum = this.sendAccNum++;
-			packer.packByte(Protocol.Reliable.getID());
+			packer.packByte(Protocol.Reliable.getBit());
 			packer.packInt(toSendAccNum);
 			packer.packByteArray(message);
 			
@@ -348,9 +412,9 @@ public class Connection implements IConnection {
 			int flags = unPacker.unpackByte();		
 			int accnum = unPacker.unpackInt();
 			
-			if((flags & ACK_MESSAGE) == ACK_MESSAGE) {
+			if((flags & ACK_BIT) == ACK_BIT) {
 				Connection.this.timer.removeResender(accnum);
-				return new byte[0];
+				return null;
 			} else {		
 				sendAckMessage(accnum);				
 				return unPacker.unpackByteArray(unPacker.remaining());
@@ -359,9 +423,9 @@ public class Connection implements IConnection {
 
 		private void sendAckMessage(int accnum) {
 			Packer packer = new Packer(5);
-			packer.packByte((byte)(Protocol.Reliable.getID() | ACK_MESSAGE));
+			packer.packByte((byte)(Protocol.Reliable.getBit() | ACK_BIT));
 			packer.packInt(accnum);
-			Connection.this.sendProtocol(packer.getPackedData());
+			Connection.this.sendInternal(packer.getPackedData());
 		}
 	}
 }
