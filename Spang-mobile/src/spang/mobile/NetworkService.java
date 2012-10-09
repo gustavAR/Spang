@@ -15,6 +15,7 @@ import utils.MessageBuffer;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.widget.Toast;
 import events.EventHandler;
@@ -57,6 +58,8 @@ public class NetworkService extends Service implements IClient {
 	//Event invoked when the service receives data on the incoming connection.
 	private EventHandlerDelegate<IClient, byte[]> recivedEvent;
 	
+	private Handler handler;
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -69,6 +72,7 @@ public class NetworkService extends Service implements IClient {
 		this.connectedEvent = new EventHandlerDelegate<IClient, Boolean>();
 		this.disconnectedEvent = new EventHandlerDelegate<IClient, DCCause>();
 		this.recivedEvent = new EventHandlerDelegate<IClient, byte[]>();		
+		this.handler = new Handler();
 		
 		addListeners();
 			
@@ -219,16 +223,31 @@ public class NetworkService extends Service implements IClient {
 		});
 	}
 	
-	private void onRecived(byte[] eventArgs) {
-		this.recivedEvent.invoke(this, eventArgs);
+	private void onRecived(final byte[] eventArgs) {
+		this.handler.post(new Runnable() {
+			
+			public void run() {
+				NetworkService.this.recivedEvent.invoke(NetworkService.this, eventArgs);	
+			}
+		});
 	}
 
-	private void onDisconnected(DCCause eventArgs) {
-		this.disconnectedEvent.invoke(this, eventArgs);
+	private void onDisconnected(final DCCause eventArgs) {
+		this.handler.post(new Runnable() {
+			
+			public void run() {
+				NetworkService.this.disconnectedEvent.invoke(NetworkService.this, eventArgs);	
+			}
+		});
 	}
 
-	private void onConnected(Boolean eventArgs) {
-		this.connectedEvent.invoke(this, eventArgs);
+	private void onConnected(final Boolean eventArgs) {
+		this.handler.post(new Runnable() {
+			
+			public void run() {
+				NetworkService.this.connectedEvent.invoke(NetworkService.this, eventArgs);	
+			}
+		});		
 	}
 
 	/**
