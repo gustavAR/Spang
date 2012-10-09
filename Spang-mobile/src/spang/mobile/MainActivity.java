@@ -1,5 +1,6 @@
 package spang.mobile;
 
+import events.Action1;
 import keyboard.KeyboardtestActivity;
 import utils.LogCatLogger;
 import utils.Logger;
@@ -73,34 +74,6 @@ public class MainActivity extends Activity {
 		this.stopService(intent);
 	}
 	
-	private class ConnectNetworkTask extends AsyncTask<Object, Void, Boolean> {
-
-		@Override
-		protected Boolean doInBackground(Object... params) {
-			String ip = (String)params[0];
-			int port = (Integer)params[1];
-			
-			try {	
-				MainActivity.this.service.connect(ip, port);
-				return true;
-			} catch(Exception e) {
-				return false;
-			}
-		}
-		
-		@Override
-		protected void onPostExecute(Boolean result) {
-			if(result) {
-				Toast.makeText(MainActivity.this, "Connection Sucessful!", Toast.LENGTH_SHORT).show();
-				Intent intent = new Intent(MainActivity.this, ComputerActivity.class);
-				MainActivity.this.startActivity(intent);
-			} else {
-				Toast.makeText(MainActivity.this, "Connection Failed!!", Toast.LENGTH_SHORT).show();
-			}
-		}
-		
-	}
-	
 
 	public void sendData(View view){
 
@@ -112,7 +85,18 @@ public class MainActivity extends Activity {
 		
 
 		Toast.makeText(this, "Connecting...!", Toast.LENGTH_SHORT).show();
-		new ConnectNetworkTask().execute(ip, port);
+		service.connectAsync(ip, port, new Action1<Boolean>() {
+			
+			public void onAction(Boolean success) {
+				if(success) {
+					Toast.makeText(MainActivity.this, "Connected!",Toast.LENGTH_SHORT).show();	
+					Intent intent = new Intent(MainActivity.this, ComputerActivity.class);
+					MainActivity.this.startActivity(intent);				
+				} else {
+					Toast.makeText(MainActivity.this, "Failed to connect!",Toast.LENGTH_SHORT).show();							
+				}
+			}
+		});			
 	}
 	
 	public void showKeyboard(View view){

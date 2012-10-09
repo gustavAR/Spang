@@ -49,7 +49,6 @@ public abstract class NetworkedActivity extends Activity {
 	}
 
 	private void removeListeners() {
-
 		if(network != null) {
 			network.removeConnectedListener(networkConnection);
 			network.removeDisconnectedListener(networkDisconnected);
