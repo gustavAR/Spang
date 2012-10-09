@@ -14,10 +14,10 @@ import android.util.Log;
  * The keyboard will send events to this view,
  * which sends them to the packer which will
  * send them over the network.
- *
+ * 
  * ATTENTION: setPacker(Packer packer) MUST be
- * called with a valid packer before
- * any keypresses are made.
+ * 			  called with a valid packer before
+ * 			  any keypresses are made.
  * @author Gustav Alm Rosenblad
  *
  */
@@ -28,7 +28,7 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 * the one we show.
 	 */
 	ControlKeyboard ctrlKeyboard;
-
+	
 	NetworkService network;
 	Packer packer;
 
@@ -97,7 +97,7 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 */
 	public void onKey(int primaryCode, int[] keyCodes) {
 		/*this.client.sendTCP(
-ByteBuffer.allocate(5).put((byte)15).putInt(primaryCode).array());*/
+				ByteBuffer.allocate(5).put((byte)15).putInt(primaryCode).array());*/
 		char character = (char)primaryCode;
 		switch (primaryCode){
 		case ControlKeyboard.SHIFT_KEYCODE:
@@ -119,7 +119,7 @@ ByteBuffer.allocate(5).put((byte)15).putInt(primaryCode).array());*/
 			this.packer.clear();
 			resetModifiers();
 			Log.i("CHAR", "" + (char)primaryCode);
-		}
+			}
 		this.updateKeyboardState();
 	}
 
@@ -150,22 +150,22 @@ ByteBuffer.allocate(5).put((byte)15).putInt(primaryCode).array());*/
 	 * since everything is handled in onKey
 	 */
 	public void onPress(int primaryCode) {
-
+		
 	}
-
+	
 	/**
 	 * We don't need to do anything here,
 	 * since everything is handled in onKey
 	 */
 	public void onRelease(int primaryCode) {
-
+		
 	}
-
+	
 	/**
 	 * We don't need to do anything here,
 	 * since everything is handled in onKey
 	 */
 	public void onText(CharSequence text) {
-
+		
 	}
 }

@@ -38,7 +38,16 @@ public enum Protocol {
 		this.orderID = orderID;
 	}
 	
-	public byte getID() {
+	public byte getBit() {
 		return this.orderID;
+	}
+
+	public static Protocol fromID(byte b) {
+		for (Protocol p : Protocol.values()) {
+			if((b & p.orderID) == p.orderID) {
+				return p;
+			}
+		}		
+		throw new IllegalArgumentException("The id " + b + " is not a valid protocol id");	
 	}
 } 

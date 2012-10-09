@@ -1,5 +1,6 @@
 package spang.mobile;
 
+import network.Protocol;
 import utils.Packer;
 import android.content.Context;
 import android.view.MotionEvent;
@@ -19,18 +20,33 @@ public class TouchView extends View {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int pointers = event.getPointerCount();
+<<<<<<< HEAD
 /*		
 		packer.pack((byte)100); //Temporary ID for touch packets
 		packer.pack((byte)pointers);
+=======
+		
+		int eventID = event.getAction()  & MotionEvent.ACTION_MASK;
+		if(eventID == MotionEvent.ACTION_UP)
+			pointers = 0;
+		
+		
+		packer.packByte((byte)this.getContext().getResources().getInteger(R.integer.Touch));
+		packer.packByte((byte)pointers);
+>>>>>>> origin/master
 		for(int i = 0; i < pointers; i++) {
-			packer.pack(event.getX(i));
-			packer.pack(event.getY(i));
-			packer.pack(event.getPressure(i));	
-			packer.pack((event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> 
-			MotionEvent.ACTION_POINTER_INDEX_SHIFT);
+			packer.packShort((short)event.getX(i));
+			packer.packShort((short)event.getY(i));
+			packer.packByte((byte)(event.getPressure(i) * 256));	
 		}
+<<<<<<< HEAD
 */
 		service.send(packer.getPackedData());
+=======
+
+		service.sendDirect(packer.getPackedData(), Protocol.Unordered);
+		packer.clear();
+>>>>>>> origin/master
 		return true;
 	}
 }

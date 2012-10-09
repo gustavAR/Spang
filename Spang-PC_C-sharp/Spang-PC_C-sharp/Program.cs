@@ -7,6 +7,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Drawing;
+using Spang_PC_C_sharp.Touch_Manager;
+
+using System.Drawing.Imaging;
 
 namespace Spang_PC_C_sharp
 {
@@ -17,6 +20,24 @@ namespace Spang_PC_C_sharp
         /// </summary>
         static void Main()
         {
+            #region Generate and show QR
+
+            //Find our local IP-address
+            IPHostEntry host;
+            string localIP = "";
+            host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    localIP = ip.ToString();
+                }
+            }
+
+            QRCodeGenerator.ShowQRCode(localIP + "/" + 1337, 120, 120, ImageFormat.Png);//120 are ok dimensions
+
+            #endregion
+
             IMessageDecoder messageHandler = new MessageDecoder();
             Phone phone = new Phone(messageHandler);
             DesktopController controller = new DesktopController(phone, new OsInterface());
@@ -26,32 +47,68 @@ namespace Spang_PC_C_sharp
 
             server.Start(1337);
 
+            TouchDecoder decoder = new TouchDecoder();
+
+            TouchEventManager em = new TouchEventManager();
+            em.Tap += () =>  Console.WriteLine("Just tapped"); 
+            em.LongTap += () =>  Console.WriteLine("Just Long Tapped"); 
+            em.Up += () => Console.WriteLine("Just Upped"); 
+            em.Down += () =>  Console.WriteLine("Just Downed"); 
+            em.Move += (x,y) => Console.WriteLine("Just moved: X: {0} , Y: {1}", x, y);
+
+            em.Tap += () => controller.LeftClick();
+            em.Up += () => controller.mouseUp();
+            em.LongTap += () => controller.RightClick();
+            em.Down += () => controller.mouseDown();
+            em.Move += (x, y) => controller.MoveMouse(moveSpeed(x), moveSpeed(y));
+            em.MulitiMove += (c, x, y) => controller.VerticalScroll(y * 10);
+
+
+            TouchStateMachine stateMachine = new TouchStateMachine(em);
+
+
+            int bytesRecived = 0;
+            long totalbytesRecived = 0;
+            System.Timers.Timer timer = new System.Timers.Timer(1000);
+            timer.AutoReset = true;
+            timer.Elapsed += (s,e) =>
+            {
+
+                Console.Title = "Total Recived: " + totalbytesRecived + " Current ByteRate: " + ((double)bytesRecived) / 1000;
+                totalbytesRecived += bytesRecived;
+                bytesRecived = 0;
+
+            };
+            timer.Start();
+
             server.Connected += (x, y) => Console.WriteLine("A connection was recived");                  
             server.Recived += (x, message) =>
             {
-                Console.WriteLine("Recived message from {0} of length {1}", message.ID, message.Data.Length);
-             //   messageHandler.DecodeMessage(message.Data);
+               // Console.WriteLine("Recived a message of size:{0}", message.Data.Length);
+
+                UnPacker unPacker = new UnPacker(message.Data);
+                bytesRecived += unPacker.remaining();
+                while(unPacker.remaining() > 0) {
+                    int id = unPacker.UnpackByte();
+                    if (id == 0)
+                    {
+                        //  Console.WriteLine("Recived mouse event!");
+                        TouchEvent e = decoder.DecodeTouch(unPacker);
+                        stateMachine.Update(e);
+                    }
+                    else if(id == 1)
+                    {
+                        String s = unPacker.UnpackString();
+                        controller.NetworkedText(s);
+                    }
+                }
             };
             server.Dissconnected += (x, y) => Console.WriteLine("Oh no we dced ;(");
+        }
 
-/*
-            Thread.Sleep(2000);
-
-            IClient client0 = OpenClient(0);
-            IClient client1 = OpenClient(1);
-
-           // client1.SendUDP(new byte[] { 123, 10, 231 });
-
-            while (true)
-            {
-               client0.SendUDP(new byte[] { 0, 2, 21, 1 });
-               client1.SendUDP(new byte[] { 0, 1, 2, 3, 4 });
-                Thread.Sleep(100);
-            } */
-
-            
-            
-
+        private static int moveSpeed(int p)
+        {
+            return p * ((int)Math.Sqrt(Math.Abs(p))) / 2;
         }
 
         private static IClient OpenClient(int id)
