@@ -357,7 +357,27 @@ public class NetworkService extends Service implements IClient {
 	}
 	
 	
-
+	public void reconnectAsync(final int retries, final int timeout, final Action1<Boolean> callback) {
+		new Thread(new Runnable() {
+			boolean success;					
+			public void run() {
+				try {
+					NetworkService.this.client.reconnect(retries, timeout);
+					success = true;
+				} catch(NetworkException exe) {
+					success = false;
+				} finally {
+					NetworkService.this.handler.post(new Runnable() {
+						public void run() {
+							callback.onAction(success);
+						}
+					});			
+				}
+			}
+		}).start();	
+	}
+	
+	
 	/**
 	 * {@inheritDoc}
 	 */
