@@ -34,6 +34,7 @@ public class SensorProcessor extends Service{
 	private NetworkService networkService;
 	private SensorManager manager;
 	private int samplingRate;
+	private Timer timer;
 
 
 	@Override
@@ -67,6 +68,7 @@ public class SensorProcessor extends Service{
     private ServiceConnection connection = new ServiceConnection() {
 		
 		public void onServiceDisconnected(ComponentName name) {
+			stopProcess();
 			networkService = null;
 		}
 		
@@ -82,7 +84,7 @@ public class SensorProcessor extends Service{
 	 * with a specific sampling rate.
 	 */
 	public void startProcess() {
-		Timer timer = new Timer();
+		this.timer = new Timer();
 		for (final ISensor sensor : sensors) {
 			TimerTask task = new TimerTask() {
 
@@ -94,6 +96,9 @@ public class SensorProcessor extends Service{
 			};
 			timer.scheduleAtFixedRate(task, 0, getSamplingRateBySensor(sensor));
 		}
+	}
+	public void stopProcess() {
+		this.timer.cancel();
 	}
 
 	private int getSamplingRateBySensor(ISensor sensor){	
@@ -129,6 +134,8 @@ public class SensorProcessor extends Service{
 	 * @param sensor 
 	 */
 	private void processInput(ISensor sensor) {
+		if(this.networkService == null)
+			return;
 		fillOutput(sensor);
 		this.networkService.send(encodedSensorInput.array());
 		encodedSensorInput.clear();
