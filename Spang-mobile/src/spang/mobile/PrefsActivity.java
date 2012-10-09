@@ -14,7 +14,12 @@ import android.preference.PreferenceScreen;
 
 
 public class PrefsActivity extends PreferenceActivity{
+	
+	private static int MAXIMUM_SAMPLE_RATE = 20;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -25,7 +30,7 @@ public class PrefsActivity extends PreferenceActivity{
 		PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(this);
 
 		SensorManager manager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		List<ISensor> sensors = new SensorListBuilder(manager).build(); 
+		List<ISensor> sensors = new SensorListBuilder(manager).build(); 			//Gets list of all available sensors
 
 		for (ISensor sensor : sensors) {
 			if(sensor != null){
@@ -37,18 +42,17 @@ public class PrefsActivity extends PreferenceActivity{
 				screen.addPreference(sensorCategory);
 				
 				CheckBoxPreference checkbox = new CheckBoxPreference(this);
-				checkbox.setKey("isActivated"+name);
+				checkbox.setKey("isActivated"+name);								//Key used to get stored checkbox value using shared preferences
 				checkbox.setTitle("Activated");
 				checkbox.setSummary("Power usage: "+sensor.getPowerUsage()+"mA");
 				
-				SeekBarPreference sampleRate = new SeekBarPreference(this, "Sample rate","Hz",1, 60);
+				SeekBarPreference sampleRate = new SeekBarPreference(this, "Sample rate","Hz",1, MAXIMUM_SAMPLE_RATE);
 				sampleRate.setTitle("Sample rate");
 				sampleRate.setSummary("Current value: "+sampleRate.getProgress());
 				sampleRate.setKey("sampleRate"+name);
 				
 				sensorCategory.addPreference(checkbox);
 				sensorCategory.addPreference(sampleRate);
-				//screen.addPreference(checkbox);
 			}
 		}
 		return screen;

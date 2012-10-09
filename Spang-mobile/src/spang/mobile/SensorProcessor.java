@@ -32,7 +32,9 @@ public class SensorProcessor extends Service{
 	private int samplingRate;
 	private Timer timer;
 
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -44,40 +46,47 @@ public class SensorProcessor extends Service{
 		SensorListBuilder builder = new SensorListBuilder(this.manager);
 		this.sensors = builder.build();
 		this.encodedSensorInput = new Packer();
-		
+
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Intent i = new Intent(this, NetworkService.class);
 		this.bindService(i, this.connection, Context.BIND_WAIVE_PRIORITY);
 		return START_STICKY;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		this.unbindService(connection);
 	}
-	
-	 //Connection used to bind the network service.
-    private ServiceConnection connection = new ServiceConnection() {
-		
+
+	//Connection used to bind the network service.
+	private ServiceConnection connection = new ServiceConnection() {
+
 		public void onServiceDisconnected(ComponentName name) {
 			stopProcess();
 			networkService = null;
 		}
-		
+
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			networkService = ((NetworkService.NetworkBinder)service).getService();
-			
+
 			startProcess();
 		}
 	};
 
 	/**
-	 * Starts a thread which processes the input from all active sensors 
-	 * with a specific sampling rate.
+	 * Starts processing input.
+	 * Creates a new timer and schedules one task per sensor, processing the sensor
+	 * input at a fixed sampling rate.
 	 */
 	public void startProcess() {
 		this.timer = new Timer();
@@ -93,6 +102,9 @@ public class SensorProcessor extends Service{
 			timer.scheduleAtFixedRate(task, 0, getSamplingRateBySensor(sensor));
 		}
 	}
+	/**
+	 * Stops the processing of the sensor input.
+	 */
 	public void stopProcess() {
 		this.timer.cancel();
 	}
@@ -138,10 +150,10 @@ public class SensorProcessor extends Service{
 	}
 
 	private void fillOutput(ISensor sensor) {	
-	//	if(sensor.isRunning()) {
-			
+		//	if(sensor.isRunning()) {
+
 		sensor.encode(this.encodedSensorInput);		
-	//	}
+		//	}
 	}
 
 	/**

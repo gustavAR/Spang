@@ -10,7 +10,7 @@ import android.hardware.SensorManager;
 
 /**
  * Builds a list of all the valid implementations of SpangSensors.
- * @author Gustav Alm Rosenblad & Pontus Pall
+ * @author Gustav Alm Rosenblad, Joakim Johansson & Pontus Pall
  *
  */
 public class SensorListBuilder {
