@@ -237,6 +237,31 @@ namespace Spang_PC_C_sharp
 
         #endregion
 
+        #region Humidity
+
+        private float humidity;
+        public float Humidity
+        {
+            get { return this.humidity; }
+            internal set
+            {
+                float temp = this.humidity;
+                this.humidity = value;
+
+                if (temp != this.humidity)
+                    this.OnHumidityChanged(temp, this.humidity);
+            }
+        }
+
+        public event Action<float, float> HumidityChanged;
+        private void OnHumidityChanged(float old, float current)
+        {
+            if (this.HumidityChanged != null)
+                this.HumidityChanged(old, current);
+        }
+
+        #endregion
+
         #region Pressure 
 
         private float pressure;

@@ -35,6 +35,7 @@ namespace Spang_PC_C_sharp
             this.handlers.Add(14, this.HandlePressureUpdate);
             this.handlers.Add(15, this.HandleOrientationUpdate);
             this.handlers.Add(16, this.HandleGPSUpdate);
+            this.handlers.Add(17, this.HandleHumidityUpdate);
         }
 
         public void DecodeMessage(byte[] message)
@@ -121,6 +122,11 @@ namespace Spang_PC_C_sharp
         private void HandlePressureUpdate(BinaryReader reader)
         {
             this.phone.Pressure = reader.ReadSingle();
+        }
+
+        private void HandleHumidityUpdate(BinaryReader reader)
+        {
+            this.phone.Humidity = reader.ReadSingle();
         }
 
         private void HandleOrientationUpdate(BinaryReader reader)
