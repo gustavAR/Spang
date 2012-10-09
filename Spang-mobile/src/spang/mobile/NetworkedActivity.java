@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.widget.Toast;
+import events.Action;
 import events.Action1;
 import events.EventHandler;
 
@@ -63,23 +64,23 @@ public abstract class NetworkedActivity extends Activity {
 		network.addRevicedListener(networkRecived);		
 	}
 
-	private EventHandler<IClient, Boolean> networkConnection = new EventHandler<IClient, Boolean>() {
+	private Action networkConnection = new Action() {
 
-		public void onAction(IClient sender, Boolean eventArgs) {
+		public void onAction() {
 			NetworkedActivity.this.onConnected();
 		}
 	};
 
-	private EventHandler<IClient, byte[]> networkRecived = new EventHandler<IClient, byte[]>() {
+	private Action1<byte[]> networkRecived = new Action1<byte[]>() {
 
-		public void onAction(IClient sender, byte[] eventArgs) {
+		public void onAction(byte[] eventArgs) {
 			NetworkedActivity.this.onMessageRecived(eventArgs);
 		}
 	};
 
-	private EventHandler<IClient, DCCause> networkDisconnected = new EventHandler<IClient, DCCause>() {
+	private Action1<DCCause> networkDisconnected = new Action1<DCCause>() {
 
-		public void onAction(IClient sender, DCCause eventArgs) {
+		public void onAction(DCCause eventArgs) {
 			NetworkedActivity.this.onDisconnected(eventArgs);
 		}
 	};
