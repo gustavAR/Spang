@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
+using com.google.zxing.qrcode;
+using com.google.zxing.common;
+using com.google.zxing;
 
 namespace Spang_PC_C_sharp
 {
@@ -38,8 +41,8 @@ namespace Spang_PC_C_sharp
         public static Bitmap GenerateQRC(string str, int width, int height)
         {
 
-            com.google.zxing.qrcode.QRCodeWriter qrCode = new com.google.zxing.qrcode.QRCodeWriter();
-            com.google.zxing.common.ByteMatrix byteIMG = qrCode.encode(str, com.google.zxing.BarcodeFormat.QR_CODE, width, height);
+            QRCodeWriter qrCode = new QRCodeWriter();
+            ByteMatrix byteIMG = qrCode.encode(str, BarcodeFormat.QR_CODE, width, height);
 
             sbyte[][] img = byteIMG.Array;
             Bitmap bmp = new Bitmap(width, height);

@@ -119,8 +119,12 @@ public class MainActivity extends Activity {
 		if (requestCode == 0) {
 			if (resultCode == android.app.Activity.RESULT_OK) {
 				String contents = data.getStringExtra("SCAN_RESULT");
-				String iPAdress = contents.substring(0, contents.indexOf("/"));
-				String portNumber = contents.substring(contents.indexOf("/") + 1, contents.length());
+				int slashIndex = contents.indexOf("/");
+				if (slashIndex == -1){
+					return;
+				}
+				String iPAdress = contents.substring(0, slashIndex);
+				String portNumber = contents.substring(slashIndex + 1, contents.length());
 				
 				EditText iPField = (EditText)this.findViewById(R.id.editText1);
 				iPField.setText(iPAdress);
