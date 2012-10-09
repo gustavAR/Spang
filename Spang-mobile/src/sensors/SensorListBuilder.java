@@ -41,8 +41,9 @@ public class SensorListBuilder {
 		if(this.manager.getDefaultSensor(ProximitySensor.SENSOR_TYPE)!=null)
 			sensorBindings.put(ProximitySensor.SENSOR_TYPE, new ProximitySensor(manager, (byte) 0xa));
 		
-		//		sensorBindings.put(Sensor.TYPE_MAGNETIC_FIELD, new MagneticFieldSensor(context));
-		//		sensorBindings.put(Sensor.TYPE_GYROSCOPE, new GyroscopeSensor(context, (byte) 0x05));
+		if(this.manager.getDefaultSensor(HumiditySensor.SENSOR_TYPE)!=null)
+			sensorBindings.put(HumiditySensor.SENSOR_TYPE, new HumiditySensor(manager, (byte) 0xa));
+		
 
 	}
 
