@@ -1,6 +1,5 @@
 package spang.mobile;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
 
@@ -10,24 +9,26 @@ import network.DCCause;
 import network.IClient;
 import network.Protocol;
 import network.exceptions.NetworkException;
-import utils.Logger;
 import utils.MessageBuffer;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.widget.Toast;
+import events.Action;
 import events.Action1;
+import events.Action1Delegate;
+import events.ActionDelegate;
 import events.EventHandler;
-import events.EventHandlerDelegate;
 
 /**
  * This is a service which provides applications with the 
  * ability to connect and send messages over the network.
  * @author Gustav Alm Rosenblad & Lukas Kurtyan
  */
-public class NetworkService extends Service implements IClient {
+public class NetworkService extends Service {
 	
 	//Default Interval in which to send buffered messages.
 	private int DEF_MESSAGE_SEND_INTERVALL = 1000 / 20;
@@ -51,14 +52,16 @@ public class NetworkService extends Service implements IClient {
 	private volatile int messageSendInterval;
 	
 	//Event invoked when the service connects to a remote location.
-	private EventHandlerDelegate<IClient, Boolean> connectedEvent;
+	private ActionDelegate connectedEvent;
 	
 	//Event invoked when the service disconnects form a remote location.
-	private EventHandlerDelegate<IClient, DCCause> disconnectedEvent;
+	private Action1Delegate<DCCause> disconnectedEvent;
 	
 	//Event invoked when the service receives data on the incoming connection.
-	private EventHandlerDelegate<IClient, byte[]> recivedEvent;
+	private Action1Delegate<byte[]> recivedEvent;
 	
+	//Handler used to offload work to the UI thread. This is done so that listeners
+	//of the network can change UI without upsetting the android API.
 	private Handler handler;
 	
 	/**
@@ -66,25 +69,30 @@ public class NetworkService extends Service implements IClient {
 	 */
 	@Override
 	public void onCreate() {
+		if(Looper.myLooper() != Looper.getMainLooper()) 
+			throw new IllegalStateException("The thread that starts the NetworkService must be the UI thread.");
+		
 		client = new Client(new Connector());
 		this.defaultProtcol = Protocol.Unordered; 
 		this.messageSendInterval = DEF_MESSAGE_SEND_INTERVALL;
 		this.sendBuffer = new MessageBuffer(1024);
-		this.connectedEvent = new EventHandlerDelegate<IClient, Boolean>();
-		this.disconnectedEvent = new EventHandlerDelegate<IClient, DCCause>();
-		this.recivedEvent = new EventHandlerDelegate<IClient, byte[]>();		
+		this.connectedEvent = new ActionDelegate();
+		this.disconnectedEvent = new Action1Delegate<DCCause>();
+		this.recivedEvent = new Action1Delegate<byte[]>();		
 		this.handler = new Handler();
 		
 		addListeners();
 			
 	}
 	
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		//Start sticky so that the service will not randomly be GCed.
 		return START_STICKY;
 	}
-	
 	
 	/**
 	 * {@inheritDoc}
@@ -102,7 +110,6 @@ public class NetworkService extends Service implements IClient {
 	public void onDestroy() {
 		Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show(); 
 		this.disconnect();
-
 		super.onDestroy();
 	}
 	
@@ -115,7 +122,7 @@ public class NetworkService extends Service implements IClient {
 	public class NetworkBinder extends Binder {
 		
 		/**
-		 * Retrives the active networkservice.
+		 * Retrieves the active networkservice.
 		 * @return the service to get.
 		 */
 		public NetworkService getService()
@@ -194,8 +201,7 @@ public class NetworkService extends Service implements IClient {
 	private void addListeners() {
 		client.addDisconnectedListener(new EventHandler<IClient, DCCause>() {
 			public void onAction(IClient sender, DCCause cause) {
-				Logger.logInfo("Dced: " + cause);
-				//Interrupts the sender-thread so it understands that we have disconnected.
+				//Interrupts the sender-thread so it does not try to send messages over the bad connection.
 				senderThread.interrupt();
 		
 				//If we timed out or crashed we reconnect.
@@ -211,13 +217,14 @@ public class NetworkService extends Service implements IClient {
 			}
 		});		
 		
+				
 		client.addConnectedListener(new EventHandler<IClient, Boolean>() {
 			public void onAction(IClient sender, Boolean eventArgs) {
 				NetworkService.this.onConnected(eventArgs);
 			}
 		});
-		client.addRevicedListener(new EventHandler<IClient, byte[]>() {
-			
+		
+		client.addRevicedListener(new EventHandler<IClient, byte[]>() {	
 			public void onAction(IClient sender, byte[] eventArgs) {
 				NetworkService.this.onRecived(eventArgs);
 			}
@@ -225,28 +232,30 @@ public class NetworkService extends Service implements IClient {
 	}
 	
 	private void onRecived(final byte[] eventArgs) {
+		//Make the event get invoked on the UI thread.
 		this.handler.post(new Runnable() {
 			
 			public void run() {
-				NetworkService.this.recivedEvent.invoke(NetworkService.this, eventArgs);	
+				NetworkService.this.recivedEvent.invoke(eventArgs);	
 			}
 		});
 	}
 
 	private void onDisconnected(final DCCause eventArgs) {
+		//Make the event get invoked on the UI thread.
 		this.handler.post(new Runnable() {
 			
 			public void run() {
-				NetworkService.this.disconnectedEvent.invoke(NetworkService.this, eventArgs);	
+				NetworkService.this.disconnectedEvent.invoke(eventArgs);	
 			}
 		});
 	}
 
 	private void onConnected(final Boolean eventArgs) {
+		//Make the event get invoked on the UI thread.
 		this.handler.post(new Runnable() {
-			
 			public void run() {
-				NetworkService.this.connectedEvent.invoke(NetworkService.this, eventArgs);	
+				NetworkService.this.connectedEvent.invoke();	
 			}
 		});		
 	}
@@ -289,59 +298,74 @@ public class NetworkService extends Service implements IClient {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Gets the connection status of the service.
+	 * @return connection status.
 	 */
 	public boolean isConnected() {
 		return this.client.isConnected();
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Gets the time a connection will wait for a message without disconnecting. 
+	 * @return time in milliseconds.
 	 */
 	public int getConnectionTimeout() {
 		return this.client.getConnectionTimeout();
 	}
 	
 	/**
-	 * {@inheritDoc}
+	 * Sets the time a connection will wait for a message without disconnecting.
+	 * @param value the time in milliseconds. Note: (0 is wait indefinite)
 	 */
 	public void setConnectionTimeout(int value) {
 		this.client.setConnectionTimeout(value);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void connect(InetSocketAddress address) {
-		this.connect(address.getHostName(), address.getPort());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void connect(InetAddress address, int port) throws NetworkException {
-		this.connect(address.getHostAddress(), port);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void connect(String host, int port) throws NetworkException {
+	
+	private void connect(InetSocketAddress address) throws NetworkException {
+		//Stops the current connection and the sender thread if we are already connected.
 		if(this.client.isConnected()) {
 			this.stopSenderThread();
 			this.client.disconnect();
 		}
 		
-		this.client.connect(host, port);
+		//Connects to the specified address.
+		this.client.connect(address);
+		//Start sending messages. 
 		this.startSendThread();
 	}
 	
+	
+	
+	/**
+	 * This is a convenience method for connectAsync(InetSocketAddress, Action1(Boolean)
+	 * @param host the host to connect to.
+	 * @param port the port to connect to.
+	 * @param callback the callback to be called when the connection is complete,
+	 */
 	public void connectAsync(final String host, final int port, final Action1<Boolean> callback) {
+		InetSocketAddress address = new InetSocketAddress(host, port);			
+		this.connectAsync(address, callback);
+	}
+	
+	/**
+	 * Connects to a new connection specified by the socketAddress.
+	 * This is done asynchronously so the caller can't make any 
+	 * assumptions about the state of the connection before the callback is called.
+	 * The callback will always be invoked on the UI thread so it is safe to modify
+	 * any UI elements from within the callback. 
+	 * 
+	 * @param host the host to connect to.
+	 * @param port the port to connect to.
+	 * @param callback the callback to be invoked when the connection is complete. The value sent
+	 * to the callback is the success status of the connection attempt. true = success, false = failure
+	 */
+	public void connectAsync(final InetSocketAddress socketAddress, final Action1<Boolean> callback) {
 		new Thread(new Runnable() {
-			boolean success;					
+			volatile boolean success;					
 			public void run() {
 				try {
-					NetworkService.this.connect(host, port);
+					NetworkService.this.connect(socketAddress);
 					success = true;
 				} catch(NetworkException exe) {
 					success = false;
@@ -355,11 +379,22 @@ public class NetworkService extends Service implements IClient {
 			}
 		}).start();
 	}
-	
-	
+		
+	/**
+	 * Reconnects to the last open connection.
+	 * This is done asynchronously so the caller can't make any 
+	 * assumptions about the state of the connection before the callback is called.
+	 * The callback will always be invoked on the UI thread so it is safe to modify
+	 * any UI elements from within the callback. 
+	 * 
+	 * @param retries number of reconnection attempts.
+	 * @param timeout timeout for each reconnection attempt. (in miliseconds)
+	 * @param callback the callback to be invoked when the reconnection is complete. The value sent
+	 * to the callback is the success status of the reconnection attempt. true = success, false = failure
+	 */
 	public void reconnectAsync(final int retries, final int timeout, final Action1<Boolean> callback) {
 		new Thread(new Runnable() {
-			boolean success;					
+			volatile boolean success;					
 			public void run() {
 				try {
 					NetworkService.this.client.reconnect(retries, timeout);
@@ -376,62 +411,65 @@ public class NetworkService extends Service implements IClient {
 			}
 		}).start();	
 	}
-	
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public void reconnect(int retries, int timeout) throws NetworkException {
-		this.client.reconnect(retries, timeout);
-	}
 
 	/**
-	 * {@inheritDoc}
+	 * Disconnects the NetworkService from it's current connection.
+	 * After this is done messages will no longer be sent over the network.
 	 */
 	public void disconnect() {
 		this.client.disconnect();
 	}
-
+	
 	/**
-	 * {@inheritDoc}
+	 * Add a listener to start listening for received events.
+	 * The connection event is called when a connection is made.
+	 * @param listener the listener to add.
 	 */
-	public void addConnectedListener(EventHandler<IClient, Boolean> listener) {
+	public void addConnectedListener(Action listener) {
 		this.connectedEvent.addListener(listener);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Removes a listener listening for disconnection events.
+	 * @param listener the listener to remove.
 	 */
-	public void removeConnectedListener(EventHandler<IClient, Boolean> listener) {
+	public void removeConnectedListener(Action listener) {
 		this.connectedEvent.removeListener(listener);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Add a listener to start listening for received events.
+	 * The disconnection event is triggered when the connection is closed or if it fails.
+	 * The cause of the disconnection is sent to the listener as a DCCause.
+	 * @param listener the listener to add.
 	 */
-	public void addDisconnectedListener(EventHandler<IClient, DCCause> listener) {
+	public void addDisconnectedListener(Action1<DCCause> listener) {
 		this.disconnectedEvent.addListener(listener);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Removes a listener listening for disconnection events.
+	 * @param listener the listener to remove.
 	 */
-	public void removeDisconnectedListener(
-			EventHandler<IClient, DCCause> listener) {
+	public void removeDisconnectedListener(Action1<DCCause> listener) {
 		this.disconnectedEvent.removeListener(listener);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Add a listener to start listening for received events.
+	 * The received event is triggered when a message is received from the network.
+	 * The data received from onAction is the message recived.
+	 * @param listener the listener to add.
 	 */
-	public void addRevicedListener(EventHandler<IClient, byte[]> listener) {
+	public void addRevicedListener(Action1<byte[]> listener) {
 		this.recivedEvent.addListener(listener);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Removes a listener listening for received events.
+	 * @param listener the listener to remove.
 	 */
-	public void removeRevicedListener(EventHandler<IClient, byte[]> listener) {
+	public void removeRevicedListener(Action1<byte[]> listener) {
 		this.recivedEvent.removeListener(listener);
 	}
 }
