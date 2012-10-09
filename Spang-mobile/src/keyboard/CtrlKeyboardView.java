@@ -27,10 +27,10 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 * This is the currently active keyboard,
 	 * the one we show.
 	 */
-	ControlKeyboard ctrlKeyboard;
+	private ControlKeyboard ctrlKeyboard;
 	
-	NetworkService network;
-	Packer packer;
+	private NetworkService network;
+	private Packer packer;
 
 	private boolean ctrlActive; //Is ctrl currently pressed?
 	private boolean altgrActive;//Is altgr currently pressed?
@@ -96,9 +96,6 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 * Called when a key is pressed.
 	 */
 	public void onKey(int primaryCode, int[] keyCodes) {
-		/*this.client.sendTCP(
-				ByteBuffer.allocate(5).put((byte)15).putInt(primaryCode).array());*/
-		char character = (char)primaryCode;
 		switch (primaryCode){
 		case ControlKeyboard.SHIFT_KEYCODE:
 			this.shiftActive = !this.shiftActive;
@@ -113,14 +110,19 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 			this.altgrActive = !this.altgrActive;
 			break;
 		default:
-			this.packer.packByte((byte)this.getContext().getResources().getInteger(R.integer.Text));
-			this.packer.packString(addModifierIDs(character));
-			this.network.send(this.packer.getPackedData());
-			this.packer.clear();
+			char character = (char)primaryCode;
+			sendChar(character);
 			resetModifiers();
 			Log.i("CHAR", "" + (char)primaryCode);
 			}
 		this.updateKeyboardState();
+	}
+
+	private void sendChar(char character) {
+		this.packer.packByte((byte)this.getContext().getResources().getInteger(R.integer.Text));
+		this.packer.packString(addModifierIDs(character));
+		this.network.send(this.packer.getPackedData());
+		this.packer.clear();
 	}
 
 	private void resetModifiers() {
