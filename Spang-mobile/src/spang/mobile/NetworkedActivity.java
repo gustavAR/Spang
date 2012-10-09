@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.widget.Toast;
+import events.Action1;
 import events.EventHandler;
 
 /**
@@ -109,13 +110,23 @@ public abstract class NetworkedActivity extends Activity {
 	}
 
 	protected  void onDisconnected(DCCause cause) {		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("We disconnection! Cause: " + cause);
 		builder.setTitle("Disconnected");
 
 		builder.setPositiveButton("Reconnect?", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
-				NetworkedActivity.this.network.reconnect(5, 1000);
+				NetworkedActivity.this.network.reconnectAsync(5, 1000, new Action1<Boolean>() {	
+					public void onAction(Boolean success) {
+						if(success) {
+							Toast.makeText(NetworkedActivity.this, "´Connected!", Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(NetworkedActivity.this, "´Failed to connect!", Toast.LENGTH_SHORT).show();
+							builder.show();
+						}
+					}
+				});
+				
 				Toast.makeText(NetworkedActivity.this, "Trying to reconnect...", Toast.LENGTH_SHORT).show();
 			}
 		});
