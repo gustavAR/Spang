@@ -2,6 +2,8 @@ package sensors;
 
 import java.nio.ByteBuffer;
 
+import utils.Packer;
+
 import android.hardware.SensorEventListener;
 
 /**
@@ -43,10 +45,10 @@ public interface ISensor extends SensorEventListener {
 	public boolean isRunning();
 	
 	/**
-	 * @param the ByteBuffer with all sensor-input 
-	 * Puts the sensor-values in the ByteBuffer.
+	 * @param the Packer with all sensor-input 
+	 * Puts the sensor-values in the Packer.
 	 */
-	public void encode(ByteBuffer buffer);
+	public void encode(Packer packer);
 	
 	/**
 	 * @return the constant number of values returned by the sensor.

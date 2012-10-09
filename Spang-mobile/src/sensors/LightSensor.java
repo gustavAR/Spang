@@ -2,6 +2,8 @@ package sensors;
 
 import java.nio.ByteBuffer;
 
+import utils.Packer;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -109,9 +111,8 @@ public class LightSensor implements ISensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void encode(ByteBuffer buffer) {
-		buffer.put(encodeID)
-					.putFloat(this.values[0]);
+	public void encode(Packer packer) {
+		packer.packFloat(this.values[0]);
 	}
 	
 	/**

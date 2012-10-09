@@ -2,6 +2,8 @@ package sensors;
 
 import java.nio.ByteBuffer;
 
+import utils.Packer;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
@@ -104,9 +106,8 @@ public class GyroscopeSensor implements ISensor {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void encode(ByteBuffer buffer) {
-		buffer.put(encodeID)
-					.putFloat(this.values[0]).putFloat(this.values[1]).putFloat(this.values[2]);
+	public void encode(Packer packer) {
+		packer.packFloatArray(this.values);
 	}
 	
 	/**

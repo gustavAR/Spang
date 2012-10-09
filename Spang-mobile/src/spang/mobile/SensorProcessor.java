@@ -1,6 +1,4 @@
 package spang.mobile;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -9,8 +7,6 @@ import java.util.TimerTask;
 import sensors.ISensor;
 import sensors.SensorListBuilder;
 import utils.Packer;
-
-import network.IConnection;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -30,7 +26,7 @@ public class SensorProcessor extends Service{
 	private static int DEFAULT_SAMPLINGRATE = 20;
 	private SharedPreferences preferences;
 	private List<ISensor> sensors = new ArrayList<ISensor>();
-	private ByteBuffer encodedSensorInput; 
+	private Packer encodedSensorInput; 
 	private NetworkService networkService;
 	private SensorManager manager;
 	private int samplingRate;
@@ -47,7 +43,7 @@ public class SensorProcessor extends Service{
 
 		SensorListBuilder builder = new SensorListBuilder(this.manager);
 		this.sensors = builder.build();
-		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
+		this.encodedSensorInput = new Packer();
 		
 	}
 	
@@ -126,7 +122,7 @@ public class SensorProcessor extends Service{
 			}
 		}
 		this.encodedSensorInput = null;
-		this.encodedSensorInput = ByteBuffer.allocate(getOutputLength()).order(ByteOrder.LITTLE_ENDIAN);
+		this.encodedSensorInput = new Packer();
 	}
 
 	/**
@@ -137,7 +133,7 @@ public class SensorProcessor extends Service{
 		if(this.networkService == null)
 			return;
 		fillOutput(sensor);
-		this.networkService.send(encodedSensorInput.array());
+		this.networkService.send(encodedSensorInput.getPackedData());
 		encodedSensorInput.clear();
 	}
 
