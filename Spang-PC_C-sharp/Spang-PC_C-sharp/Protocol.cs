@@ -10,6 +10,7 @@ namespace Spang_PC_C_sharp
     {
         Unordered = 0x01,
         Ordered = 0x02,
-        Reliable = 0x04
+        Reliable = 0x04,
+        OrderedReliable = 0x08
     }
 }

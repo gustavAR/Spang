@@ -7,7 +7,7 @@ namespace Spang_PC_C_sharp.TouchManager.States
 {
     class MoveState : TouchState
     {
-        private Vector3 prevPointer;
+        private Touch prevPointer;
 
         public MoveState(TouchStateMachine touchStateMachine, TouchEventManager touchEventManager)
             : base(touchStateMachine, touchEventManager)
@@ -16,7 +16,7 @@ namespace Spang_PC_C_sharp.TouchManager.States
 
         internal override void Enter(TouchEvent touchEvent)
         {
-            this.prevPointer = touchEvent.Pointers[0];
+            this.prevPointer = touchEvent.Touches[0];
         }
 
         internal override void Exit(TouchEvent touchEvent)
@@ -25,14 +25,14 @@ namespace Spang_PC_C_sharp.TouchManager.States
 
         internal override void Update(TouchEvent touchEvent)
         {
-            if (touchEvent.Pointers.Count == 1)
+            if (touchEvent.Touches.Count == 1)
             {
-                Vector3 currPointer = touchEvent.Pointers[0];
-                this.manager.OnMove((int)(this.prevPointer.X - currPointer.X),
-                                    (int)(this.prevPointer.Y - currPointer.Y));
+                Touch currPointer = touchEvent.Touches[0];
+                this.manager.OnMove((int)(this.prevPointer.Location.X - currPointer.Location.X),
+                                    (int)(this.prevPointer.Location.Y - currPointer.Location.Y));
                 this.prevPointer = currPointer;
             }
-            else if (touchEvent.Pointers.Count == 0)
+            else if (touchEvent.Touches.Count == 0)
             {
                 this.machine.ChangeState(new NullState(machine, manager), null);
             }

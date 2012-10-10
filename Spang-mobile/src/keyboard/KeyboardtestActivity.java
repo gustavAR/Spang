@@ -1,14 +1,9 @@
 package keyboard;
 
-import spang.mobile.NetworkService;
 import spang.mobile.NetworkedActivity;
 import spang.mobile.R;
-import utils.Packer;
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 
 /**
  * This is just a test.
@@ -39,6 +34,12 @@ public class KeyboardtestActivity extends NetworkedActivity {
 
 	@Override
 	protected void onNetworkSerivceDissconnected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void onMessageRecived(byte[] message) {
 		// TODO Auto-generated method stub
 		
 	}

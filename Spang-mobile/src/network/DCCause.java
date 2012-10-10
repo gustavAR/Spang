@@ -8,9 +8,9 @@ package network;
 public enum DCCause {
 	
 	/**
-	 * Connection disconnected from a tcp timeout.
+	 * Connection disconnected from not receiving a message during the timeout period.
 	 */
-	TCPTimeout,
+	Timeout,
 	
 	/**
 	 * Connection disconnected because the remote endpoint requested it.
@@ -29,7 +29,7 @@ public enum DCCause {
 	
 	/**
 	 * Connection was disconnection because the remote endpoint crashed.
-	 * Note: This almost always shows itself as a TCPTimeout cause.
+	 * Note: This almost always shows itself as a Timeout cause.
 	 */
 	RemoteNetworkCrash
 }

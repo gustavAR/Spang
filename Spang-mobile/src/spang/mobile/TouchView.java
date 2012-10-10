@@ -1,5 +1,6 @@
 package spang.mobile;
 
+import network.Protocol;
 import utils.Packer;
 import android.content.Context;
 import android.view.MotionEvent;
@@ -33,7 +34,7 @@ public class TouchView extends View {
 			packer.packByte((byte)(event.getPressure(i) * 256));	
 		}
 
-		service.send(packer.getPackedData());
+		service.sendDirect(packer.getPackedData(), Protocol.Reliable);
 		packer.clear();
 		return true;
 	}

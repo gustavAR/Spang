@@ -2,6 +2,7 @@ package utils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import network.exceptions.NotImplementedException;
 
@@ -15,7 +16,7 @@ public class UnPacker {
 	private ByteBuffer packedData;	
 	
 	public UnPacker(byte[] unpackdata) {
-		this.packedData = ByteBuffer.wrap(unpackdata);
+		this.packedData = ByteBuffer.wrap(unpackdata).order(ByteOrder.LITTLE_ENDIAN);
 	}
 		
 	/**
