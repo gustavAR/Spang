@@ -37,7 +37,7 @@ public class MouseView extends AbstractSpangView{
 
 	private GestureDetector gestureDetector;
 
-	private SensorProcessor sp;
+	private SpangSensorService sp;
 
 	private static final int INVALID_POINTER_ID = -1;
 	private int fingerOneID = INVALID_POINTER_ID;

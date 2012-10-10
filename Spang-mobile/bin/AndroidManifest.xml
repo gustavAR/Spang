@@ -6,7 +6,7 @@
     <permission android:name=".NetworkService" />
 
     <uses-sdk
-        android:minSdkVersion="5"
+        android:minSdkVersion="9"
         android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" >
@@ -21,7 +21,7 @@
             android:enabled="true" >
         </service>
           <service
-            android:name=".SensorProcessor"
+            android:name=".SpangSensorService"
             android:enabled="true" >
         </service>
 

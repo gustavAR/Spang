@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(this, NetworkService.class);
 		this.startService(intent);	
 		
-		Intent intent2 = new Intent(this, SensorProcessor.class);
+		Intent intent2 = new Intent(this, SpangSensorService.class);
 		this.startService(intent2);
 
 		Logger.setLogger(new LogCatLogger());
@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(this, NetworkService.class);
 		this.stopService(intent);
 		
-		Intent intent2 = new Intent(this, SensorProcessor.class);
+		Intent intent2 = new Intent(this, SpangSensorService.class);
 		this.stopService(intent2);
 	}
 

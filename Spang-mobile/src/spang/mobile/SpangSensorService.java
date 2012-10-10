@@ -1,6 +1,7 @@
 package spang.mobile;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -15,16 +16,23 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
+import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.AndroidRuntimeException;
 
 /**
  * Class used to communicate sensor input with other parts of the system.
  * @author Pontus Pall, Joakim Johansson & Gustav Alm Rosenblad
  */
-public class SensorProcessor extends Service{
+public class SpangSensorService extends Service{
 
+	public static String LUMINANCE_EXTRA = "spang.spang_sensor_service.luminance";
+	
+	
+	
 	private static int DEFAULT_SAMPLINGRATE = 20;
 	private SharedPreferences preferences;
 	private List<ISensor> sensors = new ArrayList<ISensor>();
@@ -33,6 +41,7 @@ public class SensorProcessor extends Service{
 	private SensorManager manager;
 	private int samplingRate;
 	private Timer timer;
+	private IBinder binder = new SpangSensorBinder();
 
 	/**
 	 * {@inheritDoc}
@@ -72,6 +81,13 @@ public class SensorProcessor extends Service{
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Intent i = new Intent(this, NetworkService.class);
 		this.bindService(i, this.connection, Context.BIND_WAIVE_PRIORITY);
+		
+		int luminanceSamplerFPS = intent.getIntExtra(LUMINANCE_EXTRA, -1);
+		if(luminanceSamplerFPS != -1) {
+			this.addSensor(Sensor.TYPE_LIGHT, luminanceSamplerFPS);
+		}
+		
+		
 		return START_STICKY;
 	}
 
@@ -153,6 +169,22 @@ public class SensorProcessor extends Service{
 	private void fillOutput(ISensor sensor) {	 
 		sensor.encode(this.encodedSensorInput);		
 	}
+	
+	/**
+	 * Adds a sensor of type sensorID.
+	 * These types can be found in the Sensor.TYPE_STUFF int code. For 
+	 * ex. Sensor id of accelerometer is Sensor.TYPE_ACCELEROMETER. 
+	 * @param sensorID 
+	 * @param samplerRate
+	 * @throws MissingResourceException if the sensor is not avalible on the device. 
+	 */
+	public void addSensor(int sensorID, int samplerRate) throws MissingResourceException {
+		//Balwhdanwldalwjdaljwdliawjdliawjdlijawdlijlawjid		
+	}
+	
+	public void removeSensor(int sensorID) {
+		
+	}
 
 	/**
 	 * @return The sampling rate of the processor. 
@@ -169,9 +201,18 @@ public class SensorProcessor extends Service{
 		this.samplingRate = samplingRate;
 	}
 
+	
+	public class SpangSensorBinder extends Binder {
+		
+		public SpangSensorService getService()
+		{
+			return SpangSensorService.this;
+		}
+	
+	}
+	
 	@Override
 	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.binder;
 	}
 }
