@@ -140,7 +140,7 @@ namespace Spang_PC_C_sharp
                     try
                     {
                         //Sends a heartbeat
-                        item.Send(new byte[0], Protocol.Reliable);
+                        item.Send(new byte[0], Protocol.Unordered);
                     }
                     catch
                     {

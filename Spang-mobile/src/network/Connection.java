@@ -7,9 +7,14 @@ import java.net.InetSocketAddress;
 import java.net.PortUnreachableException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import network.exceptions.NetworkException;
 import network.exceptions.RemoteCrashException;
@@ -80,9 +85,7 @@ public class Connection implements IConnection {
 		this.protocols.put(Protocol.Ordered, new OrderedProtocol());
 		this.protocols.put(Protocol.Unordered, new UnorderedProtocol());
 		this.protocols.put(Protocol.Reliable, new ReliableProtocol());
-		
-		//TODO Implement Reliable Ordered Protocol.
-		this.protocols.put(Protocol.ReliableOrdered, new ReliableProtocol());
+		this.protocols.put(Protocol.ReliableOrdered, new OrderedReliableProtocol());
 	}
 
 	/**
@@ -385,7 +388,8 @@ public class Connection implements IConnection {
 	
 	private class ReliableProtocol extends ProtocolManager {
 		volatile int sendAccNum;
-		
+		volatile int lastRecivedMessageAck;
+		List<Integer> missingMessages = new CopyOnWriteArrayList<Integer>(); 
 		
 		@Override
 		protected int getHeaderLength() {
@@ -417,8 +421,35 @@ public class Connection implements IConnection {
 				return null;
 			} else {		
 				sendAckMessage(accnum);				
-				return unPacker.unpackByteArray(unPacker.remaining());
+				return processRecivedMessage(unPacker, accnum);
 			}
+		}
+
+		private byte[] processRecivedMessage(UnPacker unPacker, int accnum) {
+		    if (accnum > this.lastRecivedMessageAck)
+            {
+                addMissingMessages(accnum);
+                this.lastRecivedMessageAck = accnum;
+
+                return unPacker.unpackByteArray(unPacker.remaining());
+            }
+            else
+            {
+                if (this.missingMessages.contains(accnum))
+                {
+                    this.missingMessages.remove(accnum);
+                    return unPacker.unpackByteArray(unPacker.remaining());
+                }
+
+                return null;
+            }
+		}
+
+		private void addMissingMessages(int accnum) {
+            for (int i = this.lastRecivedMessageAck; i < this.lastRecivedMessageAck - accnum; i++)
+            {
+                this.missingMessages.add(i);
+            }
 		}
 
 		private void sendAckMessage(int accnum) {
@@ -428,4 +459,107 @@ public class Connection implements IConnection {
 			Connection.this.sendInternal(packer.getPackedData());
 		}
 	}
+	
+	private class OrderedReliableProtocol extends ProtocolManager {
+        volatile int sendAccNum;
+        volatile int lastOrderedMessage;
+        private SortedMap<Integer, byte[]> outOfOrderMessages = new ConcurrentSkipListMap<Integer, byte[]>();
+
+        protected int getHeaderLength()
+        {
+            return 5;
+        }
+
+        protected void fixMessage(Packer packer, byte[] message)
+        {
+
+			int toSendAccNum = this.sendAccNum++;
+			packer.packByte(Protocol.ReliableOrdered.getBit());
+			packer.packInt(toSendAccNum);
+			packer.packByteArray(message);
+			
+			MessageResendTimer timer = new MessageResendTimer();
+			timer.accnumber = toSendAccNum;
+			timer.message = packer.getPackedData();
+			timer.targetTime = System.nanoTime() + MessageResendTimer.TIMER_INTERVAL;		
+			
+			Connection.this.timer.addResender(timer);
+        }
+
+        protected byte[] processMessage(UnPacker unPacker)
+        {
+            int flags = unPacker.unpackByte();
+            int accnum = unPacker.unpackInt();
+
+            if ((flags & ACK_BIT) == ACK_BIT)
+            {
+				Connection.this.timer.removeResender(accnum);
+                return null;
+            }
+            else
+            {
+                sendAckMessage(accnum);
+                return processRecivedMessage(unPacker, accnum);
+            }
+        }
+
+        private byte[] processRecivedMessage(UnPacker unPacker, int accnum)
+        {
+            if (this.lastOrderedMessage + 1 == accnum)
+            {
+                this.lastOrderedMessage++;
+                if (this.outOfOrderMessages.isEmpty())
+                    return unPacker.unpackByteArray(unPacker.remaining());
+                
+                return this.buildOrderedMessages(unPacker);
+            }
+            else if (this.lastOrderedMessage >= accnum)
+            {
+                return null;
+            } 
+            else
+            {
+                if (!this.outOfOrderMessages.containsKey(accnum))
+                {
+                    this.outOfOrderMessages.put(accnum, unPacker.unpackByteArray(unPacker.remaining()));
+                }
+                return null;
+            }
+        }
+
+        private synchronized byte[] buildOrderedMessages(UnPacker unPacker)
+        {
+            List<Integer> keysToRemove = new ArrayList<Integer>();
+            Packer packer = new Packer(unPacker.remaining());
+            packer.packByteArray(unPacker.unpackByteArray(unPacker.remaining()));
+
+            for(Integer item : this.outOfOrderMessages.keySet())
+            {
+                if (this.lastOrderedMessage + 1 == item)
+                {
+                    keysToRemove.add(item);
+                    this.lastOrderedMessage++;
+                    packer.packByteArray(this.outOfOrderMessages.get(item));
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            for (Integer integer : keysToRemove) {
+            	this.outOfOrderMessages.remove(integer);
+			}    
+
+            return packer.getPackedData();
+        }
+
+
+		private void sendAckMessage(int accnum) {
+			Packer packer = new Packer(5);
+			packer.packByte((byte)(Protocol.Reliable.getBit() | ACK_BIT));
+			packer.packInt(accnum);
+			Connection.this.sendInternal(packer.getPackedData());
+		}
+    }
 }

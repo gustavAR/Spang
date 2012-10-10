@@ -51,11 +51,11 @@ namespace Spang_PC_C_sharp
             TouchDecoder decoder = new TouchDecoder();
 
             TouchEventManager em = new TouchEventManager();
-            em.Tap += () =>  Console.WriteLine("Just tapped"); 
+       /*     em.Tap += () =>  Console.WriteLine("Just tapped"); 
             em.MultiTap += (x) =>  Console.WriteLine("Just mulit Tapped Count:{0}", x); 
             em.Up += () => Console.WriteLine("Just Upped"); 
             em.Down += () =>  Console.WriteLine("Just Downed"); 
-            em.Move += (x,y) => Console.WriteLine("Just moved: X: {0} , Y: {1}", x, y);
+            em.Move += (x,y) => Console.WriteLine("Just moved: X: {0} , Y: {1}", x, y); */
 
             em.Tap += () => controller.LeftClick();
             em.Up += () => controller.mouseUp();
@@ -68,7 +68,7 @@ namespace Spang_PC_C_sharp
             em.Pinch += (x) =>
             {
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.CONTROL);
-                Console.WriteLine("Just pinched! VALUE:{0}", x);
+       //         Console.WriteLine("Just pinched! VALUE:{0}", x);
 
                 controller.VerticalScroll(x);
 
