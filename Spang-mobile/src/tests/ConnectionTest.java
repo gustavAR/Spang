@@ -23,7 +23,7 @@ public class ConnectionTest {
 	public void setup() {
 		this.mockedSocket = mock(DatagramSocket.class);
 		when(this.mockedSocket.isConnected()).thenReturn(true);
-		connection = new Connection(mockedSocket);
+		//connection = new Connection(mockedSocket);
 	}
 	
 	@After
@@ -34,7 +34,7 @@ public class ConnectionTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void throwsExceptionOnInvalidUDPConnection() {
 		DatagramSocket socket = mock(DatagramSocket.class);	
-		new Connection(socket);
+		//new Connection(socket);
 		
 		fail("Should throw exception on invalid udp socket!");
 	}
