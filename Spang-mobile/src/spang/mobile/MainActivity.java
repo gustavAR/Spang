@@ -27,8 +27,11 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		Intent intent = new Intent(MainActivity.this, NetworkService.class);
+		Intent intent = new Intent(this, NetworkService.class);
 		this.startService(intent);	
+		
+		Intent intent2 = new Intent(this, SensorProcessor.class);
+		this.startService(intent2);
 
 		Logger.setLogger(new LogCatLogger());
 	}
@@ -69,6 +72,9 @@ public class MainActivity extends Activity {
 
 		Intent intent = new Intent(this, NetworkService.class);
 		this.stopService(intent);
+		
+		Intent intent2 = new Intent(this, SensorProcessor.class);
+		this.stopService(intent2);
 	}
 
 

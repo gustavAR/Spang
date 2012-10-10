@@ -34,7 +34,7 @@ public class TouchView extends View {
 			packer.packByte((byte)(event.getPressure(i) * 256));	
 		}
 
-		service.sendDirect(packer.getPackedData(), Protocol.Reliable);
+		service.sendDirect(packer.getPackedData(), Protocol.Unordered);
 		packer.clear();
 		return true;
 	}

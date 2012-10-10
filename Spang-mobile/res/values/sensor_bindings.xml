@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="Touch" 			type="integer">0</item>
-    <item name="Text" 			type="integer">1</item>
-    <item name="Accelerometer" 	type="integer">2</item>
-    <item name="Gyroscope" 		type="integer">3</item>
-    <item name="Luminance" 		type="integer">4</item>
-    <item name="MagneticField" type="integer">5</item>
+    <item name="Touch" 				type="integer">0</item>
+    <item name="Text" 				type="integer">1</item>
+    <item name="Accelerometer" 		type="integer">2</item>
+    <item name="Gyroscope" 			type="integer">3</item>
+    <item name="Luminance" 			type="integer">4</item>
+    <item name="MagneticField"  	type="integer">5</item>
+    <item name="Proximity"			type="integer">6</item>
+    <item name="Humidity"  			type="integer">7</item>
+    <item name="AirPressure"  		type="integer">8</item>
+    <item name="Gravity"  			type="integer">9</item>
+    <item name="Orientation"  		type="integer">10</item>
+    
 </resources>

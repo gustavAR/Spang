@@ -28,9 +28,9 @@ public class PrefsActivity extends PreferenceActivity{
 
 	private PreferenceScreen getPref() {
 		PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(this);
-
+		
 		SensorManager manager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		List<ISensor> sensors = new SensorListBuilder(manager).build(); 			//Gets list of all available sensors
+		List<ISensor> sensors = new SensorListBuilder(manager, this.getResources()).build(); 			//Gets list of all available sensors
 
 		for (ISensor sensor : sensors) {
 			if(sensor != null){

@@ -11,7 +11,7 @@ import android.hardware.SensorEventListener;
  * @author Pontus Pall & Gustav Alm Rosenblad
  *
  */
-public interface ISensor extends SensorEventListener {
+public interface ISensor {
 	
 	/**
 	 * Method to start listening to the sensor. Should be called onResume.
@@ -37,28 +37,12 @@ public interface ISensor extends SensorEventListener {
 	 * @return the type of sensor defined by android. 
 	 */
 	public int getSensorID();
-
-	/**
-	 * Checks if the sensor is running.
-	 * @return true if sensor is running, false if not.
-	 */
-	public boolean isRunning();
 	
 	/**
 	 * @param the Packer with all sensor-input 
 	 * Puts the sensor-values in the Packer.
 	 */
 	public void encode(Packer packer);
-	
-	/**
-	 * @return the constant number of values returned by the sensor.
-	 */
-	public int getValuesLength();
-	
-	/**
-	 * @return the constant number of bytes needed to encode the values of the sensor. 
-	 */
-	public int getEncodedLength();
 	
 	/**
 	 * @return the name of the sensor in the device

@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import spang.mobile.R;
+
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
@@ -21,35 +24,40 @@ public class SensorListBuilder {
 
 	/**
 	 * For each new sensor, a binding must be created in the sensorBindings map. 
+	 * @param resources 
 	 * @param context
 	 */
-	public SensorListBuilder(SensorManager manager) {
+	public SensorListBuilder(SensorManager manager, Resources resources) {
 		this.manager = manager;
+		
 	
-		if(this.manager.getDefaultSensor(LinearAccelerationSensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(LinearAccelerationSensor.SENSOR_TYPE, new LinearAccelerationSensor(manager, (byte) 0x04));
+		if(this.manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!=null)
+			sensorBindings.put(Sensor.TYPE_ACCELEROMETER, new SpangSensor(manager, Sensor.TYPE_ACCELEROMETER, (byte) resources.getInteger(R.integer.Accelerometer)));
 		
-		if(this.manager.getDefaultSensor(LightSensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(LightSensor.SENSOR_TYPE, new LightSensor(manager, (byte) 0x05));
+		if(this.manager.getDefaultSensor(Sensor.TYPE_LIGHT)!=null)
+			sensorBindings.put(Sensor.TYPE_LIGHT, new SpangSensor(manager, Sensor.TYPE_LIGHT, (byte) resources.getInteger(R.integer.Luminance)));
 		
-		if(this.manager.getDefaultSensor(GyroscopeSensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(GyroscopeSensor.SENSOR_TYPE, new GyroscopeSensor(manager, (byte) 0x06));
+		if(this.manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)!=null)
+			sensorBindings.put(Sensor.TYPE_GYROSCOPE, new SpangSensor(manager, Sensor.TYPE_GYROSCOPE, (byte) resources.getInteger(R.integer.Gyroscope)));
 		
-		if(this.manager.getDefaultSensor(MagneticFieldSensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(MagneticFieldSensor.SENSOR_TYPE, new MagneticFieldSensor(manager, (byte) 0x07));
+		if(this.manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null)
+			sensorBindings.put(Sensor.TYPE_MAGNETIC_FIELD, new SpangSensor(manager, Sensor.TYPE_MAGNETIC_FIELD, (byte) resources.getInteger(R.integer.MagneticField)));
 		
-		if(this.manager.getDefaultSensor(ProximitySensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(ProximitySensor.SENSOR_TYPE, new ProximitySensor(manager, (byte) 0xa));
+		if(this.manager.getDefaultSensor(Sensor.TYPE_PROXIMITY)!=null)
+			sensorBindings.put(Sensor.TYPE_PROXIMITY, new SpangSensor(manager, Sensor.TYPE_PROXIMITY, (byte) resources.getInteger(R.integer.Proximity)));
 		
-		if(this.manager.getDefaultSensor(HumiditySensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(HumiditySensor.SENSOR_TYPE, new HumiditySensor(manager, (byte) 0x11));
+		if(this.manager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY)!=null)
+			sensorBindings.put(Sensor.TYPE_RELATIVE_HUMIDITY, new SpangSensor(manager, Sensor.TYPE_RELATIVE_HUMIDITY, (byte) resources.getInteger(R.integer.Humidity)));
 		
-		if(this.manager.getDefaultSensor(AirPressureSensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(AirPressureSensor.SENSOR_TYPE, new AirPressureSensor(manager, (byte) 0xe));
+		if(this.manager.getDefaultSensor(Sensor.TYPE_PRESSURE)!=null)
+			sensorBindings.put(Sensor.TYPE_PRESSURE, new SpangSensor(manager, Sensor.TYPE_PRESSURE, (byte) resources.getInteger(R.integer.AirPressure)));
 		
-		if(this.manager.getDefaultSensor(GravitySensor.SENSOR_TYPE)!=null)
-			sensorBindings.put(GravitySensor.SENSOR_TYPE, new GravitySensor(manager, (byte) 0x12));
+		if(this.manager.getDefaultSensor(Sensor.TYPE_GRAVITY)!=null)
+			sensorBindings.put(Sensor.TYPE_GRAVITY, new SpangSensor(manager, Sensor.TYPE_GRAVITY, (byte) resources.getInteger(R.integer.Gravity)));
 		
+		//Both Magnetic sensor and gravity sensor needed to calculate orientation
+		if(this.manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null && this.manager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null) 
+			sensorBindings.put(Sensor.TYPE_GRAVITY, new OrientationSensor(manager, (byte) resources.getInteger(R.integer.Orientation)));
 
 	}
 

@@ -1,64 +1,64 @@
 package sensors;
 
+import java.nio.ByteBuffer;
+
 import utils.Packer;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 /**
- * Class that contains the devices gravity sensor
+ * Class that contains a device sensor 
  * and simplifies usage of it.
- * @author Joakim Johansson
+ * @author Pontus Pall, Gustav Alm Rosenblad, Lukas Kurtyan & Joakim Johansson
  *
  */
-public class GravitySensor implements ISensor {
-	public static final int SENSOR_TYPE = Sensor.TYPE_GRAVITY;
-	public static final int VALUES_LENGTH = 3;
-	public static final int ENCODED_LENGTH = VALUES_LENGTH * 4 + 1;
+public class SpangSensor implements ISensor, SensorEventListener {
 
-	private float[] values = new float[3];
+	private float[] values;
 	private int accuracy;
-	private boolean isActive;
 	private byte encodeID;
 
 	private SensorManager sensorManager;
 	private Sensor sensor;
 
 	/**
-	 * Doesn't start listening to the sensor. Only gets the gravity sensor from the device.
-	 * If the device has no gravity sensor, a NoSensorException is thrown.
-	 * @param context
+	 * Doesn't start listening to the sensor. Only gets the sensor from the device.
+	 * If the device has no sensor of the specified type, a NoSensorException is thrown.
+	 * @param manager A SensorManager
+	 * @param sensorType Int value representing the type of the sensor
+	 * @param encodeID The id the sensor is encoded with for the network
 	 */
-	public GravitySensor(SensorManager manager, byte encodeID) {
+	public SpangSensor(SensorManager manager, int sensorType, byte encodeID) {
 		this.sensorManager = manager;
-		this.sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+		this.sensor = sensorManager.getDefaultSensor(sensorType);
 		this.encodeID = encodeID;
-
+		
 		if (this.sensor == null) {
-			throw new NoSensorException("Device has no gravity sensor");
+			throw new NoSensorException("Device has no MagneticField-sensor");
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
-	 */
+	 */	
 	public void start() {
 		sensorManager.registerListener(this, sensor,
 				SensorManager.SENSOR_DELAY_NORMAL);
-		this.isActive = true;
 	}
 
 	/**
 	 * {@inheritDoc}
-	 */
+	 */	
 	public void stop() {
 		sensorManager.unregisterListener(this);
-		this.isActive = false;
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * @return the Gravity sensor value. 
+	 * @return the sensor value. 
 	 * Return value occupies only 3 positions in the array.
 	 */
 	public float[] getValues() {
@@ -68,6 +68,7 @@ public class GravitySensor implements ISensor {
 	/**
 	 * {@inheritDoc}
 	 */
+	
 	public void onAccuracyChanged(Sensor unused, int newAccuracy) {
 		accuracy = newAccuracy;
 	}
@@ -75,6 +76,7 @@ public class GravitySensor implements ISensor {
 	/**
 	 * {@inheritDoc}
 	 */
+	
 	public void onSensorChanged(SensorEvent event) {
 		values = event.values.clone();
 	}
@@ -82,6 +84,7 @@ public class GravitySensor implements ISensor {
 	/**
 	 * {@inheritDoc}
 	 */
+	
 	public int getAccuracy() {
 		return this.accuracy;
 	}
@@ -89,36 +92,19 @@ public class GravitySensor implements ISensor {
 	/**
 	 * {@inheritDoc}
 	 */
+	
 	public int getSensorID() {
-		return SENSOR_TYPE;
+		return this.sensor.getType();
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public boolean isRunning() {
-		return isActive;
-	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	public void encode(Packer packer) {
+		if(this.values == null)
+			return;
+		packer.packByte(encodeID);
 		packer.packFloatArray(this.values);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public int getValuesLength() {
-		return VALUES_LENGTH;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public int getEncodedLength() {
-		return ENCODED_LENGTH;
 	}
 	
 	/**

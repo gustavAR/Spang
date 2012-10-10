@@ -109,10 +109,22 @@ namespace Spang_PC_C_sharp
                         TouchEvent e = decoder.DecodeTouch(unPacker);
                         stateMachine.Update(e);
                     }
-                    else if(id == 1)
+                    else if (id == 1)
                     {
                         String s = unPacker.UnpackString();
                         controller.NetworkedText(s);
+                    }
+                    else if(id == 9)
+                    {
+                        Console.WriteLine("Recived gravity data.");
+                        float[] values = unPacker.UnpackFloatArray(3);
+                        Console.WriteLine("{0}, {1}, {2}", values[0], values[1], values[2]);
+                    }
+                    else if (id == 10)
+                    {
+                        Console.WriteLine("Recived orientation data.");
+                        float[] values = unPacker.UnpackFloatArray(3);
+                        Console.WriteLine("{0}, {1}, {2}", values[0], values[1], values[2]);
                     }
                 }
             };

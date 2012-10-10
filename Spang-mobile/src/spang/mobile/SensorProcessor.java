@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.Resources;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -42,11 +44,25 @@ public class SensorProcessor extends Service{
 		this.manager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE); 
 
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		preferences.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
+			
+			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+					String key) {
+				onPreferenceChanged(sharedPreferences, key);
+				
+			}
+		});
 
-		SensorListBuilder builder = new SensorListBuilder(this.manager);
+		Resources resources = this.getResources();
+
+		SensorListBuilder builder = new SensorListBuilder(this.manager, resources);
 		this.sensors = builder.build();
 		this.encodedSensorInput = new Packer();
 
+	}
+	public void onPreferenceChanged(SharedPreferences sharedPreferences, String key){
+		this.stopProcess();
+		this.startProcess();
 	}
 
 	/**
@@ -92,11 +108,16 @@ public class SensorProcessor extends Service{
 		this.timer = new Timer();
 		for (final ISensor sensor : sensors) {
 			TimerTask task = new TimerTask() {
-
+				
 				@Override
 				public void run() {
-					if(isSensorActivated(sensor))
+					if(isSensorActivated(sensor)){
+						sensor.stop();
+						sensor.start();
 						processInput(sensor);
+					}
+					else
+						sensor.stop();
 				}
 			};
 			timer.scheduleAtFixedRate(task, 0, getSamplingRateBySensor(sensor));
@@ -110,7 +131,7 @@ public class SensorProcessor extends Service{
 	}
 
 	private int getSamplingRateBySensor(ISensor sensor){	
-		return this.preferences.getInt("sampleRate"+sensor.getName(), DEFAULT_SAMPLINGRATE);
+		return 1000 / (this.preferences.getInt("sampleRate"+sensor.getName(), DEFAULT_SAMPLINGRATE) + 1);
 	}
 
 	private boolean isSensorActivated(ISensor sensor){
@@ -118,56 +139,19 @@ public class SensorProcessor extends Service{
 	}
 
 	/**
-	 * Starts or stops a specific sensor.  
-	 * @param sensorID the sensor to be started/stopped.
-	 * @param value starts if true, stops if false.
-	 */
-	public void setActive(int sensorID, boolean value) {
-		for (ISensor sensor : sensors) {
-			if(sensor.getSensorID() == sensorID) {
-				if(value){
-					sensor.start();
-					return;
-				}
-				sensor.stop();
-				return;
-			}
-		}
-		this.encodedSensorInput = null;
-		this.encodedSensorInput = new Packer();
-	}
-
-	/**
 	 * Updates the value of getEncodedSensorInput() for the specified sensor
 	 * @param sensor 
 	 */
 	private void processInput(ISensor sensor) {
-		if(this.networkService == null)
+		if(this.networkService == null || !this.networkService.isConnected())
 			return;
 		fillOutput(sensor);
 		this.networkService.send(encodedSensorInput.getPackedData());
 		encodedSensorInput.clear();
 	}
 
-	private void fillOutput(ISensor sensor) {	
-		//	if(sensor.isRunning()) {
-
+	private void fillOutput(ISensor sensor) {	 
 		sensor.encode(this.encodedSensorInput);		
-		//	}
-	}
-
-	/**
-	 * @return the length of the output of all used sensors.
-	 */
-	private int getOutputLength() {
-		int totalEncodedLength = 0;
-
-		for (ISensor sensor : sensors) {
-			if(sensor.isRunning()) {
-				totalEncodedLength += sensor.getEncodedLength();
-			}
-		}
-		return totalEncodedLength;
 	}
 
 	/**
