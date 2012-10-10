@@ -134,11 +134,11 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	private String addModifierIDs(char character) {
 		String toSend = "";
 		if(this.shiftActive)//These values will probably not even be used in the final implementation
-			toSend += "\\shift";//TODO: Replace these ugly hardcoded values
+			toSend += "${s";//TODO: Replace these ugly hardcoded values
 		if(this.ctrlActive)
-			toSend += "\\ctrl";//TODO: Replace these ugly hardcoded values
+			toSend += "c";//TODO: Replace these ugly hardcoded values
 		if(this.altgrActive)
-			toSend += "\\altgr";//TODO: Replace these ugly hardcoded values
+			toSend += "a";//TODO: Replace these ugly hardcoded values
 		toSend += character;
 		return toSend;
 	}
