@@ -25,7 +25,7 @@ public class ComputerActivity extends NetworkedActivity {
 	@Override
 	protected void onNetworkServiceConnected() {				
 		//TODO remove testing code!.
-		TouchView view = new TouchView(this, this.getNetworkService());
+		SpangTouchView view = new SpangTouchView(this, this.getNetworkService());
 		setContentView(view);
 		view.setFocusableInTouchMode(true);
 		view.requestFocus();	
