@@ -126,6 +126,10 @@ namespace Spang_PC_C_sharp
                         float[] values = unPacker.UnpackFloatArray(3);
                         Console.WriteLine("{0}, {1}, {2}", values[0], values[1], values[2]);
                     }
+                    else
+                    {
+                        Console.WriteLine("ZZZZZZ: " + id);
+                    }
                 }
             };
             server.Dissconnected += (x, y) => Console.WriteLine("Oh no we dced ;(");

@@ -57,7 +57,7 @@ public class SensorListBuilder {
 		
 		//Both Magnetic sensor and gravity sensor needed to calculate orientation
 		if(this.manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null && this.manager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null) 
-			sensorBindings.put(Sensor.TYPE_GRAVITY, new OrientationSensor(manager, (byte) resources.getInteger(R.integer.Orientation)));
+			sensorBindings.put(Sensor.TYPE_ORIENTATION, new OrientationSensor(manager, (byte) resources.getInteger(R.integer.Orientation)));
 
 	}
 
