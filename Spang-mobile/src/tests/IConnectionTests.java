@@ -53,7 +53,7 @@ public class IConnectionTests {
 		connection.send(new byte[] { 1 }, Protocol.Unordered);
 		connection.send(new byte[] { 1 }, Protocol.Ordered);
 		connection.send(new byte[] { 1 }, Protocol.Reliable);
-		connection.send(new byte[] { 1 }, Protocol.ReliableOrdered);
+		connection.send(new byte[] { 1 }, Protocol.OrderedReliable);
 	}
 	
 	@Test

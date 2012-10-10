@@ -85,7 +85,7 @@ public class Connection implements IConnection {
 		this.protocols.put(Protocol.Ordered, new OrderedProtocol());
 		this.protocols.put(Protocol.Unordered, new UnorderedProtocol());
 		this.protocols.put(Protocol.Reliable, new ReliableProtocol());
-		this.protocols.put(Protocol.ReliableOrdered, new OrderedReliableProtocol());
+		this.protocols.put(Protocol.OrderedReliable, new OrderedReliableProtocol());
 	}
 
 	/**
@@ -474,7 +474,7 @@ public class Connection implements IConnection {
         {
 
 			int toSendAccNum = this.sendAccNum++;
-			packer.packByte(Protocol.ReliableOrdered.getBit());
+			packer.packByte(Protocol.OrderedReliable.getBit());
 			packer.packInt(toSendAccNum);
 			packer.packByteArray(message);
 			

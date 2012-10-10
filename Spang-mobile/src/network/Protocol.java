@@ -29,7 +29,7 @@ public enum Protocol {
 	 * NOTE: Only use if important this type of messages can be very slow and 
 	 * put high pressure on the network.
 	 */
-	ReliableOrdered((byte)0x08);
+	OrderedReliable((byte)0x08);
 	
 	
 	private final byte orderID;
