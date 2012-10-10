@@ -103,7 +103,7 @@ public class Connection implements IConnection {
 	}
 	
 	
-	private void sendInternal(byte[] toSend) {		
+	private void sendRaw(byte[] toSend) {		
 		//Create a new packet to send.
 		DatagramPacket packet = new DatagramPacket(toSend, toSend.length);		
 		try {
@@ -119,7 +119,7 @@ public class Connection implements IConnection {
 		Packer packer = new Packer(1);
 		packer.packByte((byte)(SHUTDOWN_BIT));	
 		//Send it.
-		this.sendInternal(packer.getPackedData());
+		this.sendRaw(packer.getPackedData());
 	}
 	
 	/**
@@ -278,7 +278,7 @@ public class Connection implements IConnection {
 		byte[] message;
 		
 		public void resend() {
-			Connection.this.sendInternal(message);
+			Connection.this.sendRaw(message);
 		}
 	}
 	
@@ -329,7 +329,7 @@ public class Connection implements IConnection {
 		private void sendMessage(byte[] message) {
 			Packer packer = new Packer(message.length + getHeaderLength());
 			fixMessage(packer, message);
-			Connection.this.sendInternal(packer.getPackedData());			
+			Connection.this.sendRaw(packer.getPackedData());			
 		}
 		
 		private byte[] processRecivedMessage(byte[] recivedMessage) {
@@ -456,7 +456,7 @@ public class Connection implements IConnection {
 			Packer packer = new Packer(5);
 			packer.packByte((byte)(Protocol.Reliable.getBit() | ACK_BIT));
 			packer.packInt(accnum);
-			Connection.this.sendInternal(packer.getPackedData());
+			Connection.this.sendRaw(packer.getPackedData());
 		}
 	}
 	
@@ -559,7 +559,7 @@ public class Connection implements IConnection {
 			Packer packer = new Packer(5);
 			packer.packByte((byte)(Protocol.Reliable.getBit() | ACK_BIT));
 			packer.packInt(accnum);
-			Connection.this.sendInternal(packer.getPackedData());
+			Connection.this.sendRaw(packer.getPackedData());
 		}
     }
 }
