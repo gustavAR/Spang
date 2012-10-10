@@ -12,7 +12,7 @@ namespace Spang_PC_C_sharp
 {
     class Connection : IConnection
     {
-        private const int ACK_BIT = 0x01;
+        private const int ACK_BIT = 0x10;
         private const int SHUTDOWN_BIT = 0x20;
 
         private readonly int port;
@@ -33,6 +33,7 @@ namespace Spang_PC_C_sharp
             this.protocols.Add(Protocol.Unordered, new UnorderedProtocol(this));
             this.protocols.Add(Protocol.Ordered, new OrderedProtocol(this));
             this.protocols.Add(Protocol.Reliable, new ReliableProtocol(this));
+            this.protocols.Add(Protocol.OrderedReliable, new OrderedReliableProtocol(this));
         }
 
         public void Send(byte[] data)
@@ -286,9 +287,9 @@ namespace Spang_PC_C_sharp
 
         private class ReliableProtocol : ProtocolManager
         {
-            private const int ACK_MESSAGE = 0x10;
             volatile int sendAccNum;
-
+            volatile int lastRecivedMessageAckNum;
+            private List<int> missingMessages = new List<int>();
 
             protected override int getHeaderLength()
             {
@@ -315,7 +316,8 @@ namespace Spang_PC_C_sharp
                 int flags = unPacker.UnpackByte();
                 int accnum = unPacker.UnpackInteger();
 
-                if ((flags & ACK_MESSAGE) == ACK_MESSAGE)
+
+                if ((flags & ACK_BIT) == ACK_BIT)
                 {
                     connection.reliableTimer.removeResender(accnum);
                     return null;
@@ -323,7 +325,37 @@ namespace Spang_PC_C_sharp
                 else
                 {
                     sendAckMessage(accnum);
+                    return processRecivedMessage(unPacker, accnum);
+                }
+            }
+
+            private byte[] processRecivedMessage(UnPacker unPacker, int accnum)
+            {
+                if (accnum > this.lastRecivedMessageAckNum)
+                {
+                    addMissingMessages(accnum);
+                    this.lastRecivedMessageAckNum = accnum;
+
                     return unPacker.UnpackByteArray(unPacker.remaining());
+                }
+                else
+                {
+                    if (this.missingMessages.Contains(accnum))
+                    {
+                        this.missingMessages.Remove(accnum);
+                        return unPacker.UnpackByteArray(unPacker.remaining());
+                    }
+
+                    return null;
+                }
+            }
+
+            private void addMissingMessages(int accnum)
+            {
+                for (int i = this.lastRecivedMessageAckNum; i < this.lastRecivedMessageAckNum - accnum; i++)
+                {
+                    Console.WriteLine("Adding missing messages!");
+                    this.missingMessages.Add(i);
                 }
             }
 
@@ -337,5 +369,111 @@ namespace Spang_PC_C_sharp
 
             public ReliableProtocol(Connection connection) : base(connection) { }
         }
+
+        private class OrderedReliableProtocol : ProtocolManager
+        {
+            volatile int sendAccNum;
+            volatile int lastOrderedMessage = -1;
+            private SortedList<int, byte[]> outOfOrderMessages = new SortedList<int, byte[]>();
+
+            protected override int getHeaderLength()
+            {
+                return 5;
+            }
+
+            protected override void fixMessage(Packer packer, byte[] message)
+            {
+                int toSendAccNum = this.sendAccNum++;
+                packer.Pack((byte)Protocol.Reliable);
+                packer.Pack(toSendAccNum);
+                packer.Pack(message);
+
+                MessageResendTimer timer = new MessageResendTimer();
+                timer.accnumber = toSendAccNum;
+                timer.message = packer.GetPackedData();
+                timer.stopWatch.Start();
+
+                connection.reliableTimer.addResender(timer);
+            }
+
+            protected override byte[] processMessage(UnPacker unPacker)
+            {
+                int flags = unPacker.UnpackByte();
+                int accnum = unPacker.UnpackInteger();
+
+                if ((flags & ACK_BIT) == ACK_BIT)
+                {
+                    connection.reliableTimer.removeResender(accnum);
+                    return null;
+                }
+                else
+                {
+                    sendAckMessage(accnum);
+                    return processRecivedMessage(unPacker, accnum);
+                }
+            }
+
+            private byte[] processRecivedMessage(UnPacker unPacker, int accnum)
+            {
+                if (this.lastOrderedMessage + 1 == accnum)
+                {
+                    this.lastOrderedMessage++;
+                    if (this.outOfOrderMessages.Count == 0)
+                        return unPacker.UnpackByteArray(unPacker.remaining());
+                    
+                    return this.buildOrderedMessages(unPacker);
+                }
+                else if (this.lastOrderedMessage >= accnum)
+                {
+                    return null;
+                } 
+                else
+                {
+                    if (!this.outOfOrderMessages.ContainsKey(accnum))
+                    {
+                        Console.WriteLine("Message out of order! {0}", accnum);
+                        this.outOfOrderMessages.Add(accnum, unPacker.UnpackByteArray(unPacker.remaining()));
+                    }
+                    return null;
+                }
+            }
+
+            private byte[] buildOrderedMessages(UnPacker unPacker)
+            {
+                List<int> keysToRemove = new List<int>();
+                Packer packer = new Packer(unPacker.remaining());
+                packer.Pack(unPacker.UnpackByteArray(unPacker.remaining()));
+  
+                foreach (var item in this.outOfOrderMessages.Keys)
+                {
+                    if (this.lastOrderedMessage + 1 == item)
+                    {
+                        keysToRemove.Add(item);
+                        this.lastOrderedMessage++;
+                        packer.Pack(this.outOfOrderMessages[item]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                keysToRemove.ForEach((x) => this.outOfOrderMessages.Remove(x));
+
+                return packer.GetPackedData();
+            }
+
+            private void sendAckMessage(int accnum)
+            {
+                Packer packer = new Packer(5);
+                packer.Pack((byte)(((int)Protocol.OrderedReliable) | ACK_BIT));
+                packer.Pack(accnum);
+                this.connection.SendInternal(packer.GetPackedData());
+            }
+
+            
+            public OrderedReliableProtocol(Connection connection) : base(connection) { }
+        }
+
     }
 }

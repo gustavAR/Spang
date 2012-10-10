@@ -4,7 +4,7 @@ package events;
 /**
  *  A class that makes event-handling of Action1 simpler.
  *  This class is thread safe.
- * @author Lukas
+ * @author Lukas Kurtyan
  * @param <T> the type of argument the listener uses.
  */
 public class Action1Delegate<T> extends Delegate<Action1<T>>{

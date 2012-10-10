@@ -9,20 +9,18 @@ namespace Spang_PC_C_sharp.Touch_Manager
     {
         public TouchEvent DecodeTouch(UnPacker unpacker)
         {
-            TouchEvent e = new TouchEvent();
-            e.Pointers = new List<Vector3>();
-
             int length = unpacker.UnpackByte();
+            Touch[] touches = new Touch[length];                        
             for (int i = 0; i < length; i++)
             {
-                Vector3 state = new Vector3();
-                state.X = unpacker.UnpackShort();
-                state.Y = unpacker.UnpackShort();
-                state.Z = unpacker.UnpackByte();
-                e.Pointers.Add(state);
+                Touch touch;
+                touch.Location.X = unpacker.UnpackShort();
+                touch.Location.Y = unpacker.UnpackShort();
+                touch.Pressure = unpacker.UnpackByte() / 256.0f;
+                touches[i] = touch;
             }
 
-            return e;
+            return new TouchEvent(touches);
         }
 
     }

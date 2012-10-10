@@ -5,10 +5,9 @@ using System.Text;
 
 namespace Spang_PC_C_sharp
 {
-    class TouchEvent
+    struct Touch
     {
-        public List<Vector3> Pointers { get; set; }
-
-        public static TouchEvent Empty { get; set; }
+        public Vector2 Location;
+        public float Pressure;
     }
 }
