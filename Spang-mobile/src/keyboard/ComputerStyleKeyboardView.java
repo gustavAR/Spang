@@ -1,5 +1,7 @@
 package keyboard;
 
+import java.util.ResourceBundle.Control;
+
 import spang.mobile.NetworkService;
 import spang.mobile.R;
 import utils.Packer;
@@ -121,8 +123,9 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 			this.altgrActive = !this.altgrActive;
 			return;
 		default://Was an F-key pressed?
-			if(-22<primaryCode && primaryCode<-11)//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
-				sendKeyPress("${" + (-primaryCode-10) + "}");//Is there any way we could avoid having the keyboard knowing the keycodelayout?
+			if(ComputerStyleKeyboard.F12_KEYCODE<primaryCode && primaryCode<ComputerStyleKeyboard.F1_KEYCODE)//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
+				sendKeyPress(R.string.keyboardinputmessage_begin + "F" + (-primaryCode-10) + 
+							 R.string.keyboardinputmessage_end);//Is there any way we could avoid having the keyboard knowing the keycodelayout?
 		}
 	}
 
@@ -138,21 +141,35 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 		Log.i("Sent: ", character);
 	}
 
+	/**
+	 * Resets all modifiers.
+	 */
 	private void resetModifiers() {
 		this.shiftActive = false;
 		this.altgrActive = false;
 		this.ctrlActive = false;
 	}
 
-	private String addModifierIDs(String character) {
+	/**
+	 * This returns the the proper modifiers attached to the input string.
+	 * The modifiers describe what kind of modifiers were during input.
+	 * @param textInput The keypress.
+	 * @return
+	 */
+	private String addModifierIDs(String textInput) {
 		String toSend = "";
-		if(this.shiftActive)//These values will probably not even be used in the final implementation
-			toSend += "${s";//TODO: Replace these ugly hardcoded values
+		if(!(this.altgrActive || this.ctrlActive || this.shiftActive))
+			return textInput;
+		toSend += R.string.keyboardinputmessage_begin;
+		if(this.shiftActive)
+			toSend += R.string.keyboardinputmessage_shift;
 		if(this.ctrlActive)
-			toSend += "c";//TODO: Replace these ugly hardcoded values
+			toSend += R.string.keyboardinputmessage_ctrl;
 		if(this.altgrActive)
-			toSend += "a";//TODO: Replace these ugly hardcoded values
-		toSend += character;
+			toSend += R.string.keyboardinputmessage_altgr;
+		toSend += R.string.keyboardinputmessage_end;
+		
+		toSend += textInput;
 		return toSend;
 	}
 

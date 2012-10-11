@@ -9,39 +9,6 @@ package spang.mobile;
 
 public final class R {
     public static final class attr {
-        /** <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
-"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-         */
-        public static final int exampleColor=0x7f010002;
-        /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
-Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
-in (inches), mm (millimeters).
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-         */
-        public static final int exampleDimension=0x7f010001;
-        /** <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
-or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
-<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
-"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
-         */
-        public static final int exampleDrawable=0x7f010003;
-        /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-         */
-        public static final int exampleString=0x7f010000;
     }
     public static final class drawable {
         public static final int ic_action_search=0x7f020000;
@@ -84,9 +51,6 @@ containing a value of this type.
         public static final int activity_networked=0x7f030004;
         public static final int activity_text_sender=0x7f030005;
         public static final int input=0x7f030006;
-        public static final int sample_ctrl_keyboard_view=0x7f030007;
-        public static final int sample_custom_keyboard_view=0x7f030008;
-        public static final int sample_network_view=0x7f030009;
     }
     public static final class menu {
         public static final int activity_computer=0x7f080000;
@@ -103,6 +67,11 @@ containing a value of this type.
         public static final int default_ip=0x7f060007;
         public static final int default_port=0x7f060008;
         public static final int hello_world=0x7f060001;
+        public static final int keyboardinputmessage_altgr=0x7f060012;
+        public static final int keyboardinputmessage_begin=0x7f06000f;
+        public static final int keyboardinputmessage_ctrl=0x7f060013;
+        public static final int keyboardinputmessage_end=0x7f060010;
+        public static final int keyboardinputmessage_shift=0x7f060011;
         public static final int menu_settings=0x7f060002;
         public static final int network_service_started=0x7f06000a;
         public static final int title_activity_computer=0x7f06000d;
@@ -124,87 +93,4 @@ containing a value of this type.
         public static final int unicodeqwerty=0x7f040003;
         public static final int unicodeshifted=0x7f040004;
     }
-    public static final class styleable {
-        /** Attributes that can be used with a CtrlKeyboardView.
-           <p>Includes the following attributes:</p>
-           <table>
-           <colgroup align="left" />
-           <colgroup align="left" />
-           <tr><th>Attribute</th><th>Description</th></tr>
-           <tr><td><code>{@link #CtrlKeyboardView_exampleColor spang.mobile:exampleColor}</code></td><td></td></tr>
-           <tr><td><code>{@link #CtrlKeyboardView_exampleDimension spang.mobile:exampleDimension}</code></td><td></td></tr>
-           <tr><td><code>{@link #CtrlKeyboardView_exampleDrawable spang.mobile:exampleDrawable}</code></td><td></td></tr>
-           <tr><td><code>{@link #CtrlKeyboardView_exampleString spang.mobile:exampleString}</code></td><td></td></tr>
-           </table>
-           @see #CtrlKeyboardView_exampleColor
-           @see #CtrlKeyboardView_exampleDimension
-           @see #CtrlKeyboardView_exampleDrawable
-           @see #CtrlKeyboardView_exampleString
-         */
-        public static final int[] CtrlKeyboardView = {
-            0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003
-        };
-        /**
-          <p>This symbol is the offset where the {@link spang.mobile.R.attr#exampleColor}
-          attribute's value can be found in the {@link #CtrlKeyboardView} array.
-
-
-          <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
-"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-          @attr name android:exampleColor
-        */
-        public static final int CtrlKeyboardView_exampleColor = 2;
-        /**
-          <p>This symbol is the offset where the {@link spang.mobile.R.attr#exampleDimension}
-          attribute's value can be found in the {@link #CtrlKeyboardView} array.
-
-
-          <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
-Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
-in (inches), mm (millimeters).
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-          @attr name android:exampleDimension
-        */
-        public static final int CtrlKeyboardView_exampleDimension = 1;
-        /**
-          <p>This symbol is the offset where the {@link spang.mobile.R.attr#exampleDrawable}
-          attribute's value can be found in the {@link #CtrlKeyboardView} array.
-
-
-          <p>May be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
-or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
-<p>May be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
-"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
-          @attr name android:exampleDrawable
-        */
-        public static final int CtrlKeyboardView_exampleDrawable = 3;
-        /**
-          <p>This symbol is the offset where the {@link spang.mobile.R.attr#exampleString}
-          attribute's value can be found in the {@link #CtrlKeyboardView} array.
-
-
-          <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-          @attr name android:exampleString
-        */
-        public static final int CtrlKeyboardView_exampleString = 0;
-        /** Attributes that can be used with a CustomKeyboardView.
-         */
-        public static final int[] CustomKeyboardView = {
-            
-        };
-    };
 }
