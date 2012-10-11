@@ -67,13 +67,15 @@ public final class R {
         public static final int default_ip=0x7f060007;
         public static final int default_port=0x7f060008;
         public static final int hello_world=0x7f060001;
-        public static final int keyboardinputmessage_altgr=0x7f060012;
+        public static final int keyboardinputmessage_altgr=0x7f060013;
         public static final int keyboardinputmessage_begin=0x7f06000f;
-        public static final int keyboardinputmessage_ctrl=0x7f060013;
+        public static final int keyboardinputmessage_ctrl=0x7f060012;
         public static final int keyboardinputmessage_end=0x7f060010;
         public static final int keyboardinputmessage_shift=0x7f060011;
         public static final int menu_settings=0x7f060002;
         public static final int network_service_started=0x7f06000a;
+        public static final int scan_qrc_text=0x7f060014;
+        public static final int show_keyboard_text=0x7f060015;
         public static final int title_activity_computer=0x7f06000d;
         public static final int title_activity_connection=0x7f06000e;
         public static final int title_activity_keyboardtest=0x7f06000c;

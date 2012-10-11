@@ -21,5 +21,8 @@
     <string name="keyboardinputmessage_shift">s</string>
     <string name="keyboardinputmessage_ctrl">c</string>
     <string name="keyboardinputmessage_altgr">a</string>
+    
+    <string name="scan_qrc_text">Scan QRC</string>
+    <string name="show_keyboard_text">Show keyboard</string>
 
 </resources>
