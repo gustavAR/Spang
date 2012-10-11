@@ -28,7 +28,7 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 * the one we show.
 	 */
 	private ControlKeyboard ctrlKeyboard;
-	
+
 	private NetworkService network;
 	private Packer packer;
 
@@ -96,33 +96,46 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 * Called when a key is pressed.
 	 */
 	public void onKey(int primaryCode, int[] keyCodes) {
-		switch (primaryCode){
-		case ControlKeyboard.SHIFT_KEYCODE:
-			this.shiftActive = !this.shiftActive;
-			break;
-		case ControlKeyboard.CTRL_KEYCODE:
-			this.ctrlActive = !this.ctrlActive;
-			break;
-		case ControlKeyboard.HIDE_KEYBOARD_KEYCODE:
-			goBackToMain();
-			break;
-		case ControlKeyboard.ALTGR_KEYCODE:
-			this.altgrActive = !this.altgrActive;
-			break;
-		default:
+		if(isFunctionKeycode(primaryCode)){
+			handleFunctionPress(primaryCode);
+		}else{
 			char character = (char)primaryCode;
-			sendChar(character);
+			sendKeyPress("" + character);
 			resetModifiers();
-			Log.i("CHAR", "" + (char)primaryCode);
-			}
+		}
 		this.updateKeyboardState();
 	}
 
-	private void sendChar(char character) {
+	private void handleFunctionPress(int primaryCode) {
+		switch (primaryCode){
+		case ControlKeyboard.SHIFT_KEYCODE:
+			this.shiftActive = !this.shiftActive;
+			return;
+		case ControlKeyboard.CTRL_KEYCODE:
+			this.ctrlActive = !this.ctrlActive;
+			return;
+		case ControlKeyboard.HIDE_KEYBOARD_KEYCODE:
+			goBackToMain();
+			return;
+		case ControlKeyboard.ALTGR_KEYCODE:
+			this.altgrActive = !this.altgrActive;
+			return;
+		default://Was an F-key pressed?
+			if(-22<primaryCode && primaryCode<-11)//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
+				sendKeyPress("${" + (-primaryCode-10) + "}");//Is there any way we could avoid having the keyboard knowing the keycodelayout?
+		}
+	}
+
+	private boolean isFunctionKeycode(int primaryCode) {
+		return primaryCode<0;
+	}
+
+	private void sendKeyPress(String character) {
 		this.packer.packByte((byte)this.getContext().getResources().getInteger(R.integer.Text));
 		this.packer.packString(addModifierIDs(character));
 		this.network.send(this.packer.getPackedData());
 		this.packer.clear();
+		Log.i("Sent: ", character);
 	}
 
 	private void resetModifiers() {
@@ -131,7 +144,7 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 		this.ctrlActive = false;
 	}
 
-	private String addModifierIDs(char character) {
+	private String addModifierIDs(String character) {
 		String toSend = "";
 		if(this.shiftActive)//These values will probably not even be used in the final implementation
 			toSend += "${s";//TODO: Replace these ugly hardcoded values
@@ -152,22 +165,22 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 * since everything is handled in onKey
 	 */
 	public void onPress(int primaryCode) {
-		
+
 	}
-	
+
 	/**
 	 * We don't need to do anything here,
 	 * since everything is handled in onKey
 	 */
 	public void onRelease(int primaryCode) {
-		
+
 	}
-	
+
 	/**
 	 * We don't need to do anything here,
 	 * since everything is handled in onKey
 	 */
 	public void onText(CharSequence text) {
-		
+
 	}
 }
