@@ -7,10 +7,13 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Drawing;
-using Spang_PC_C_sharp.Touch_Manager;
+using Spang.Core.Utils;
+using Spang.Core.Network;
 
 using System.Drawing.Imaging;
 using WindowsInput;
+using Spang.Core.Decoding;
+using Spang.Core.Android;
 
 namespace Spang_PC_C_sharp
 {
@@ -40,7 +43,7 @@ namespace Spang_PC_C_sharp
             #endregion
 
             IMessageDecoder messageHandler = new MessageDecoder();
-            Phone phone = new Phone(messageHandler);
+            AndroidPhone phone = new AndroidPhone(messageHandler);
             DesktopController controller = new DesktopController(phone, new OsInterface());
 
             IServer server = new Server();
@@ -138,26 +141,6 @@ namespace Spang_PC_C_sharp
         private static int moveSpeed(int p)
         {
             return p * ((int)Math.Sqrt(Math.Abs(p))) / 2;
-        }
-
-        private static IClient OpenClient(int id)
-        {
-            IClient client = new Client();
-            client.ConnectionTimeout = 1;
-
-            client.Connected += (x, y) => Console.WriteLine("Client connected! " + id);
-            client.Dissconnected += (x, y) => Console.WriteLine("Client Dced" + id);
-            client.Recived += (x, y) =>
-            {
-                if (y[0] == 0)
-                    Console.WriteLine("Got a heartbeat " + id);
-                else
-                    Console.WriteLine(":O jsut got udp message");
-            };
-
-            client.Connect(1337, "192.168.0.12");
-
-            return client;
         }
     }
 }
