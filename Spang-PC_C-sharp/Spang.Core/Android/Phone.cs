@@ -9,18 +9,38 @@ namespace Spang.Core.Android
 {
     public class AndroidPhone : Spang.Core.Android.IPhone 
     {
-        private readonly IMessageDecoder messageDecoder;
+        private readonly TouchEventManager touchEventManager;
 
-        public AndroidPhone(IMessageDecoder messageDecoder)
+        public AndroidPhone()
         {
-            this.messageDecoder = messageDecoder;
-            this.messageDecoder.Phone = this;
+            this.touchEventManager = new TouchEventManager();
+            this.touchEventManager.Tap += this.OnTap;
+            this.touchEventManager.LongTap += this.OnLongTap;
+            this.touchEventManager.Move += this.OnMove;
+            this.touchEventManager.Down += this.OnDown;
+            this.touchEventManager.Up += this.OnUp;
+            this.touchEventManager.MultiTap += this.OnMultiTap;
+            this.touchEventManager.MulitiMove += this.OnMultiMove;
+       }
+
+        #region Volume
+
+        public event Action VolumeDown;
+        internal void OnVolumeDown()
+        {
+            if (this.VolumeDown != null)
+                this.VolumeDown();
+        }
+        
+
+        public event Action VolumeUp;
+        internal void OnVolumeUp()
+        {
+            if (this.VolumeUp != null)
+                this.VolumeUp();
         }
 
-        public void ProcessMessage(byte[] data)
-        {
-            this.messageDecoder.DecodeMessage(data);
-        }
+        #endregion
 
 
         #region Accelerometer
@@ -45,67 +65,6 @@ namespace Spang.Core.Android
         {
             if (this.AccelerometerChanged != null)
                 this.AccelerometerChanged(old, current);
-        }
-
-        #endregion
-
-        #region Phone Events 
-
-        public event Action Tapped;
-        internal void OnTap()
-        {
-            if (this.Tapped != null)
-                this.Tapped();
-        }
-
-        public event Action LongTapped;
-        internal void OnLongTap()
-        {
-            if (this.LongTapped != null)
-                this.LongTapped();
-        }
-
-        public event Action<int,int> TouchMoved;
-        internal void OnTouchMove(int dx, int dy)
-        {
-            if (this.TouchMoved != null)
-                this.TouchMoved(dx, dy);
-        }
-
-        public event Action VolumeUp;
-        internal void OnVolumeUp()
-        {
-            if (this.VolumeUp != null)
-                this.VolumeUp();
-        }
-
-        public event Action VolumeDown;
-        internal void OnVolumeDown()
-        {
-            if (this.VolumeDown != null)
-                this.VolumeDown();
-        }
-
-        public event Action<String> NetworkedText;
-        internal void OnNetworkedText(string text)
-        {
-            if (this.NetworkedText != null)
-                this.NetworkedText(text);
-        }
-
-        public event Action<int> VerticalScroll;
-        internal void OnVerticalScroll(int delta)
-        {
-            if (this.VerticalScroll != null)
-                this.VerticalScroll(delta);
-        }
-
-
-        public event Action<int> Horizontalscroll;
-        internal void OnHorizontalScroll(int delta)
-        {
-            if (this.Horizontalscroll != null)
-                this.Horizontalscroll(delta);
         }
 
         #endregion
@@ -338,6 +297,92 @@ namespace Spang.Core.Android
         {
             if (this.GravityChanged != null)
                 this.GravityChanged(old, current);
+        }
+
+        #endregion
+
+        public void ProcessMessage(UnPacker unpacker)
+        {
+            TouchDecoder decoder = new TouchDecoder();
+            TouchEvent te = decoder.DecodeTouch(unpacker);
+            this.OnTouch(te);
+        }
+
+        #region Touch
+
+        List<Touch> touches;
+        public List<Touch> Touches
+        {
+            get { return this.touches; }
+        }
+
+        public event Action<TouchEvent> Touch;
+        private void OnTouch(TouchEvent touchEvent)
+        {
+            this.touches = touchEvent.Touches;
+
+
+            if (this.Touch != null)
+                this.Touch(touchEvent);
+
+            this.touchEventManager.ProcessEvent(touchEvent);
+        }
+
+        public event Action Tap;
+        internal void OnTap()
+        {
+            if (this.Tap != null)
+                this.Tap();
+        }
+
+        
+        public event Action LongTap;
+        internal void OnLongTap()
+        {
+            if (this.LongTap != null)
+                this.LongTap();
+        }
+
+        public event Action Down;
+        internal void OnDown()
+        {
+            if (this.Down != null)
+                this.Down();
+        }
+
+        public event Action Up;
+        internal void OnUp()
+        {
+            if (this.Up != null)
+                this.Up();
+        }
+
+        public event Action<int, int> Move;
+        internal void OnMove(int dx, int dy)
+        {
+            if (this.Move != null)
+                this.Move(dx, dy);
+        }
+
+        public event Action<int> MultiTap;
+        internal void OnMultiTap(int count)
+        {
+            if (this.MultiTap != null)
+                this.MultiTap(count);
+        }
+
+        public event Action<int, int, int> MulitiMove;
+        internal void OnMultiMove(int count, int dx, int dy)
+        {
+            if (this.MulitiMove != null)
+                this.MulitiMove(count, dx, dy);
+        }
+
+        public event Action<int> Pinch;
+        internal void OnPinch(int pinch)
+        {
+            if (this.Pinch != null)
+                this.Pinch(pinch);
         }
 
         #endregion

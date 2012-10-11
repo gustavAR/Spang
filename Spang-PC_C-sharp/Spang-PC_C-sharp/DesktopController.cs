@@ -22,14 +22,8 @@ namespace Spang_PC_C_sharp
 
         private void RegisterEvents()
         {
-            phone.Tapped += LeftClick;
-            phone.LongTapped += RightClick;
-            phone.TouchMoved += MoveMouse;
             phone.VolumeUp += IncreaseVolume;
             phone.VolumeDown += DecreaseVolume;
-            phone.VerticalScroll += VerticalScroll;
-            phone.Horizontalscroll += HorizontalScroll;
-            phone.NetworkedText += NetworkedText;
         }
 
         public void LeftClick()
