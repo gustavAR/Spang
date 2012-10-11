@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
-namespace Spang.Core.Touch
+namespace Spang.Core.Android
 {
     class MarkingState : TouchState
     {

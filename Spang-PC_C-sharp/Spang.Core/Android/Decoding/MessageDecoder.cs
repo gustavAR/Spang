@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using Spang.Core.Android;
+using Spang.Core.Utils;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Decoding
 {
-    class MessageDecoder : IMessageDecoder
+    public class MessageDecoder : IMessageDecoder
     {
         private IDictionary<byte, Action<BinaryReader>> handlers;
-        private Phone phone;
-        public Phone Phone
+        private AndroidPhone phone;
+        public IPhone Phone
         {
-            set { this.phone = value; }
+            set { this.phone = (AndroidPhone)value; }
         }
 
         public MessageDecoder()

@@ -88,7 +88,7 @@ namespace Spang.Core.Network
         void SendToAll(byte[] toSend, Protocol protocol);
     }
 
-    class Server : IServer
+    public class Server : IServer
     {
         #region Connection Reciver class
         

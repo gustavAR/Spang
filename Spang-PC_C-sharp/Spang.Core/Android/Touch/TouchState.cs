@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Spang.Core.Touch
+namespace Spang.Core.Android
 {
     abstract class TouchState
     {

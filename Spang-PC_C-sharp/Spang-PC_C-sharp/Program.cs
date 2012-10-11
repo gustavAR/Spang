@@ -7,12 +7,13 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Drawing;
-using Spang.Core.Touch;
 using Spang.Core.Utils;
 using Spang.Core.Network;
 
 using System.Drawing.Imaging;
 using WindowsInput;
+using Spang.Core.Decoding;
+using Spang.Core.Android;
 
 namespace Spang_PC_C_sharp
 {
@@ -42,7 +43,7 @@ namespace Spang_PC_C_sharp
             #endregion
 
             IMessageDecoder messageHandler = new MessageDecoder();
-            Phone phone = new Phone(messageHandler);
+            AndroidPhone phone = new AndroidPhone(messageHandler);
             DesktopController controller = new DesktopController(phone, new OsInterface());
 
             IServer server = new Server();

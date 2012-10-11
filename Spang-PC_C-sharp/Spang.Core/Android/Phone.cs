@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Spang.Core.Decoding;
+using Spang.Core.Utils;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Android
 {
-    class Phone
+    public class AndroidPhone : Spang.Core.Android.IPhone 
     {
         private readonly IMessageDecoder messageDecoder;
 
-        public Phone(IMessageDecoder messageDecoder)
+        public AndroidPhone(IMessageDecoder messageDecoder)
         {
             this.messageDecoder = messageDecoder;
             this.messageDecoder.Phone = this;
