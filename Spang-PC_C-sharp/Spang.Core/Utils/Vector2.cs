@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Utils
 {
-    struct Vector2
+    public struct Vector2
     {
         public float X;
         public float Y;

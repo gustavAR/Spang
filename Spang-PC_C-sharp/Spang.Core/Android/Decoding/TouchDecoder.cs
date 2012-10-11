@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Spang.Core.Utils;
+using Spang.Core.Android;
 
-namespace Spang.Core.Touch
+namespace Spang.Core.Decoding
 {
-    class TouchDecoder
+    public class TouchDecoder
     {
         public TouchEvent DecodeTouch(UnPacker unpacker)
         {

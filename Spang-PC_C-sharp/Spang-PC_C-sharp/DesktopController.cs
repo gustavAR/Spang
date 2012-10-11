@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
+using Spang.Core.Android;
 
 namespace Spang_PC_C_sharp
 {
     class DesktopController
     {
-        private readonly Phone phone;
+        private readonly IPhone phone;
         private readonly OsInterface os;
 
-        public DesktopController(Phone phone, OsInterface os)
+        public DesktopController(IPhone phone, OsInterface os)
         {
             this.phone = phone;
             this.os = os;

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Spang_PC_C_sharp.Touch_Manager;
 using System.Timers;
 using System.Diagnostics;
+using Spang.Core.Utils;
 
-namespace Spang.Core.Touch
+namespace Spang.Core.Android
 {
     class DownState : TouchState
     {

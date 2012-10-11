@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Spang.Core.Touch
+namespace Spang.Core.Android
 {
-    class TouchEventManager
+    public class TouchEventManager
     {
         public event Action Tap;
         public event Action LongTap;

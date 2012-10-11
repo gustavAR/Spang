@@ -7,6 +7,7 @@ using System.Net;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Diagnostics;
+using Spang.Core.Utils;
 
 namespace Spang.Core.Network
 {

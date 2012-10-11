@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 
-namespace Spang.Core.Touch
+namespace Spang.Core.Android
 {
     class JustTappedState : TouchState
     {

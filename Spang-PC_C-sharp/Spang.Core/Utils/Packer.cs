@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Spang.Core.Utils
 {
-    class Packer
+    public class Packer
     {
         private const int DEFAULT_CAPACITY = 4;
 

@@ -5,7 +5,21 @@ using System.Text;
 
 namespace Spang.Core.Network
 {
-    class EventArgs
+    public class ConnectionEventArgs
     {
+        public readonly int ID;
+        public ConnectionEventArgs(int id) { this.ID = id; }
+    }
+
+    public class RecivedEventArgs : ConnectionEventArgs
+    {
+        public readonly byte[] Data;
+        public RecivedEventArgs(int id, byte[] Data) : base(id) { this.Data = Data; }
+    }
+
+    public class DisconnectionEventArgs : ConnectionEventArgs
+    {
+        public readonly DisconnectCause Cause;
+        public DisconnectionEventArgs(int id, DisconnectCause Cause) : base(id) { this.Cause = Cause; }
     }
 }

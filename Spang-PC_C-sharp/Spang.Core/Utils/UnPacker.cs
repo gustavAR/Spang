@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Spang.Core.Utils
 {
-    class UnPacker
+    public class UnPacker
     {
         MemoryStream data;
         BinaryReader reader;

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Spang_PC_C_sharp.TouchManager.States;
 
-namespace Spang.Core.Touch
+namespace Spang.Core.Android
 {
-    class TouchStateMachine
+    public class TouchStateMachine
     {
         private TouchState state;
 
@@ -15,7 +14,7 @@ namespace Spang.Core.Touch
             this.state = new NullState(this, eventManager);
         }
 
-        public void ChangeState(TouchState newState, TouchEvent te)
+        internal void ChangeState(TouchState newState, TouchEvent te)
         {
             Console.WriteLine("{0} to {1}", state, newState);
 

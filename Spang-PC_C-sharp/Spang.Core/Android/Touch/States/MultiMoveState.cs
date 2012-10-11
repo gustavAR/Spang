@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Spang.Core.Utils;
 
-namespace Spang.Core.Touch
+namespace Spang.Core.Android
 {
     class MultiMoveState : TouchState
     {
