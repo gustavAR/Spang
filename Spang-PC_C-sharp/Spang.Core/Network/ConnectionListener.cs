@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 using System.Net;
+using Spang.Core.Utils;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Network
 {
-    class ConnectionListener
+    public class ConnectionListener : Spang.Core.Network.IConnectionListener
     {
         private const int DEFAULT_CONNECTION_TIMEOUT = 1000;
 

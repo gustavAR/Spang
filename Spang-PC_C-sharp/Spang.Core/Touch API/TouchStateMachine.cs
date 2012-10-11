@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Spang_PC_C_sharp.TouchManager.States;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Touch
 {
     class TouchStateMachine
     {

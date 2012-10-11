@@ -6,7 +6,7 @@ using Spang_PC_C_sharp.Touch_Manager;
 using System.Timers;
 using System.Diagnostics;
 
-namespace Spang_PC_C_sharp.TouchManager.States
+namespace Spang.Core.Touch
 {
     class DownState : TouchState
     {

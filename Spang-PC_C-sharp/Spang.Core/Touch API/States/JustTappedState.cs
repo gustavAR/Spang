@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 
-namespace Spang_PC_C_sharp.TouchManager.States
+namespace Spang.Core.Touch
 {
     class JustTappedState : TouchState
     {

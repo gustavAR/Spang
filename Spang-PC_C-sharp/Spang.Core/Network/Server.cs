@@ -7,12 +7,12 @@ using System.Net;
 using System.Threading;
 using System.Collections.Concurrent;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Network
 {
     /// <summary>
     /// A server is a type of endpoint that can have multiple connections.
     /// </summary>
-    interface IServer
+    public interface IServer
     {
         /// <summary>
         /// Gets the connection status of the IEndpoint.

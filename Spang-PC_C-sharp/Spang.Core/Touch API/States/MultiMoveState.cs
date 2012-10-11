@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Spang_PC_C_sharp.TouchManager.States
+namespace Spang.Core.Touch
 {
     class MultiMoveState : TouchState
     {

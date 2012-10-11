@@ -8,9 +8,9 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Diagnostics;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Network
 {
-    class Connection : IConnection
+    public class Connection : IConnection
     {
         private const int ACK_BIT = 0x10;
         private const int SHUTDOWN_BIT = 0x20;

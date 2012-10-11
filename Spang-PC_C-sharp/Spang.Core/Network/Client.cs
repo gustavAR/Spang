@@ -7,14 +7,14 @@ using System.Threading;
 using System.Net.Sockets;
 using System.IO;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Network
 {
 
     /// <summary>
     /// A client is a class that can connect over a network
     /// and recives messages from that connection.
     /// </summary>
-    interface IClient
+    public interface IClient
     {
         /// <summary>
         /// Gets the connection status of the client.
@@ -88,7 +88,7 @@ namespace Spang_PC_C_sharp
         event Action<IClient, byte[]> Recived;
     }
 
-    enum DisconnectCause
+    public enum DisconnectCause
     {
         Graceful,
         Unexpected
@@ -97,7 +97,7 @@ namespace Spang_PC_C_sharp
     /// <summary>
     /// Multithreaded implementation of IClient.
     /// </summary>
-    class Client : IClient
+    public class Client : IClient
     {
         //The connection to send/recive messages from.
         private IConnection connection;

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Net;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Network
 {
-    interface IConnection
+    public interface IConnection
     {
         /// <summary>
         /// Send a message using the UDP-protocoll.

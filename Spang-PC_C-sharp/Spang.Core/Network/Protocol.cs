@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Network
 {
     [Flags]
-    enum Protocol
+    public enum Protocol
     {
         Unordered = 0x01,
         Ordered = 0x02,
