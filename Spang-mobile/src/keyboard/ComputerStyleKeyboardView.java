@@ -21,13 +21,13 @@ import android.util.Log;
  * @author Gustav Alm Rosenblad
  *
  */
-public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKeyboardActionListener {
+public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardView.OnKeyboardActionListener {
 
 	/**
 	 * This is the currently active keyboard,
 	 * the one we show.
 	 */
-	private ControlKeyboard ctrlKeyboard;
+	private ComputerStyleKeyboard ctrlKeyboard;
 
 	private NetworkService network;
 	private Packer packer;
@@ -41,9 +41,9 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 * @param context
 	 * @param attrs
 	 */
-	public CtrlKeyboardView(Context context, AttributeSet attrs, NetworkService networkService ) {
+	public ComputerStyleKeyboardView(Context context, AttributeSet attrs, NetworkService networkService ) {
 		super(context, attrs);
-		this.ctrlKeyboard = new ControlKeyboard(context, R.xml.unicodeqwerty);
+		this.ctrlKeyboard = new ComputerStyleKeyboard(context, R.xml.unicodeqwerty);
 		this.setKeyboard(ctrlKeyboard);
 		this.setOnKeyboardActionListener(this);
 		this.packer = new Packer();
@@ -55,15 +55,15 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 	 */
 	public void updateKeyboardState(){
 		if (ctrlActive){
-			ctrlKeyboard = new ControlKeyboard(this.getContext(), R.xml.unicodeqwerty);
+			ctrlKeyboard = new ComputerStyleKeyboard(this.getContext(), R.xml.unicodeqwerty);
 		} else if (altgrActive){
-			ctrlKeyboard = new ControlKeyboard(this.getContext(), R.xml.unicodealtgr);
+			ctrlKeyboard = new ComputerStyleKeyboard(this.getContext(), R.xml.unicodealtgr);
 		}
 		else if (this.shiftActive){
-			ctrlKeyboard = new ControlKeyboard(this.getContext(), R.xml.unicodeshifted);
+			ctrlKeyboard = new ComputerStyleKeyboard(this.getContext(), R.xml.unicodeshifted);
 		}
 		else {
-			ctrlKeyboard = new ControlKeyboard(this.getContext(), R.xml.unicodeqwerty);
+			ctrlKeyboard = new ComputerStyleKeyboard(this.getContext(), R.xml.unicodeqwerty);
 		}
 		this.setKeyboard(ctrlKeyboard);
 		ctrlKeyboard.ctrlKey.on = this.ctrlActive;
@@ -108,16 +108,16 @@ public class CtrlKeyboardView extends KeyboardView implements KeyboardView.OnKey
 
 	private void handleFunctionPress(int primaryCode) {
 		switch (primaryCode){
-		case ControlKeyboard.SHIFT_KEYCODE:
+		case ComputerStyleKeyboard.SHIFT_KEYCODE:
 			this.shiftActive = !this.shiftActive;
 			return;
-		case ControlKeyboard.CTRL_KEYCODE:
+		case ComputerStyleKeyboard.CTRL_KEYCODE:
 			this.ctrlActive = !this.ctrlActive;
 			return;
-		case ControlKeyboard.HIDE_KEYBOARD_KEYCODE:
+		case ComputerStyleKeyboard.HIDE_KEYBOARD_KEYCODE:
 			goBackToMain();
 			return;
-		case ControlKeyboard.ALTGR_KEYCODE:
+		case ComputerStyleKeyboard.ALTGR_KEYCODE:
 			this.altgrActive = !this.altgrActive;
 			return;
 		default://Was an F-key pressed?

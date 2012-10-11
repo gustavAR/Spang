@@ -1,19 +1,17 @@
 package keyboard;
 
-import java.util.Collections;
-import java.util.List;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.inputmethodservice.Keyboard;
 
 /**
- * This keyboard will 
+ * This keyboard can return its ctrl- and altgr-key from getters.
+ * 
  * @author Gustav Alm Rosenblad
  *
  */
-public class ControlKeyboard extends Keyboard {
+public class ComputerStyleKeyboard extends Keyboard {
     
 	public static final int SHIFT_KEYCODE = -1;
 	public static final int CTRL_KEYCODE = -2;
@@ -36,11 +34,11 @@ public class ControlKeyboard extends Keyboard {
 	Key ctrlKey;
 	Key altgrKey;
 	
-    public ControlKeyboard(Context context, int xmlLayoutResId) {
+    public ComputerStyleKeyboard(Context context, int xmlLayoutResId) {
         super(context, xmlLayoutResId);
     }
 
-    public ControlKeyboard(Context context, int layoutTemplateResId, 
+    public ComputerStyleKeyboard(Context context, int layoutTemplateResId, 
             CharSequence characters, int columns, int horizontalPadding) {
         super(context, layoutTemplateResId, characters, columns, horizontalPadding);
     }

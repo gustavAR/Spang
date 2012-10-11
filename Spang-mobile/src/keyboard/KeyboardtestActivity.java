@@ -27,7 +27,7 @@ public class KeyboardtestActivity extends NetworkedActivity {
 
 	@Override
 	protected void onNetworkServiceConnected() {
-        CtrlKeyboardView cKV = new CtrlKeyboardView(this, null, this.getNetworkService());
+        ComputerStyleKeyboardView cKV = new ComputerStyleKeyboardView(this, null, this.getNetworkService());
         cKV.setId(R.layout.activity_keyboardtest);
 		setContentView(cKV);
 	}
