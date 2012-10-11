@@ -9,7 +9,6 @@ import android.inputmethodservice.Keyboard;
  * This keyboard can return its ctrl- and altgr-key from getters.
  * 
  * @author Gustav Alm Rosenblad
- *
  */
 public class ComputerStyleKeyboard extends Keyboard {
     
@@ -18,6 +17,9 @@ public class ComputerStyleKeyboard extends Keyboard {
 	public static final int HIDE_KEYBOARD_KEYCODE = -3;
 	public static final int ALTGR_KEYCODE = -4;
 	
+	/*
+	 * These are the keycodes for the F-keys on a computer
+	 */
 	public static final int F1_KEYCODE = -11;
 	public static final int F2_KEYCODE = -12;
 	public static final int F3_KEYCODE = -13;
@@ -38,11 +40,17 @@ public class ComputerStyleKeyboard extends Keyboard {
         super(context, xmlLayoutResId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ComputerStyleKeyboard(Context context, int layoutTemplateResId, 
             CharSequence characters, int columns, int horizontalPadding) {
         super(context, layoutTemplateResId, characters, columns, horizontalPadding);
     }
 
+    /**
+     * Used to create all the individual keys of the keyboard
+     */
     @Override
     protected Key createKeyFromXml(Resources res, Row parent, int x, int y, 
             XmlResourceParser parser) {
