@@ -40,8 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Android\Decoding\IMessageDecoder.cs" />
-    <Compile Include="Android\Decoding\MessageDecoder.cs" />
     <Compile Include="Android\IPhone.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\Connection.cs" />

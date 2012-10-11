@@ -42,45 +42,29 @@ namespace Spang_PC_C_sharp
 
             #endregion
 
-            IMessageDecoder messageHandler = new MessageDecoder();
-            AndroidPhone phone = new AndroidPhone(messageHandler);
+            AndroidPhone phone = new AndroidPhone();
             DesktopController controller = new DesktopController(phone, new OsInterface());
 
             IServer server = new Server();
             server.ConnectionTimeout = 5000;
-
             server.Start(1337);
 
             TouchDecoder decoder = new TouchDecoder();
 
-            TouchEventManager em = new TouchEventManager();
-       /*     em.Tap += () =>  Console.WriteLine("Just tapped"); 
-            em.MultiTap += (x) =>  Console.WriteLine("Just mulit Tapped Count:{0}", x); 
-            em.Up += () => Console.WriteLine("Just Upped"); 
-            em.Down += () =>  Console.WriteLine("Just Downed"); 
-            em.Move += (x,y) => Console.WriteLine("Just moved: X: {0} , Y: {1}", x, y); */
-
-            em.Tap += () => controller.LeftClick();
-            em.Up += () => controller.mouseUp();
-            em.MultiTap += (x) => { if (x == 2) controller.RightClick(); };
-            em.Down += () => controller.mouseDown();
-            em.Move += (x, y) => controller.MoveMouse(moveSpeed(x), moveSpeed(y));
-            em.MulitiMove += (c, x, y) => controller.VerticalScroll(y * 10);
+            phone.Tap += () => controller.LeftClick();
+            phone.Up += () => controller.mouseUp();
+            phone.MultiTap += (x) => { if (x == 2) controller.RightClick(); };
+            phone.Down += () => controller.mouseDown();
+            phone.Move += (x, y) => controller.MoveMouse(moveSpeed(x), moveSpeed(y));
+            phone.MulitiMove += (c, x, y) => controller.VerticalScroll(y * 10);
 
 
-            em.Pinch += (x) =>
+            phone.Pinch += (x) =>
             {
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.CONTROL);
-       //         Console.WriteLine("Just pinched! VALUE:{0}", x);
-
                 controller.VerticalScroll(x);
-
                 InputSimulator.SimulateKeyUp(VirtualKeyCode.CONTROL);
             };
-            
-
-
-            TouchStateMachine stateMachine = new TouchStateMachine(em);
 
 
             int bytesRecived = 0;
@@ -108,9 +92,7 @@ namespace Spang_PC_C_sharp
                     int id = unPacker.UnpackByte();
                     if (id == 0)
                     {
-                        //  Console.WriteLine("Recived mouse event!");
-                        TouchEvent e = decoder.DecodeTouch(unPacker);
-                        stateMachine.Update(e);
+                        phone.ProcessMessage(unPacker);
                     }
                     else if(id == 1)
                     {

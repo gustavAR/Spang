@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Spang.Core.Android
 {
-    public class TouchEventManager
+    class TouchEventManager
     {
         private TouchStateMachine machine;
 
@@ -13,7 +13,6 @@ namespace Spang.Core.Android
         {
             this.machine = new TouchStateMachine(this);
         }
-
 
         public event Action Tap;
         public event Action LongTap;

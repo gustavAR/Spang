@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Spang.Core.Android
 {
-    public class TouchStateMachine
+    class TouchStateMachine
     {
         private TouchState state;
 
