@@ -5,8 +5,13 @@ import java.util.MissingResourceException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import network.exceptions.NotImplementedException;
+
+import org.apache.http.MalformedChunkCodingException;
+
 import sensors.ISensor;
 import sensors.SensorListBuilder;
+import utils.MissingSensorException;
 import utils.Packer;
 import android.app.Service;
 import android.content.ComponentName;
@@ -25,12 +30,25 @@ import android.util.AndroidRuntimeException;
 
 /**
  * Class used to communicate sensor input with other parts of the system.
- * @author Pontus Pall, Joakim Johansson & Gustav Alm Rosenblad
+ * Sensors can be activated by sending samplingrate integers as intent extras with
+ * a string key corresponding to the specific sensor 
+ * (e.g. the string SpangSensorService.ACCELEROMETER_EXTRA will identify the sample rate
+ * of the accelerometer sensor). 
+ * Any samplingrate > 0 will also make the sensor activated.
+ * 
+ * @author Pontus Pall, Lukas Kurtyan, Joakim Johansson & Gustav Alm Rosenblad
  */
 public class SpangSensorService extends Service{
 
-	public static String LUMINANCE_EXTRA = "spang.spang_sensor_service.luminance";
-	
+	public static String ACCELEROMETER_EXTRA	= "spang.spang_sensor_service.accelerometer";
+	public static String GYROSCOPE_EXTRA		= "spang.spang_sensor_service.gyroscope";
+	public static String LUMINANCE_EXTRA		= "spang.spang_sensor_service.luminance";
+	public static String MAGNETICFIELD_EXTRA	= "spang.spang_sensor_service.magneticField";
+	public static String HUMIDITY_EXTRA			= "spang.spang_sensor_service.humidity";
+	public static String PROXIMITY_EXTRA		= "spang.spang_sensor_service.proximity";
+	public static String AIRPRESSURE_EXTRA		= "spang.spang_sensor_service.airPressure";
+	public static String GRAVITY_EXTRA			= "spang.spang_sensor_service.gravity";
+	public static String ORIENTATION_EXTRA		= "spang.spang_sensor_service.orientation";
 	
 	
 	private static int DEFAULT_SAMPLINGRATE = 20;
@@ -67,8 +85,8 @@ public class SpangSensorService extends Service{
 		SensorListBuilder builder = new SensorListBuilder(this.manager, resources);
 		this.sensors = builder.build();
 		this.encodedSensorInput = new Packer();
-
 	}
+	
 	public void onPreferenceChanged(SharedPreferences sharedPreferences, String key){
 		this.stopProcess();
 		this.startProcess();
@@ -77,18 +95,40 @@ public class SpangSensorService extends Service{
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("deprecation") //Orientation sensor is deprecated, but we only use the sensor type value here.
+									 //The ISensor used in the service uses non-depricated methods.
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Intent i = new Intent(this, NetworkService.class);
 		this.bindService(i, this.connection, Context.BIND_WAIVE_PRIORITY);
 		
-		int luminanceSamplerFPS = intent.getIntExtra(LUMINANCE_EXTRA, -1);
-		if(luminanceSamplerFPS != -1) {
-			this.addSensor(Sensor.TYPE_LIGHT, luminanceSamplerFPS);
-		}
-		
+		setUpSensorFromIntent(intent, ACCELEROMETER_EXTRA, 	Sensor.TYPE_ACCELEROMETER);
+		setUpSensorFromIntent(intent, GYROSCOPE_EXTRA, 		Sensor.TYPE_GYROSCOPE);
+		setUpSensorFromIntent(intent, LUMINANCE_EXTRA, 		Sensor.TYPE_LIGHT);
+		setUpSensorFromIntent(intent, MAGNETICFIELD_EXTRA, 	Sensor.TYPE_MAGNETIC_FIELD);
+		setUpSensorFromIntent(intent, PROXIMITY_EXTRA,	 	Sensor.TYPE_PROXIMITY);
+		setUpSensorFromIntent(intent, HUMIDITY_EXTRA, 		Sensor.TYPE_RELATIVE_HUMIDITY);
+		setUpSensorFromIntent(intent, AIRPRESSURE_EXTRA, 	Sensor.TYPE_PRESSURE);
+		setUpSensorFromIntent(intent, GRAVITY_EXTRA, 		Sensor.TYPE_GRAVITY);
+		setUpSensorFromIntent(intent, ORIENTATION_EXTRA, 	Sensor.TYPE_ORIENTATION); 
 		
 		return START_STICKY;
+	}
+	
+	/**
+	 * Helping method setting the sample rate of a specified sensor based on an
+	 * intent. 
+	 * If the sample rate is < 0, the sensor is not added.
+	 * @param intent The intent containing the extras. Should be the intent used to
+	 * start the spangSensorService
+	 * @param intentExtraKey the string key corresponding to the specific sensor 
+	 * (see javadoc of SpangSensorService).
+	 * @param SensorType Integer representing the specific sensor (e.g. Sensor.TYPE_MAGNETIC_FIELD)
+	 */
+	private void setUpSensorFromIntent(Intent intent, String intentExtraKey, int SensorType){
+		int sampleRate= intent.getIntExtra(intentExtraKey, -1);
+		if(sampleRate < 0)
+			this.addSensor(SensorType, sampleRate);
 	}
 
 	/**
@@ -172,18 +212,43 @@ public class SpangSensorService extends Service{
 	
 	/**
 	 * Adds a sensor of type sensorID.
-	 * These types can be found in the Sensor.TYPE_STUFF int code. For 
-	 * ex. Sensor id of accelerometer is Sensor.TYPE_ACCELEROMETER. 
+	 * These types can be found in the Sensor.TYPE_<sensor name> int code. 
+	 * (e.g. Sensor id of accelerometer is Sensor.TYPE_ACCELEROMETER). 
 	 * @param sensorID 
-	 * @param samplerRate
-	 * @throws MissingResourceException if the sensor is not avalible on the device. 
+	 * @param sampleRate The rate to update the sensor values
+	 * @throws MissingResourceException if the sensor is not available on the device. 
 	 */
-	public void addSensor(int sensorID, int samplerRate) throws MissingResourceException {
-		//Balwhdanwldalwjdaljwdliawjdliawjdlijawdlijlawjid		
+	public void addSensor(int sensorID, int sampleRate) throws MissingSensorException {
+		ISensor temp = null;
+		for (ISensor s: this.sensors) {
+			if(s.getSensorID() == sensorID){
+				temp=s;
+				break;
+			}
+		}
+		if(temp == null)
+			throw new MissingSensorException("No sensor found with ID:"+sensorID);
+		
+		final ISensor sensor = temp;
+		TimerTask task = new TimerTask() {
+			
+			@Override
+			public void run() {
+				if(isSensorActivated(sensor)){
+					sensor.stop();
+					sensor.start();
+					processInput(sensor);
+				}
+				else
+					sensor.stop();
+			}
+		};
+		timer.scheduleAtFixedRate(task, 0, sampleRate);		
 	}
 	
 	public void removeSensor(int sensorID) {
-		
+		//TODO Implement
+		throw new NotImplementedException("removeSensor not implementet yet...");
 	}
 
 	/**
