@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>303f02ad-b633-4426-9607-c16f564386f8</ProjectGuid>
+    <ProjectGuid>{483218B2-4985-4137-A36C-EB91699CA424}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Spang.Core</RootNamespace>
@@ -40,9 +40,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Network\Client.cs" />
+    <Compile Include="Network\Connection.cs" />
+    <Compile Include="Network\ConnectionListener.cs" />
+    <Compile Include="Network\IConnection.cs" />
+    <Compile Include="Network\IConnectionListener.cs" />
+    <Compile Include="Network\IServerConnection.cs" />
+    <Compile Include="Network\Protocol.cs" />
+    <Compile Include="Network\Server.cs" />
+    <Compile Include="Network\UdpWorker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Touch API\States\DownState.cs" />
+    <Compile Include="Touch API\States\JustTappedState.cs" />
+    <Compile Include="Touch API\States\MarkingState.cs" />
+    <Compile Include="Touch API\States\MoveState.cs" />
+    <Compile Include="Touch API\States\MultiDownState.cs" />
+    <Compile Include="Touch API\States\MultiMoveState.cs" />
+    <Compile Include="Touch API\States\NullState.cs" />
+    <Compile Include="Touch API\Touch.cs" />
+    <Compile Include="Touch API\TouchDecoder.cs" />
+    <Compile Include="Touch API\TouchEvent.cs" />
+    <Compile Include="Touch API\TouchManager.cs" />
+    <Compile Include="Touch API\TouchState.cs" />
+    <Compile Include="Touch API\TouchStateMachine.cs" />
+    <Compile Include="Utils\Packer.cs" />
+    <Compile Include="Utils\UnPacker.cs" />
+    <Compile Include="Worker.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
