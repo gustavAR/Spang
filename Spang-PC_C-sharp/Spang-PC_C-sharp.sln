@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spang.Core", "Spang.Core\Spang.Core.csproj", "{483218B2-4985-4137-A36C-EB91699CA424}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ashtung", "Ashtung\Ashtung\Ashtung.csproj", "{E0752539-9D1D-4D34-8EA2-B30410C75463}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "AshtungContent", "Ashtung\AshtungContent\AshtungContent.contentproj", "{EC85E769-2A8B-49D0-8637-5CC611DC6925}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Spang-PC_C-sharp.vsmdi
@@ -57,6 +61,22 @@ Global
 		{483218B2-4985-4137-A36C-EB91699CA424}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{483218B2-4985-4137-A36C-EB91699CA424}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{483218B2-4985-4137-A36C-EB91699CA424}.Release|x86.ActiveCfg = Release|Any CPU
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Debug|x86.ActiveCfg = Debug|x86
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Debug|x86.Build.0 = Debug|x86
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Release|Any CPU.ActiveCfg = Release|x86
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Release|Mixed Platforms.Build.0 = Release|x86
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Release|x86.ActiveCfg = Release|x86
+		{E0752539-9D1D-4D34-8EA2-B30410C75463}.Release|x86.Build.0 = Release|x86
+		{EC85E769-2A8B-49D0-8637-5CC611DC6925}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{EC85E769-2A8B-49D0-8637-5CC611DC6925}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{EC85E769-2A8B-49D0-8637-5CC611DC6925}.Debug|x86.ActiveCfg = Debug|x86
+		{EC85E769-2A8B-49D0-8637-5CC611DC6925}.Release|Any CPU.ActiveCfg = Release|x86
+		{EC85E769-2A8B-49D0-8637-5CC611DC6925}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{EC85E769-2A8B-49D0-8637-5CC611DC6925}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
