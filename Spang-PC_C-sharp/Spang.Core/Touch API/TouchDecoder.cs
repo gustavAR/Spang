@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Spang_PC_C_sharp.Touch_Manager
+namespace Spang.Core.Touch
 {
     class TouchDecoder
     {

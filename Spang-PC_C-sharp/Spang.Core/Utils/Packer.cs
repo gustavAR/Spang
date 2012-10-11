@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Utils
 {
     class Packer
     {

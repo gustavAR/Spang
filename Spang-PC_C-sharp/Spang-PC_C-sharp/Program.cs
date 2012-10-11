@@ -7,7 +7,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Drawing;
-using Spang_PC_C_sharp.Touch_Manager;
+using Spang.Core.Touch;
+using Spang.Core.Utils;
+using Spang.Core.Network;
 
 using System.Drawing.Imaging;
 using WindowsInput;
@@ -122,26 +124,6 @@ namespace Spang_PC_C_sharp
         private static int moveSpeed(int p)
         {
             return p * ((int)Math.Sqrt(Math.Abs(p))) / 2;
-        }
-
-        private static IClient OpenClient(int id)
-        {
-            IClient client = new Client();
-            client.ConnectionTimeout = 1;
-
-            client.Connected += (x, y) => Console.WriteLine("Client connected! " + id);
-            client.Dissconnected += (x, y) => Console.WriteLine("Client Dced" + id);
-            client.Recived += (x, y) =>
-            {
-                if (y[0] == 0)
-                    Console.WriteLine("Got a heartbeat " + id);
-                else
-                    Console.WriteLine(":O jsut got udp message");
-            };
-
-            client.Connect(1337, "192.168.0.12");
-
-            return client;
         }
     }
 }

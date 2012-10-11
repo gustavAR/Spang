@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Spang_PC_C_sharp.Touch_Manager;
 
-namespace Spang_PC_C_sharp.TouchManager.States
+namespace Spang.Core.Touch
 {
     class NullState : TouchState
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 
-namespace Spang_PC_C_sharp
+namespace Spang.Core.Network
 {
     /// <summary>
     /// A worker class that listens to UDP messages.
