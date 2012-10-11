@@ -28,7 +28,7 @@ public abstract class NetworkedActivity extends Activity {
 	 * NOTE: This will return null before onNetworkServiceConnected is called!
 	 * @return a NetworkService.
 	 */
-	public NetworkService getNetworkService() {		
+	public NetworkService getNetworkService() {	
 		return this.network;
 	}
 
@@ -36,7 +36,7 @@ public abstract class NetworkedActivity extends Activity {
 	protected void onStart() {
 		//Bind the service so we can use it.
 		Intent intent = new Intent(this, NetworkService.class);
-		this.bindService(intent, connection, Context.BIND_WAIVE_PRIORITY);	  	
+		this.bindService(intent, connection, Context.BIND_WAIVE_PRIORITY);	
 		super.onStart();
 	}
 
@@ -59,7 +59,7 @@ public abstract class NetworkedActivity extends Activity {
 	private void addListeners() {
 		network.addConnectedListener(networkConnection);
 		network.addDisconnectedListener(networkDisconnected);
-		network.addRevicedListener(networkRecived);		
+		network.addRevicedListener(networkRecived);	
 	}
 
 	private Action networkConnection = new Action() {
@@ -108,7 +108,7 @@ public abstract class NetworkedActivity extends Activity {
 		//Dunno what to do here atm :O
 	}
 
-	protected  void onDisconnected(DCCause cause) {		
+	protected void onDisconnected(DCCause cause) {	
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("We disconnected! Cause: " + cause);
 		builder.setTitle("Disconnected");
@@ -120,17 +120,17 @@ public abstract class NetworkedActivity extends Activity {
 						if(success) {
 							Toast.makeText(NetworkedActivity.this, "Connected!", Toast.LENGTH_SHORT).show();
 						} else {
-							builder.setMessage("Failed to connect!");							
+							builder.setMessage("Failed to connect!");	
 							builder.show();
 						}
 					}
 				});
-				
+
 				Toast.makeText(NetworkedActivity.this, "Trying to reconnect...", Toast.LENGTH_SHORT).show();
 			}
 		});
 
-		builder.show();		
+		builder.show();	
 	}
 
 

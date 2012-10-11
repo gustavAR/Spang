@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 public class ComputerActivity extends NetworkedActivity {
@@ -40,14 +41,14 @@ public class ComputerActivity extends NetworkedActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.Keyboard:
-            	this.onShowKeyboard();
+            	this.onShowKeyboard(item);
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 	
 	
-	public void onShowKeyboard() {
+	public void onShowKeyboard(MenuItem item) {
 		Intent intent = new Intent(this, KeyboardtestActivity.class);
 		this.startActivity(intent);
 	}

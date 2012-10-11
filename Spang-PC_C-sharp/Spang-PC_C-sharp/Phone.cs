@@ -237,6 +237,31 @@ namespace Spang_PC_C_sharp
 
         #endregion
 
+        #region Humidity
+
+        private float humidity;
+        public float Humidity
+        {
+            get { return this.humidity; }
+            internal set
+            {
+                float temp = this.humidity;
+                this.humidity = value;
+
+                if (temp != this.humidity)
+                    this.OnHumidityChanged(temp, this.humidity);
+            }
+        }
+
+        public event Action<float, float> HumidityChanged;
+        private void OnHumidityChanged(float old, float current)
+        {
+            if (this.HumidityChanged != null)
+                this.HumidityChanged(old, current);
+        }
+
+        #endregion
+
         #region Pressure 
 
         private float pressure;
@@ -285,6 +310,32 @@ namespace Spang_PC_C_sharp
         {
             if (this.GPSLocationChanged != null)
                 this.GPSLocationChanged(old, current);
+        }
+
+        #endregion
+
+        #region Gravity
+
+        private Vector3 gravity;
+        public Vector3 Gravity
+        {
+            get { return this.gravity; }
+
+            set
+            {
+                Vector3 temp = this.gravity;
+                this.gravity = value;
+                if (temp != this.gravity)
+                    this.OnGravityChanged(temp, this.gravity);
+
+            }
+        }
+
+        public event Action<Vector3, Vector3> GravityChanged;
+        private void OnGravityChanged(Vector3 old, Vector3 current)
+        {
+            if (this.GravityChanged != null)
+                this.GravityChanged(old, current);
         }
 
         #endregion

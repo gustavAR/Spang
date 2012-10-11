@@ -148,7 +148,7 @@ namespace Spang_PC_C_sharp
             float[] array = new float[length];
             for (int i = 0; i < array.Length; i++)
             {
-                array[i] = this.reader.ReadUInt64();
+                array[i] = this.reader.ReadSingle();
             }
             return array;
         }
@@ -163,7 +163,7 @@ namespace Spang_PC_C_sharp
             double[] array = new double[length];
             for (int i = 0; i < array.Length; i++)
             {
-                array[i] = this.reader.ReadUInt64();
+                array[i] = this.reader.ReadDouble();
             }
             return array;
         }

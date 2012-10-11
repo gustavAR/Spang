@@ -7,7 +7,7 @@
     <string name="title_activity_prefs">PrefsActivity</string>
     <string name="button_send">Connect</string>
     <string name="title_activity_mouse">MouseActivity</string>
-    <string name="default_ip">192.168.0.12</string>
+    <string name="default_ip">129.16.187.226</string>
     <string name="default_port">1337</string>
     <string name="title_activity_text_sender">Send Text!</string>
     <string name="network_service_started">Service started</string>
