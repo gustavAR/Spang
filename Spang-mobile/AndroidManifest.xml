@@ -20,7 +20,7 @@
             android:name=".NetworkService"
             android:enabled="true" >
         </service>
-          <service
+        <service
             android:name=".SpangSensorService"
             android:enabled="true" >
         </service>
@@ -30,6 +30,7 @@
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -76,6 +77,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ShortcutActivity"
+            android:label="@string/title_activity_shortcut" >
         </activity>
     </application>
 
