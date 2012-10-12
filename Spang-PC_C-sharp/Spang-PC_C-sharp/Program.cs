@@ -63,7 +63,7 @@ namespace Spang_PC_C_sharp
             phone.Down += () => controller.mouseDown();
             phone.Move += (x, y) => controller.MoveMouse(moveSpeed(x), moveSpeed(y));
             phone.MulitiMove += (c, x, y) => controller.VerticalScroll(y * 10);
-
+            
 
             phone.Pinch += (x) =>
             {
@@ -94,9 +94,9 @@ namespace Spang_PC_C_sharp
                 {
                     phone.ProcessMessage((IPhoneMessage)message.Message);
                 }
-                else 
+                else if(message.Message is String)
                 {
-                    Console.WriteLine(message.Message);
+                    controller.NetworkedText(message.Message.ToString());
                 }
 
             };

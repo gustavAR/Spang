@@ -21,6 +21,7 @@ namespace Spang.Core.Android
             this.touchEventManager.Up += this.OnUp;
             this.touchEventManager.MultiTap += this.OnMultiTap;
             this.touchEventManager.MulitiMove += this.OnMultiMove;
+            this.touchEventManager.Pinch += this.OnPinch;
        }
 
         #region Volume
