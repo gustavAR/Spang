@@ -42,8 +42,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:onClick="showKeyboard"
-        android:text="Keyboardtest" />
+        android:text="@string/show_keyboard_text" 
+        android:onClick="showKeyboard"/>
+        
 
 
     <Button
@@ -52,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/button3"
-        android:text="Scan QRC" 
+        android:text="@string/scan_qrc_text" 
         android:onClick="scanQRC"/>
     
 </RelativeLayout>

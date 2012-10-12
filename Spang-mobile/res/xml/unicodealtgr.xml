@@ -27,18 +27,30 @@ All special messages are implemented with negative numbers.
     </Row>
     
     <Row>
-        <Key android:codes="-11" android:keyLabel="F1" android:keyEdgeFlags="left"/>
-        <Key android:codes="-12" android:keyLabel="F2"/>
-        <Key android:codes="-13" android:keyLabel="F3"/>
-        <Key android:codes="-14" android:keyLabel="F4"/>
-        <Key android:codes="-15" android:keyLabel="F5"/>
-        <Key android:codes="-16" android:keyLabel="F6"/>
-        <Key android:codes="-17" android:keyLabel="F7"/>
-        <Key android:codes="-18" android:keyLabel="F8"/>
-        <Key android:codes="-19" android:keyLabel="F9"/>
-        <Key android:codes="-20" android:keyLabel="F10"/>
-        <Key android:codes="-21" android:keyLabel="F11"/>
-        <Key android:codes="-22" android:keyLabel="F12" android:keyEdgeFlags="right"/>
+        <Key android:codes="-11" android:keyLabel="F1" 
+            android:keyWidth="8%p"  android:keyEdgeFlags="left"/>
+        <Key android:codes="-12" android:keyLabel="F2"
+            android:keyWidth="8%p" />
+        <Key android:codes="-13" android:keyLabel="F3"
+            android:keyWidth="8%p" />
+        <Key android:codes="-14" android:keyLabel="F4"
+            android:keyWidth="8%p" />
+        <Key android:codes="-15" android:keyLabel="F5"
+            android:keyWidth="8%p" />
+        <Key android:codes="-16" android:keyLabel="F6"
+            android:keyWidth="8%p" />
+        <Key android:codes="-17" android:keyLabel="F7"
+            android:keyWidth="8%p" />
+        <Key android:codes="-18" android:keyLabel="F8"
+            android:keyWidth="8%p" />
+        <Key android:codes="-19" android:keyLabel="F9"
+            android:keyWidth="8%p" />
+        <Key android:codes="-20" android:keyLabel="F10"
+            android:keyWidth="8%p" />
+        <Key android:codes="-21" android:keyLabel="F11"
+            android:keyWidth="8%p" />
+        <Key android:codes="-22" android:keyLabel="F12"
+            android:keyWidth="8%p"  android:keyEdgeFlags="right"/>
     </Row>
     
     <Row>

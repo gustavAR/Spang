@@ -15,5 +15,13 @@
     <string name="title_activity_keyboardtest">KeyboardtestActivity</string>
     <string name="title_activity_computer">ComputerActivity</string>
     <string name="title_activity_connection">ConnectionActivity</string>
+    <string name="keyboardinputmessage_begin">${</string>
+    <string name="keyboardinputmessage_end">}</string>
+    <string name="keyboardinputmessage_shift">s</string>
+    <string name="keyboardinputmessage_ctrl">c</string>
+    <string name="keyboardinputmessage_altgr">a</string>
+    <string name="scan_qrc_text">Scan QRC</string>
+    <string name="show_keyboard_text">Show keyboard</string>
+    <string name="title_activity_shortcut">ShortcutActivity</string>
 
 </resources>
