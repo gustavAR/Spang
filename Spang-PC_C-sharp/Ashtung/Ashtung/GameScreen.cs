@@ -11,9 +11,16 @@ namespace Ashtung
 {
     abstract class GameScreen
     {
-        public abstract void Enter();
-        public abstract void Exit();
-        public abstract void LoadContent(ContentManager manager);
+        protected Achtung achtung;
+
+        public GameScreen(Achtung achtung)
+        {
+            this.achtung = achtung;
+        }
+
+        public virtual void Enter() { }
+        public virtual void Exit() { }
+        public virtual void LoadContent(ContentManager manager) { }
 
         public abstract void ConnectionRecived(IServer server, ConnectionEventArgs eventArgs);
         public abstract void ConnectionDC(IServer server, DisconnectionEventArgs eventArgs);

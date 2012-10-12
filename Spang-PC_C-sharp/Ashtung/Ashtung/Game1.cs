@@ -30,28 +30,32 @@ namespace Ashtung
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    class Achtung : Microsoft.Xna.Framework.Game
     {
-        private object _lock = new object();
+        public object _lock = new object();
         private const int PORT = 23452;
-        private GameState state = GameState.Lobby;
 
-        private List<PlayerInfo> players = new List<PlayerInfo>();
-        private SpriteFont font;
+        public List<Player> players = new List<Player>();
+        public SpriteFont font;
+        public Texture2D pixel;
+        public RenderTarget2D renderTarget;
+        public Random random = new Random();
+        public IServer server;
+
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        IServer server;
+        
+        GameScreen screen;
 
-        private Worm worm;
+        public void ChangeScreen(GameScreen screen)
+        {
+            this.screen.Exit();
+            this.screen = screen;
+            this.screen.Enter();
+        }
 
-
-        Texture2D pixel;
-
-        private RenderTarget2D renderTarget;
-
-
-        public Game1()
+        public Achtung()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -125,15 +129,14 @@ namespace Ashtung
                                                    DepthFormat.None, 1, RenderTargetUsage.PreserveContents);
 
             this.GraphicsDevice.SetRenderTarget(renderTarget);
-            this.GraphicsDevice.Clear(Color.Gold);
+            this.GraphicsDevice.Clear(Color.Black);
             this.GraphicsDevice.SetRenderTarget(null);
+
+            this.screen = new LobbyScreen(this);
+            this.screen.Enter();
 
 
             this.font = Content.Load<SpriteFont>("SpriteFont1");
-
-            this.worm = new Worm();
-            this.worm.Position = new Vector2(200, 200);
-            this.worm.Speed = new Vector2(0.5f,0);
         }
 
         /// <summary>
@@ -147,47 +150,17 @@ namespace Ashtung
 
         void ConnectionDC(IServer sender, DisconnectionEventArgs eventArgs)
         {
-            if (state == GameState.Lobby)
-            {
-                this.players.RemoveAt(eventArgs.ID);
-            }
-            else
-            {
-                PlayerInfo info = new PlayerInfo();
-                info.Color = Color.Gray;
-            }
-
+            this.screen.ConnectionDC(sender, eventArgs);
         }
 
         void MesssageRecived(IServer sender, RecivedEventArgs eventArgs)
         {
-            if (state == GameState.Lobby)
-            {
-
-                if (eventArgs.Message is String)
-                {
-                    String name = (String)eventArgs.Message;
-                    PlayerInfo info = this.players[eventArgs.ID];
-                    info.Name = name;
-                }
-            }
+            this.screen.ConnectionRecived(sender, eventArgs);
         }
 
         void ConnectionRecived(IServer sender, ConnectionEventArgs eventArgs)
         {
-            if (state == GameState.Lobby)
-            {
-                PlayerInfo info = new PlayerInfo();
-                info.Color = Color.Gold;
-                info.Name = "Player" + this.players.Count;
-                info.Connected = true;
-                info.ConnectionID = eventArgs.ID;
-
-                this.players.Insert(eventArgs.ID, info);
-            }
-            else
-            {
-            }
+            this.screen.ConnectionRecived(sender, eventArgs);
         }
 
 
@@ -201,63 +174,31 @@ namespace Ashtung
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
-
-            KeyboardState state = Keyboard.GetState();
-            
-            if(state.IsKeyDown(Keys.Left)) 
+            lock (_lock)
             {
-                this.worm.Turn(-11);
+                this.screen.Update(gameTime);
+
+
+            /*  
+                }*/
+
             }
 
-            if(state.IsKeyDown(Keys.Right)) 
-            {
-                this.worm.Turn(11);
-            }
-
-            this.worm.Move();
-
-            this.WormCollision(worm);
             base.Update(gameTime);
         }
 
-        private bool WormCollision(Worm worm)
-        {
-            Color[] collisionData = new Color[this.renderTarget.Width * this.renderTarget.Height];
-            this.renderTarget.GetData<Color>(collisionData);
-
-            return worm.Collision(collisionData, this.renderTarget.Height, this.renderTarget.Width);                
-        }
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            this.GraphicsDevice.Clear(Color.Black);
 
-            this.GraphicsDevice.SetRenderTarget(this.renderTarget);
-
-            this.spriteBatch.Begin();
-            this.spriteBatch.Draw(this.pixel, this.worm.Bounds, null, Color.GreenYellow, 0, this.worm.Origin, SpriteEffects.None, 0);
-            this.spriteBatch.End();
-
-            this.GraphicsDevice.SetRenderTarget(null);
-
-
-            this.spriteBatch.Begin();
-            this.spriteBatch.Draw(this.renderTarget, this.GraphicsDevice.Viewport.Bounds, Color.White);
-            this.spriteBatch.End();
-            
-            this.spriteBatch.Begin();
             lock (_lock)
             {
-                for(int i = 0; i < this.players.Count; i++)
-                {
-                    Vector2 offset = new Vector2(20, i * 50);
-                    if(players[i].Name != null)
-                        this.spriteBatch.DrawString(this.font, players[i].Name, offset, players[i].Color);
-                }
+                this.screen.Draw(gameTime, this.spriteBatch);
             }
-            this.spriteBatch.End();
         }
     }
 }

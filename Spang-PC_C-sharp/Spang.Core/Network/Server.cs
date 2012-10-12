@@ -180,10 +180,14 @@ namespace Spang.Core.Network
                 throw new ArgumentException(string.Format("Already listening to {0}", reciverWorker.Port));
 
             reciverWorker = new ReciverWorker(port, this);
-            new Thread(reciverWorker.DoWork).Start();
+            Thread reciver = new Thread(reciverWorker.DoWork);
+            reciver.IsBackground = true;
+            reciver.Start();
 
             keepAliveWorker = new KeepAliveWorker(this);
-            new Thread(keepAliveWorker.DoWork).Start();
+            Thread keepAlive = new Thread(keepAliveWorker.DoWork);
+            keepAlive.IsBackground = true;
+            keepAlive.Start();
         }
 
         public void Stop()

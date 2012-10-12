@@ -10,7 +10,7 @@ namespace Ashtung
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (Achtung game = new Achtung())
             {
                 game.Run();
             }
