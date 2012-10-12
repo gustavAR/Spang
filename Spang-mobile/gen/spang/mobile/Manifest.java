@@ -9,6 +9,6 @@ package spang.mobile;
 
 public final class Manifest {
     public static final class permission {
-        public static final String NetworkService=".NetworkService";
+        public static final String NetworkService="android.network.NetworkService";
     }
 }

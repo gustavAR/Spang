@@ -1,4 +1,4 @@
-package spang.mobile;
+package android.network;
 
 import network.Protocol;
 import network.messages.Touch;

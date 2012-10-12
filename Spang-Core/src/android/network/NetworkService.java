@@ -1,7 +1,6 @@
-package spang.mobile;
+package android.network;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 
 import network.Client;
 import network.Connector;
@@ -9,12 +8,11 @@ import network.DCCause;
 import network.IClient;
 import network.Protocol;
 import network.exceptions.NetworkException;
-import network.messages.SensorEventSerializer;
-import network.messages.StringSerializer;
-import network.messages.TouchEventSerializer;
 import serialization.ISerializer;
+import serialization.SensorEventSerializer;
 import serialization.SerializeManager;
-import utils.MessageBuffer;
+import serialization.StringSerializer;
+import serialization.TouchEventSerializer;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;

@@ -2,15 +2,14 @@ package spang.mobile;
 
 import java.util.List;
 
-import sensors.ISensor;
-import sensors.SensorListBuilder;
-import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
+import android.sensors.ISensor;
+import android.sensors.SensorListBuilder;
 
 
 public class PrefsActivity extends PreferenceActivity{

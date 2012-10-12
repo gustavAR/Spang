@@ -2,12 +2,12 @@ package keyboard;
 
 import java.util.ResourceBundle.Control;
 
-import spang.mobile.NetworkService;
 import spang.mobile.R;
 import utils.Packer;
 import android.app.Activity;
 import android.content.Context;
 import android.inputmethodservice.KeyboardView;
+import android.network.NetworkService;
 import android.util.AttributeSet;
 import android.util.Log;
 

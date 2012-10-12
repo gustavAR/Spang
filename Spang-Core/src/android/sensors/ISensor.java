@@ -1,10 +1,6 @@
-package sensors;
-
-import java.nio.ByteBuffer;
+package android.sensors;
 
 import utils.Packer;
-
-import android.hardware.SensorEventListener;
 
 /**
  * Simplifies retrieval of values from sensors.

@@ -1,4 +1,4 @@
-package spang.mobile;
+package android.network;
 
 import network.DCCause;
 import android.app.Activity;

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
+import android.network.NetworkService;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;

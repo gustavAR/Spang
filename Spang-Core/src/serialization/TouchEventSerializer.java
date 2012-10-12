@@ -1,5 +1,7 @@
-package network.messages;
+package serialization;
 
+import network.messages.Touch;
+import network.messages.TouchEvent;
 import serialization.Serializer;
 import utils.Packer;
 import utils.UnPacker;

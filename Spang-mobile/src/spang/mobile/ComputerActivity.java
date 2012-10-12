@@ -2,6 +2,8 @@ package spang.mobile;
 
 import keyboard.KeyboardtestActivity;
 import android.content.Intent;
+import android.network.NetworkedActivity;
+import android.network.SpangTouchView;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;

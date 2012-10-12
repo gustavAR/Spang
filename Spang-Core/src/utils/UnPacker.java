@@ -4,8 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import network.exceptions.NotImplementedException;
-
 /**
  * Helper class that makes it easy to unpack data that was packed by the 
  * utils.Packer class.

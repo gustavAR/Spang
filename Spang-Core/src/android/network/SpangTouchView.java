@@ -1,4 +1,4 @@
-package spang.mobile;
+package android.network;
 
 import java.util.ArrayList;
 import java.util.List;

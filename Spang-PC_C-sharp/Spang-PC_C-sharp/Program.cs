@@ -101,6 +101,9 @@ namespace Spang_PC_C_sharp
 
             };
             server.Dissconnected += (x, y) => Console.WriteLine("Oh no we dced ;(");
+
+
+            while (true) Thread.Sleep(75531253);
         }
 
         private static int moveSpeed(int p)

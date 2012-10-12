@@ -1,4 +1,4 @@
-package sensors;
+package android.sensors;
 
 @SuppressWarnings("serial")
 public class NoSensorException extends RuntimeException {

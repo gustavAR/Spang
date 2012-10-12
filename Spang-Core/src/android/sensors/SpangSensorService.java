@@ -1,4 +1,4 @@
-package spang.mobile;
+package android.sensors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -10,8 +10,6 @@ import network.messages.SensorEvent;
 
 import org.apache.http.MalformedChunkCodingException;
 
-import sensors.ISensor;
-import sensors.SensorListBuilder;
 import utils.MissingSensorException;
 import utils.Packer;
 import android.app.Service;
@@ -24,6 +22,8 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.network.NetworkService;
+import android.network.NetworkService.NetworkBinder;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;

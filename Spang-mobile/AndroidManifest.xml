@@ -3,7 +3,7 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <permission android:name=".NetworkService" />
+    <permission android:name= "android.network.NetworkService" />
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -16,12 +16,12 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <service
-            android:name=".NetworkService"
+            android:name="android.network.NetworkService"
             android:enabled="true" >
         </service>
         
         <service
-            android:name=".SpangSensorService"
+            android:name="android.sensors.SpangSensorService"
             android:enabled="true" >
         </service>
 
@@ -58,7 +58,7 @@
         </service>
 
         <activity
-            android:name=".NetworkedActivity"
+            android:name="android.NetworkedActivity"
             android:label="@string/title_activity_networked" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

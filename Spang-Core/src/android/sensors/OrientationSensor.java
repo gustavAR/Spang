@@ -1,4 +1,4 @@
-package sensors;
+package android.sensors;
 
 import utils.Packer;
 import android.hardware.Sensor;

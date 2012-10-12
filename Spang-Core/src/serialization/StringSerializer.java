@@ -1,4 +1,4 @@
-package network.messages;
+package serialization;
 
 import serialization.Serializer;
 import utils.Packer;

@@ -1,4 +1,4 @@
-package spang.mobile;
+package android.network;
 
 import android.content.Context;
 import android.view.MotionEvent;
