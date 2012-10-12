@@ -49,8 +49,9 @@ public final class R {
         public static final int activity_main=0x7f030002;
         public static final int activity_mouse=0x7f030003;
         public static final int activity_networked=0x7f030004;
-        public static final int activity_text_sender=0x7f030005;
-        public static final int input=0x7f030006;
+        public static final int activity_shortcut=0x7f030005;
+        public static final int activity_text_sender=0x7f030006;
+        public static final int input=0x7f030007;
     }
     public static final class menu {
         public static final int activity_computer=0x7f080000;
@@ -59,7 +60,8 @@ public final class R {
         public static final int activity_main=0x7f080003;
         public static final int activity_mouse=0x7f080004;
         public static final int activity_networked=0x7f080005;
-        public static final int activity_text_sender=0x7f080006;
+        public static final int activity_shortcut=0x7f080006;
+        public static final int activity_text_sender=0x7f080007;
     }
     public static final class string {
         public static final int app_name=0x7f060000;
@@ -83,6 +85,7 @@ public final class R {
         public static final int title_activity_mouse=0x7f060006;
         public static final int title_activity_networked=0x7f06000b;
         public static final int title_activity_prefs=0x7f060004;
+        public static final int title_activity_shortcut=0x7f060016;
         public static final int title_activity_text_sender=0x7f060009;
     }
     public static final class style {
