@@ -1,7 +1,8 @@
 package spang.mobile;
 
 import network.Protocol;
-import utils.Packer;
+import network.messages.Touch;
+import network.messages.TouchEvent;
 import android.content.Context;
 import android.view.MotionEvent;
 import android.view.View;
@@ -9,12 +10,10 @@ import android.view.View;
 public class TouchView extends View {
 
 	private NetworkService service;
-	private Packer packer;
 
 	public TouchView(Context context, NetworkService service) {
 		super(context);
 		this.service = service;
-		this.packer = new Packer(32);
 	}
 
 	@Override
@@ -24,18 +23,16 @@ public class TouchView extends View {
 		int eventID = event.getAction() & MotionEvent.ACTION_MASK;
 		if(eventID == MotionEvent.ACTION_UP)
 			pointers = 0;
-
-
-		packer.packByte((byte)this.getContext().getResources().getInteger(R.integer.Touch));
-		packer.packByte((byte)pointers);
+		
+		Touch[] touches = new Touch[pointers];
 		for(int i = 0; i < pointers; i++) {
-			packer.packShort((short)event.getX(i));
-			packer.packShort((short)event.getY(i));
-			packer.packByte((byte)(event.getPressure(i) * 256));	
+			float x = event.getX(i);
+			float y = event.getY(i);
+			float pressure = event.getPressure(i);
+			touches[i] = new Touch(x,y, pressure);
 		}
-
-		service.sendDirect(packer.getPackedData(), Protocol.Unordered);
-		packer.clear();
+		
+		service.sendDirect(new TouchEvent(touches), Protocol.Unordered);
 		return true;
 	}
 }

@@ -6,7 +6,7 @@ using Spang.Core.Utils;
 
 namespace Spang.Core.Serialization
 {
-    class SerializeManager
+    public class SerializeManager
     {
         private int nextID = 0;
 
@@ -30,14 +30,14 @@ namespace Spang.Core.Serialization
             this.serializerByType.Add(serializer.SerializeType, serializer);
         }
 
-        public void Serialize<T>(Packer packer, T message)
+        public void Serialize(Packer packer, object message)
         {
-            if (!this.serializerByType.ContainsKey(typeof(T)))
-                throw new ArgumentException("Cannot serialize type: " + typeof(T));
+            if (!this.serializerByType.ContainsKey(message.GetType()))
+                throw new ArgumentException("Cannot serialize type: " + message.GetType());
 
-            this.PackID(packer, this.typeToID[typeof(T)]);
+            this.PackID(packer, this.typeToID[message.GetType()]);
 
-            ISerializer serializer = this.serializerByType[typeof(T)];
+            ISerializer serializer = this.serializerByType[message.GetType()];
             serializer.Serialize(packer, message);
         }
 

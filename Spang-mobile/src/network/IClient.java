@@ -3,6 +3,8 @@ package network;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import serialization.ISerializer;
+
 import network.exceptions.NetworkException;
 
 import events.EventHandler;
@@ -69,14 +71,21 @@ public interface IClient {
 	 * @param toSend the message to send.
 	 * @throws NetworkException if the client is not connected. 
 	 */
-	void send(byte[] toSend) throws NetworkException;
+	void send(Object toSend) throws NetworkException;
 	
 	/**
 	 * Sends a message using the TCP-protocol.
 	 * @param toSend the message to send.
 	 * @throws NetworkException if the client is not connected. 
 	 */
-	void send(byte[] toSend, Protocol protocol) throws NetworkException;
+	void send(Object toSend, Protocol protocol) throws NetworkException;
+	
+	
+	/**
+	 * Registers a new type to be sent over the network.
+	 * @param serializer the serializer
+	 */
+	void registerSerializer(ISerializer serializer);
 	
 	/**
 	 * Adds a listener that will be notified when the client is connected.
@@ -106,11 +115,11 @@ public interface IClient {
 	 * Adds a listener that will be notified when the client receives messages.
 	 * @param listener the listener.
 	 */
-	void addRevicedListener(EventHandler<IClient, byte[]> listener);
+	void addRevicedListener(EventHandler<IClient, Object> listener);
 	
 	/**
 	 * Removes a listener forcing it to stop listening to received messages.
 	 * @param listener the listener.
 	 */
-	void removeRevicedListener(EventHandler<IClient, byte[]> listener);
+	void removeRevicedListener(EventHandler<IClient, Object> listener);
 }

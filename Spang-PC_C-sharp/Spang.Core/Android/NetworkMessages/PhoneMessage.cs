@@ -6,6 +6,6 @@ using System.Text;
 namespace Spang.Core.Android
 {   
     //Used as an id basically.
-    interface IPhoneMessage
+    public interface IPhoneMessage
     { }
 }

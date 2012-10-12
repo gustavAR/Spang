@@ -69,9 +69,9 @@ public abstract class NetworkedActivity extends Activity {
 		}
 	};
 
-	private Action1<byte[]> networkRecived = new Action1<byte[]>() {
+	private Action1<Object> networkRecived = new Action1<Object>() {
 
-		public void onAction(byte[] eventArgs) {
+		public void onAction(Object eventArgs) {
 			NetworkedActivity.this.onMessageRecived(eventArgs);
 		}
 	};
@@ -101,7 +101,7 @@ public abstract class NetworkedActivity extends Activity {
 
 	protected abstract void onNetworkServiceConnected();
 	protected abstract void onNetworkSerivceDissconnected();
-	protected abstract void onMessageRecived(byte[] message);
+	protected abstract void onMessageRecived(Object message);
 
 
 	protected void onConnected() {

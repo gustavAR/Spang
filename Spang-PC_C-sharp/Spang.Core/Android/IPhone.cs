@@ -18,7 +18,7 @@ namespace Spang.Core.Android
 
         List<Touch> Touches { get; }
 
-        void ProcessMessage(UnPacker unpacker);
+        void ProcessMessage(IPhoneMessage message);
 
         event Action<Vector3, Vector3> AccelerometerChanged;
         event Action<Vector2, Vector2> GPSLocationChanged;

@@ -30,8 +30,6 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	private ComputerStyleKeyboard ctrlKeyboard;
 
 	private NetworkService network;
-	private Packer packer;
-
 	private boolean ctrlActive; //Is ctrl currently pressed?
 	private boolean altgrActive;//Is altgr currently pressed?
 	private boolean shiftActive;//Is shift currently pressed?
@@ -46,7 +44,6 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 		this.ctrlKeyboard = new ComputerStyleKeyboard(context, R.xml.unicodeqwerty);
 		this.setKeyboard(ctrlKeyboard);
 		this.setOnKeyboardActionListener(this);
-		this.packer = new Packer();
 		this.network = networkService;
 	}
 
@@ -131,10 +128,7 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	}
 
 	private void sendKeyPress(String character) {
-		this.packer.packByte((byte)this.getContext().getResources().getInteger(R.integer.Text));
-		this.packer.packString(addModifierIDs(character));
-		this.network.send(this.packer.getPackedData());
-		this.packer.clear();
+		this.network.send(addModifierIDs(character));
 		Log.i("Sent: ", character);
 	}
 

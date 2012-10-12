@@ -14,6 +14,7 @@ using System.Drawing.Imaging;
 using WindowsInput;
 using Spang.Core.Decoding;
 using Spang.Core.Android;
+using Spang.Core.Serialization;
 
 namespace Spang_PC_C_sharp
 {
@@ -45,7 +46,12 @@ namespace Spang_PC_C_sharp
             AndroidPhone phone = new AndroidPhone();
             DesktopController controller = new DesktopController(phone, new OsInterface());
 
-            IServer server = new Server();
+            SerializeManager serializeManager = new SerializeManager();
+            serializeManager.RegisterSerilizer(new TouchEventSerializer());
+            serializeManager.RegisterSerilizer(new SensorEventSerializer());
+            serializeManager.RegisterSerilizer(new StringSerializer());
+
+            IServer server = new Server(serializeManager);
             server.ConnectionTimeout = 5000;
             server.Start(1337);
 
@@ -84,38 +90,15 @@ namespace Spang_PC_C_sharp
             server.Connected += (x, y) => Console.WriteLine("A connection was recived");                  
             server.Recived += (x, message) =>
             {
-               // Console.WriteLine("Recived a message of size:{0}", message.Data.Length);
-
-                UnPacker unPacker = new UnPacker(message.Data);
-                bytesRecived += unPacker.remaining();
-                while(unPacker.remaining() > 0) {
-                    int id = unPacker.UnpackByte();
-                    if (id == 0)
-                    {
-                        phone.ProcessMessage(unPacker);
-                    }
-                    else if (id == 1)
-                    {
-                        String s = unPacker.UnpackString();
-                        controller.NetworkedText(s);
-                    }
-                    else if(id == 9)
-                    {
-                        Console.WriteLine("Recived gravity data.");
-                        float[] values = unPacker.UnpackFloatArray(3);
-                        Console.WriteLine("{0}, {1}, {2}", values[0], values[1], values[2]);
-                    }
-                    else if (id == 10)
-                    {
-                        Console.WriteLine("Recived orientation data.");
-                        float[] values = unPacker.UnpackFloatArray(3);
-                        Console.WriteLine("{0}, {1}, {2}", values[0], values[1], values[2]);
-                    }
-                    else
-                    {
-                        Console.WriteLine("ZZZZZZ: " + id);
-                    }
+                if (message.Message is IPhoneMessage)
+                {
+                    phone.ProcessMessage((IPhoneMessage)message.Message);
                 }
+                else 
+                {
+                    Console.WriteLine(message.Message);
+                }
+
             };
             server.Dissconnected += (x, y) => Console.WriteLine("Oh no we dced ;(");
         }

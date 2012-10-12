@@ -41,6 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Android\IPhone.cs" />
+    <Compile Include="Android\NetworkMessages\PhoneMessage.cs" />
+    <Compile Include="Android\NetworkMessages\SensorEvent.cs" />
+    <Compile Include="Android\NetworkMessages\SensorEventSerializer.cs" />
+    <Compile Include="Android\NetworkMessages\TouchEventMessageSerializer.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\Connection.cs" />
     <Compile Include="Network\ConnectionListener.cs" />
@@ -66,6 +70,10 @@
     <Compile Include="Android\Touch\TouchManager.cs" />
     <Compile Include="Android\Touch\TouchState.cs" />
     <Compile Include="Android\Touch\TouchStateMachine.cs" />
+    <Compile Include="Serialization\ByteArraySerializer.cs" />
+    <Compile Include="Serialization\ISerializer.cs" />
+    <Compile Include="Serialization\SerializeManager.cs" />
+    <Compile Include="Serialization\StringSerializer.cs" />
     <Compile Include="Utils\Packer.cs" />
     <Compile Include="Utils\UnPacker.cs" />
     <Compile Include="Utils\Vector2.cs" />

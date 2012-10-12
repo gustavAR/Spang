@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Spang.Core.Android
 {
-    public class TouchEvent
+    public class TouchEvent : IPhoneMessage
     {
         public List<Touch> Touches { get; set; }
 

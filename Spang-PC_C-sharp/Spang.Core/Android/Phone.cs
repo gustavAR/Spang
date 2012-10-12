@@ -301,12 +301,17 @@ namespace Spang.Core.Android
 
         #endregion
 
-        public void ProcessMessage(UnPacker unpacker)
+
+        public void ProcessMessage(IPhoneMessage iPhoneMessage)
         {
-            TouchDecoder decoder = new TouchDecoder();
-            TouchEvent te = decoder.DecodeTouch(unpacker);
-            this.OnTouch(te);
+            if (iPhoneMessage is TouchEvent)
+                this.OnTouch((TouchEvent)iPhoneMessage);
+            else if (iPhoneMessage is SensorEvent)
+            {
+               //Do sensor stuff here! :)
+            }
         }
+
 
         #region Touch
 
@@ -320,7 +325,6 @@ namespace Spang.Core.Android
         private void OnTouch(TouchEvent touchEvent)
         {
             this.touches = touchEvent.Touches;
-
 
             if (this.Touch != null)
                 this.Touch(touchEvent);

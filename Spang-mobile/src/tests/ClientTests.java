@@ -24,7 +24,7 @@ import events.EventHandler;
  */
 public class ClientTests {
 	
-	private InetSocketAddress sampleAddress() {
+/*	private InetSocketAddress sampleAddress() {
 		return new InetSocketAddress("localhost", 1337);
 	}
 	
@@ -181,5 +181,5 @@ public class ClientTests {
 		client.disconnect();
 		
 		assertTrue(helper[0]);	
-	}
+	}*/
 }

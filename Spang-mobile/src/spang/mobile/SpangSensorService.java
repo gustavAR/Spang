@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import network.exceptions.NotImplementedException;
+import network.messages.SensorEvent;
 
 import org.apache.http.MalformedChunkCodingException;
 
@@ -54,7 +55,6 @@ public class SpangSensorService extends Service{
 	private static int DEFAULT_SAMPLINGRATE = 20;
 	private SharedPreferences preferences;
 	private List<ISensor> sensors = new ArrayList<ISensor>();
-	private Packer encodedSensorInput; 
 	private NetworkService networkService;
 	private SensorManager manager;
 	private int samplingRate;
@@ -84,7 +84,6 @@ public class SpangSensorService extends Service{
 
 		SensorListBuilder builder = new SensorListBuilder(this.manager, resources);
 		this.sensors = builder.build();
-		this.encodedSensorInput = new Packer();
 	}
 	
 	public void onPreferenceChanged(SharedPreferences sharedPreferences, String key){
@@ -200,13 +199,9 @@ public class SpangSensorService extends Service{
 	private void processInput(ISensor sensor) {
 		if(this.networkService == null || !this.networkService.isConnected())
 			return;
-		fillOutput(sensor);
-		this.networkService.send(encodedSensorInput.getPackedData());
-		encodedSensorInput.clear();
-	}
-
-	private void fillOutput(ISensor sensor) {	 
-		sensor.encode(this.encodedSensorInput);		
+		
+		SensorEvent event = new SensorEvent(sensor.getSensorID(), sensor.getValues());
+		this.networkService.send(event);		
 	}
 	
 	/**

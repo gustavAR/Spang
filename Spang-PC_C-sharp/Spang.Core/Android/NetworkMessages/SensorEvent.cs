@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Spang.Core.Android.NetworkMessages
+namespace Spang.Core.Android
 {
-    class SensorEvent : IPhoneMessage
+    public class SensorEvent : IPhoneMessage
     {
         public int SensorID;
         public float[] SensorData;

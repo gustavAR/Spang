@@ -13,13 +13,19 @@ namespace Spang.Core.Network
 
     public class RecivedEventArgs : ConnectionEventArgs
     {
-        public readonly byte[] Data;
-        public RecivedEventArgs(int id, byte[] Data) : base(id) { this.Data = Data; }
+        public readonly Object Message;
+        public RecivedEventArgs(int id, Object message) : base(id) 
+        {
+            this.Message = message; 
+        }
     }
 
     public class DisconnectionEventArgs : ConnectionEventArgs
     {
         public readonly DisconnectCause Cause;
-        public DisconnectionEventArgs(int id, DisconnectCause Cause) : base(id) { this.Cause = Cause; }
+        public DisconnectionEventArgs(int id, DisconnectCause Cause) : base(id) 
+        { 
+            this.Cause = Cause; 
+        }
     }
 }

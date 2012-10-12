@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using Spang.Core.Utils;
 
-namespace Spang.Core.Android.NetworkMessages
+namespace Spang.Core.Android
 {
-    class TouchEventSerializer : Serialization.Serializer<TouchEvent>
+    public class TouchEventSerializer : Serialization.Serializer<TouchEvent>
     {
-        public override void Serialize(Packer packer, TouchEvent message)
+        public override void SerializeInternal(Packer packer, TouchEvent message)
         {
             packer.Pack((byte)message.Touches.Count);
             foreach (var touch in message.Touches)
@@ -19,7 +19,7 @@ namespace Spang.Core.Android.NetworkMessages
             }
         }
 
-        public override TouchEvent Deserialize(UnPacker unpacker)
+        public override TouchEvent DeserializeInternal(UnPacker unpacker)
         {
             int count = unpacker.UnpackByte();
             Touch[] touches = new Touch[count];
@@ -29,6 +29,7 @@ namespace Spang.Core.Android.NetworkMessages
                 touch.Location.X = unpacker.UnpackShort();
                 touch.Location.Y = unpacker.UnpackShort();
                 touch.Pressure = (unpacker.UnpackByte() / 256.0f);
+                touches[i] = touch;
             }
 
             return new TouchEvent(touches);

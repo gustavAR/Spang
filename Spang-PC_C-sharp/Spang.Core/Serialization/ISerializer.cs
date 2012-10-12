@@ -15,20 +15,27 @@ namespace Spang.Core.Serialization
 
     public abstract class Serializer<T> : ISerializer
     {
-        public abstract void Serialize(Packer packer, T message);
-        public abstract T Deserialize(UnPacker unpacker);
+        public abstract void SerializeInternal(Packer packer, T message);
+        public abstract T DeserializeInternal(UnPacker unpacker);
 
-        public sealed void Serialize(Packer packer, object message)
+        public void Serialize(Packer packer, object message)
         {
             if (message.GetType() != typeof(T))
                 throw new InvalidCastException(string.Format("Expected type: {0} but was {1}", message.GetType(), typeof(T)));
 
-            this.Serialize(packer, (T)message);
+            this.SerializeInternal(packer, (T)message);
+        }
+
+        public object Deserialize(UnPacker unpacker)
+        {
+            return DeserializeInternal(unpacker);
         }
 
         public Type SerializeType
         {
             get { return typeof(T); }
         }
+
+
     }
 }
