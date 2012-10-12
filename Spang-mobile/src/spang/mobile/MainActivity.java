@@ -27,8 +27,13 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		Intent intent = new Intent(MainActivity.this, NetworkService.class);
+		Intent intent = new Intent(this, NetworkService.class);
 		this.startService(intent);	
+		
+		Intent intent2 = new Intent(this, SpangSensorService.class);
+		intent2.putExtra(SpangSensorService.GRAVITY_EXTRA, 15); //Activates the Gravity sensor and setting its update frequency to 15
+		intent2.putExtra(SpangSensorService.ACCELEROMETER_EXTRA, 1); //Activates the Gravity sensor and setting its update frequency to 15
+		this.startService(intent2);
 
 		Logger.setLogger(new LogCatLogger());
 	}
