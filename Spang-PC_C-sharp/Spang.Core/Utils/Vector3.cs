@@ -9,6 +9,14 @@ namespace Spang.Core.Utils
     {
         public float X, Y, Z;
 
+        public Vector3(float x, float y, float z)
+        {
+            // TODO: Complete member initialization
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+        }
+
         public static bool operator != (Vector3 a, Vector3 b)
         {
             return a.X != b.X && a.Y != b.Y && a.Z != b.Z;
