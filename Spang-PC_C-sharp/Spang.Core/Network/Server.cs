@@ -6,6 +6,8 @@ using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using System.Collections.Concurrent;
+using Spang.Core.Serialization;
+using Spang.Core.Utils;
 
 namespace Spang.Core.Network
 {
@@ -66,26 +68,26 @@ namespace Spang.Core.Network
         /// </summary>
         /// <param name="connectionID">ID of the client to send to.</param>
         /// <param name="toSend">The message to send.</param>
-        void Send(int connectionID, byte[] toSend);
+        void Send(int connectionID, object toSend);
 
         /// <summary>
         /// Sends a message to a client using the TCP-protocol.
         /// </summary>
         /// <param name="connectionID">ID of the client to send to.</param>
         /// <param name="toSend">The message to send.</param>
-        void Send(int connectionID, byte[] toSend, Protocol protocol);
+        void Send(int connectionID, object toSend, Protocol protocol);
         
         /// <summary>
         /// Sends a message to all connected clients. Using UDP-Protocol.
         /// </summary>
         /// <param name="toSend">The message to send.</param>
-        void SendToAll(byte[] toSend);
+        void SendToAll(object toSend);
 
         /// <summary>
         /// Sends a message to all connected clients. Using TCP-Protocol.
         /// </summary>
         /// <param name="toSend">The message to send.</param>
-        void SendToAll(byte[] toSend, Protocol protocol);
+        void SendToAll(object toSend, Protocol protocol);
     }
 
     public class Server : IServer
@@ -163,10 +165,12 @@ namespace Spang.Core.Network
         private ReciverWorker reciverWorker;
         private KeepAliveWorker keepAliveWorker;
         private readonly IDictionary<int, IServerConnection> connections;
-        
-        public Server()
+        private readonly SerializeManager serializeManager;
+
+        public Server(SerializeManager serializeManager)
         {
             this.connections = new ConcurrentDictionary<int, IServerConnection>();
+            this.serializeManager = serializeManager;
             this.heartbeatInterval = 1000;
         }
 
@@ -274,10 +278,18 @@ namespace Spang.Core.Network
                 return;
             }
 
+            UnPacker unPacker = new UnPacker(bytes);
+            while (unPacker.remaining() > 0)
+            {
+                RecivedEventArgs eventArgs = new RecivedEventArgs(connectionID, this.DeserializeMessage(unPacker));
+                if (this.Recived != null)
+                    this.Recived(this, eventArgs);
+            }
+        }
 
-            RecivedEventArgs eventArgs = new RecivedEventArgs(connectionID, bytes);
-            if (this.Recived != null)
-                this.Recived(this, eventArgs);
+        private object DeserializeMessage(UnPacker unpacker)
+        {
+            return this.serializeManager.Deserialize(unpacker);
         }
 
         private bool IsHeartbeat(byte[] recived)
@@ -308,27 +320,37 @@ namespace Spang.Core.Network
 
         #region Send
 
-        public void Send(int connectionID, byte[] toSend)
+        public void Send(int connectionID, object toSend)
         {
+            byte[] message = this.Serialize(toSend);
             IServerConnection connection = this.connections[connectionID];
-            connection.Send(toSend);
+            connection.Send(this.Serialize(toSend));
         }
 
-        public void Send(int connectionID, byte[] toSend, Protocol protocol)
+        private byte[] Serialize(object toSend)
         {
-            IServerConnection connection = this.connections[connectionID];
-            connection.Send(toSend, protocol);
+            Packer packer = new Packer();
+            this.serializeManager.Serialize(packer, toSend);
+            return packer.GetPackedData();
         }
 
-        public void SendToAll(byte[] toSend, Protocol protocol)
+        public void Send(int connectionID, object toSend, Protocol protocol)
         {
+
+            IServerConnection connection = this.connections[connectionID];
+            connection.Send(this.Serialize(toSend), protocol);
+        }
+
+        public void SendToAll(object toSend, Protocol protocol)
+        {
+            byte[] message = this.Serialize(toSend);
             foreach (var connection in this.connections.Values)
             {
-                connection.Send(toSend, protocol);
+                connection.Send(message, protocol);
             }
         }
 
-        public void SendToAll(byte[] toSend)
+        public void SendToAll(object toSend)
         {
             this.SendToAll(toSend, Protocol.Unordered);
         }

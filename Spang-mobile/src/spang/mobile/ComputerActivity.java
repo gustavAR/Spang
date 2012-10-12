@@ -54,7 +54,7 @@ public class ComputerActivity extends NetworkedActivity {
 	}
 
 	@Override
-	protected void onMessageRecived(byte[] message) {
+	protected void onMessageRecived(Object message) {
 		//Don't rly care tbh :O
 	}
 }

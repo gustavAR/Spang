@@ -7,16 +7,20 @@ namespace Spang.Core.Android
 {
     public class TouchEventManager
     {
+        private TouchStateMachine machine;
+
+        public TouchEventManager()
+        {
+            this.machine = new TouchStateMachine(this);
+        }
+
         public event Action Tap;
         public event Action LongTap;
         public event Action Down;
-        public event Action Up;
-        
+        public event Action Up;    
         public event Action<int, int> Move;
-
         public event Action<int> MultiTap;
         public event Action<int, int, int> MulitiMove;
-
         public event Action<int> Pinch;
 
         internal void OnTap()
@@ -65,6 +69,11 @@ namespace Spang.Core.Android
         {
             if (this.Pinch != null)
                 this.Pinch(delta);
+        }
+
+        public void ProcessEvent(TouchEvent touchEvent)
+        {
+            this.machine.Update(touchEvent);
         }
     }
 }

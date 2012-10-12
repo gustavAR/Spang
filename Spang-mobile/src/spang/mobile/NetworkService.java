@@ -9,6 +9,11 @@ import network.DCCause;
 import network.IClient;
 import network.Protocol;
 import network.exceptions.NetworkException;
+import network.messages.SensorEventSerializer;
+import network.messages.StringSerializer;
+import network.messages.TouchEventSerializer;
+import serialization.ISerializer;
+import serialization.SerializeManager;
 import utils.MessageBuffer;
 import android.app.Service;
 import android.content.Intent;
@@ -51,12 +56,6 @@ public class NetworkService extends Service {
 	//Binder used by Activities to bind to this instance of NetworkService
 	private final IBinder binder = new NetworkBinder();
 	
-	//Buffer that help buffer network messages.
-	private MessageBuffer sendBuffer;
-	
-	//Thread used to send buffered messages.
-	private Thread senderThread;
-	
 	//The default protocol to use when sending messages.
 	private volatile Protocol defaultProtcol;
 	
@@ -70,7 +69,7 @@ public class NetworkService extends Service {
 	private Action1Delegate<DCCause> disconnectedEvent;
 	
 	//Event invoked when the service receives data on the incoming connection.
-	private Action1Delegate<byte[]> recivedEvent;
+	private Action1Delegate<Object> recivedEvent;
 	
 	//Handler used to offload work to the UI thread. This is done so that listeners
 	//of the network can change UI without upsetting the android API.
@@ -84,17 +83,31 @@ public class NetworkService extends Service {
 		if(Looper.myLooper() != Looper.getMainLooper()) 
 			throw new IllegalStateException("The thread that starts the NetworkService must be the UI thread.");
 		
-		client = new Client(new Connector());
+		SerializeManager manager = new SerializeManager();
+		manager.registerSerilizer(new TouchEventSerializer());
+		manager.registerSerilizer(new SensorEventSerializer());
+		manager.registerSerilizer(new StringSerializer());
+		
+		client = new Client(new Connector(), manager);
+		
 		this.defaultProtcol = Protocol.Unordered; 
 		this.messageSendInterval = DEF_MESSAGE_SEND_INTERVALL;
-		this.sendBuffer = new MessageBuffer(1024);
 		this.connectedEvent = new ActionDelegate();
 		this.disconnectedEvent = new Action1Delegate<DCCause>();
-		this.recivedEvent = new Action1Delegate<byte[]>();		
+		this.recivedEvent = new Action1Delegate<Object>();		
 		this.handler = new Handler();
 		
 		addListeners();
 			
+	}
+	
+	/**
+	 * Registers a serializer that can serialize a custom type.
+	 * IMPORTANT: This method must be called for all custom messages.
+	 * @param serializer the serializer to register.
+	 */
+	public void registerSerializer(ISerializer serializer) {
+		this.client.registerSerializer(serializer);		
 	}
 	
 	/**
@@ -143,43 +156,6 @@ public class NetworkService extends Service {
 		}
 	}
 
-	private void stopSenderThread() {
-		if(this.senderThread != null)
-			this.senderThread.interrupt();
-	}
-
-	private void startSendThread() {
-		senderThread = new Thread(new Runnable() {
-
-			public void run() {
-				try {
-					while(true) {
-						//Gets the messages since the last time messages were sent and sends them.						
-						sendMessages();
-						//We send messages in a given interval to lower network traffic.
-						Thread.sleep(NetworkService.this.messageSendInterval);
-					}					
-				} catch(NetworkException e) {
-					return; //We cannot fix what ever caused the connection problem in this thread so we exit.
-				} catch (InterruptedException e) {
-					return; //We were interupted we should exit.
-				}
-			}
-		});
-		
-		senderThread.start();
-	}
-	
-	private void sendMessages() {
-		//Sends all the buffered messages using the protocol they were buffered with.
-		for (Protocol protocol : Protocol.values()) {
-			List<byte[]> toSend = sendBuffer.getNewMessages(protocol);
-			for (byte[] bs : toSend) {
-				client.send(bs, protocol);
-			}	
-		}	
-	}
-
 	/**
 	 * Sets the default protocol that will be used when messages are sent,
 	 * @see send(byte[])
@@ -211,19 +187,13 @@ public class NetworkService extends Service {
 		return this.messageSendInterval;
 	}
 	
-
 	private void addListeners() {
-		
 		client.addDisconnectedListener(new EventHandler<IClient, DCCause>() {
 			public void onAction(IClient sender, DCCause cause) {
-				//Interrupts the sender-thread so it does not try to send messages over the bad connection.
-				senderThread.interrupt();
-		
 				//If we timed out or crashed we reconnect.
 				if(cause == DCCause.Timeout || cause == DCCause.LocalNetworkCrash || cause == DCCause.RemoteNetworkCrash) {		
 					try {
 						sender.reconnect(3, 1000);	
-						startSendThread();
 					} catch(NetworkException e) {
 						//If we could not reconnect we notify any listeners about this.
 						NetworkService.this.onDisconnected(cause);
@@ -239,14 +209,14 @@ public class NetworkService extends Service {
 			}
 		});
 		
-		client.addRevicedListener(new EventHandler<IClient, byte[]>() {	
-			public void onAction(IClient sender, byte[] eventArgs) {
+		client.addRevicedListener(new EventHandler<IClient, Object>() {	
+			public void onAction(IClient sender, Object eventArgs) {
 				NetworkService.this.onRecived(eventArgs);
 			}
 		});
 	}
 	
-	private void onRecived(final byte[] eventArgs) {
+	private void onRecived(final Object eventArgs) {
 		//Make the event get invoked on the UI thread.
 		this.handler.post(new Runnable() {
 			
@@ -281,9 +251,13 @@ public class NetworkService extends Service {
 	 * to change the interval.
 	 * @param message the message to send.
 	 */
-	public void send(byte[] message) {
-		//Buffer the message.
-		this.sendBuffer.addMessage(message, this.defaultProtcol);
+	public void send(Object message) {
+		try {		
+			this.client.send(message, this.defaultProtcol);		
+		} catch(Exception e) {
+			//The connection is not valid. but there is nothing we can do about it here
+			//so we silently ignore the exception.
+		}
 	}
 	
 	/**
@@ -293,9 +267,13 @@ public class NetworkService extends Service {
 	 * @param message the message to send.
 	 * @param protocol the protocol to be used when sending.
 	 */
-	public void send(byte[] message, Protocol protocol) {
-		//Buffer the message.
-		this.sendBuffer.addMessage(message, protocol);
+	public void send(Object message, Protocol protocol) {
+		try {		
+			this.client.send(message, protocol);		
+		} catch(Exception e) {
+			//The connection is not valid. but there is nothing we can do about it here
+			//so we silently ignore the exception.
+		}
 	}
 	
 	/**
@@ -303,7 +281,7 @@ public class NetworkService extends Service {
 	 * @param message the message to send.
 	 * @param protocol the protocol used when sending.
 	 */
-	public void sendDirect(byte[] message, Protocol protocol) {
+	public void sendDirect(Object message, Protocol protocol) {
 		try {		
 			this.client.send(message, protocol);		
 		} catch(Exception e) {
@@ -340,14 +318,11 @@ public class NetworkService extends Service {
 	private void connect(InetSocketAddress address) throws NetworkException {
 		//Stops the current connection and the sender thread if we are already connected.
 		if(this.client.isConnected()) {
-			this.stopSenderThread();
 			this.client.disconnect();
 		}
 		
 		//Connects to the specified address.
 		this.client.connect(address);
-		//Start sending messages. 
-		this.startSendThread();
 	}
 	
 	
@@ -476,7 +451,7 @@ public class NetworkService extends Service {
 	 * The data received from onAction is the message recived.
 	 * @param listener the listener to add.
 	 */
-	public void addRevicedListener(Action1<byte[]> listener) {
+	public void addRevicedListener(Action1<Object> listener) {
 		this.recivedEvent.addListener(listener);
 	}
 
@@ -484,7 +459,7 @@ public class NetworkService extends Service {
 	 * Removes a listener listening for received events.
 	 * @param listener the listener to remove.
 	 */
-	public void removeRevicedListener(Action1<byte[]> listener) {
+	public void removeRevicedListener(Action1<Object> listener) {
 		this.recivedEvent.removeListener(listener);
 	}
 }

@@ -14,6 +14,7 @@ using System.Drawing.Imaging;
 using WindowsInput;
 using Spang.Core.Decoding;
 using Spang.Core.Android;
+using Spang.Core.Serialization;
 
 namespace Spang_PC_C_sharp
 {
@@ -42,45 +43,34 @@ namespace Spang_PC_C_sharp
 
             #endregion
 
-            IMessageDecoder messageHandler = new MessageDecoder();
-            AndroidPhone phone = new AndroidPhone(messageHandler);
+            AndroidPhone phone = new AndroidPhone();
             DesktopController controller = new DesktopController(phone, new OsInterface());
 
-            IServer server = new Server();
-            server.ConnectionTimeout = 5000;
+            SerializeManager serializeManager = new SerializeManager();
+            serializeManager.RegisterSerilizer(new TouchEventSerializer());
+            serializeManager.RegisterSerilizer(new SensorEventSerializer());
+            serializeManager.RegisterSerilizer(new StringSerializer());
 
+            IServer server = new Server(serializeManager);
+            server.ConnectionTimeout = 5000;
             server.Start(1337);
 
             TouchDecoder decoder = new TouchDecoder();
 
-            TouchEventManager em = new TouchEventManager();
-       /*     em.Tap += () =>  Console.WriteLine("Just tapped"); 
-            em.MultiTap += (x) =>  Console.WriteLine("Just mulit Tapped Count:{0}", x); 
-            em.Up += () => Console.WriteLine("Just Upped"); 
-            em.Down += () =>  Console.WriteLine("Just Downed"); 
-            em.Move += (x,y) => Console.WriteLine("Just moved: X: {0} , Y: {1}", x, y); */
-
-            em.Tap += () => controller.LeftClick();
-            em.Up += () => controller.mouseUp();
-            em.MultiTap += (x) => { if (x == 2) controller.RightClick(); };
-            em.Down += () => controller.mouseDown();
-            em.Move += (x, y) => controller.MoveMouse(moveSpeed(x), moveSpeed(y));
-            em.MulitiMove += (c, x, y) => controller.VerticalScroll(y * 10);
-
-
-            em.Pinch += (x) =>
-            {
-                InputSimulator.SimulateKeyDown(VirtualKeyCode.CONTROL);
-       //         Console.WriteLine("Just pinched! VALUE:{0}", x);
-
-                controller.VerticalScroll(x);
-
-                InputSimulator.SimulateKeyUp(VirtualKeyCode.CONTROL);
-            };
+            phone.Tap += () => controller.LeftClick();
+            phone.Up += () => controller.mouseUp();
+            phone.MultiTap += (x) => { if (x == 2) controller.RightClick(); };
+            phone.Down += () => controller.mouseDown();
+            phone.Move += (x, y) => controller.MoveMouse(moveSpeed(x), moveSpeed(y));
+            phone.MulitiMove += (c, x, y) => controller.VerticalScroll(y * 10);
             
 
-
-            TouchStateMachine stateMachine = new TouchStateMachine(em);
+            phone.Pinch += (x) =>
+            {
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.CONTROL);
+                controller.VerticalScroll(x);
+                InputSimulator.SimulateKeyUp(VirtualKeyCode.CONTROL);
+            };
 
 
             int bytesRecived = 0;
@@ -100,40 +90,15 @@ namespace Spang_PC_C_sharp
             server.Connected += (x, y) => Console.WriteLine("A connection was recived");                  
             server.Recived += (x, message) =>
             {
-               // Console.WriteLine("Recived a message of size:{0}", message.Data.Length);
-
-                UnPacker unPacker = new UnPacker(message.Data);
-                bytesRecived += unPacker.remaining();
-                while(unPacker.remaining() > 0) {
-                    int id = unPacker.UnpackByte();
-                    if (id == 0)
-                    {
-                        //  Console.WriteLine("Recived mouse event!");
-                        TouchEvent e = decoder.DecodeTouch(unPacker);
-                        stateMachine.Update(e);
-                    }
-                    else if (id == 1)
-                    {
-                        String s = unPacker.UnpackString();
-                        controller.NetworkedText(s);
-                    }
-                    else if(id == 9)
-                    {
-                        Console.WriteLine("Recived gravity data.");
-                        float[] values = unPacker.UnpackFloatArray(3);
-                        Console.WriteLine("{0}, {1}, {2}", values[0], values[1], values[2]);
-                    }
-                    else if (id == 10)
-                    {
-                        Console.WriteLine("Recived orientation data.");
-                        float[] values = unPacker.UnpackFloatArray(3);
-                        Console.WriteLine("{0}, {1}, {2}", values[0], values[1], values[2]);
-                    }
-                    else
-                    {
-                        Console.WriteLine("ZZZZZZ: " + id);
-                    }
+                if (message.Message is IPhoneMessage)
+                {
+                    phone.ProcessMessage((IPhoneMessage)message.Message);
                 }
+                else if(message.Message is String)
+                {
+                    controller.NetworkedText(message.Message.ToString());
+                }
+
             };
             server.Dissconnected += (x, y) => Console.WriteLine("Oh no we dced ;(");
         }

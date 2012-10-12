@@ -6,7 +6,11 @@ import java.net.UnknownHostException;
 
 import network.exceptions.InvalidEndpointException;
 import network.exceptions.NetworkException;
+import serialization.ISerializer;
+import serialization.SerializeManager;
 import utils.Logger;
+import utils.Packer;
+import utils.UnPacker;
 import events.Action1;
 import events.EventHandler;
 import events.EventHandlerDelegate;
@@ -35,7 +39,7 @@ public class Client implements IClient {
 	private EventHandlerDelegate<IClient, Boolean> connectionEvent;
 	
 	//Event handler that raises the received event.
-	private EventHandlerDelegate<IClient, byte[]> recivedEvent;
+	private EventHandlerDelegate<IClient, Object> recivedEvent;
 	
 	//Event handler that raises the disconnected event.
 	private EventHandlerDelegate<IClient, DCCause> disconnectedEvent;
@@ -49,14 +53,18 @@ public class Client implements IClient {
 	//Stores the time the last message was sent.
 	private long lastMessageSent;
 	
+	//Serializes messages to byte arrays.
+	private final SerializeManager serializeManager;
+	
 	
 	/**
 	 * Creates a new client.
 	 */
-	public Client(IConnector connector) {
+	public Client(IConnector connector, SerializeManager serializeManager) {
 		this.connector = connector;
+		this.serializeManager = serializeManager;
 		this.connectionEvent = new EventHandlerDelegate<IClient, Boolean>();
-		this.recivedEvent = new EventHandlerDelegate<IClient, byte[]>();
+		this.recivedEvent = new EventHandlerDelegate<IClient, Object>();
 		this.disconnectedEvent = new EventHandlerDelegate<IClient, DCCause>();
 		this.connectionTimeout = DEF_TIMEOUT;
 		this.heartBeatInterval = DEF_HEARTBEAT_INTERVAL;
@@ -71,6 +79,13 @@ public class Client implements IClient {
 	}
 
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void registerSerializer(ISerializer serializer) {
+		this.serializeManager.registerSerilizer(serializer);
+	}	
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -227,11 +242,12 @@ public class Client implements IClient {
 		if(isHeartbeat(message)) { 
 			if(shouldSendHeartbeatCallback())
 				this.sendHeartBeatResponse();
-			
-		} else if(isSystemMessage(message)) {
-			this.handleSystemMessage(message);		
 		} else {
-			this.recivedEvent.invoke(this, message);
+			UnPacker unpacker = new UnPacker(message);
+			while(unpacker.remaining() > 0) {
+				Object deserializedMessage = this.serializeManager.deserialize(unpacker);
+				this.recivedEvent.invoke(this, deserializedMessage);	
+			}
 		}	
 	}
 		
@@ -242,40 +258,40 @@ public class Client implements IClient {
 	private void sendHeartBeatResponse() {
 		//Since it is not important that every hearthbeat  makes it we 
 		//may send it using the unordered fast protocol.
-		this.send(new byte[0], Protocol.Unordered);
+		this.connection.send(new byte[0], Protocol.Unordered);
 	}
 
 	private boolean isHeartbeat(byte[] message) {
 		return message.length == 0;
 	}
 	
-	private boolean isSystemMessage(byte[] message) {
-		return message[0] == 0;
-	}
 	
-	private void handleSystemMessage(byte[] message) {		
-		//TODO implement this.		
-		System.out.println("Just recived a system message.");
-	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
-	public void send(byte[] toSend) {
+	public void send(Object toSend) {
 		this.send(toSend, Protocol.Unordered);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void send(byte[] toSend, Protocol protocol) {
+	public void send(Object toSend, Protocol protocol) {
 		try {
-			this.connection.send(toSend, protocol);
+			byte[] serializedMessage = this.serializeMessage(toSend);				
+			this.connection.send(serializedMessage, protocol);
 			this.lastMessageSent = System.currentTimeMillis();
 		} catch(NetworkException e) {
 			Logger.logException(e);
 			this.onDisconnect(DCCause.LocalNetworkCrash);
 		}
+	}
+
+	private byte[] serializeMessage(Object toSend) {
+		Packer packer = new Packer();
+		this.serializeManager.serialize(packer, toSend);
+		return packer.getPackedData();		
 	}
 
 	/**
@@ -311,14 +327,14 @@ public class Client implements IClient {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addRevicedListener(EventHandler<IClient, byte[]> listener) {
+	public void addRevicedListener(EventHandler<IClient, Object> listener) {
 		this.recivedEvent.addListener(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeRevicedListener(EventHandler<IClient, byte[]> listener) {
+	public void removeRevicedListener(EventHandler<IClient, Object> listener) {
 		this.recivedEvent.removeListener(listener);
 	}
 
@@ -327,5 +343,5 @@ public class Client implements IClient {
 	 */
 	public void close() {
 		this.connection.close();
-	}	
+	}
 }
