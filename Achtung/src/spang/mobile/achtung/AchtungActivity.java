@@ -42,7 +42,7 @@ public class AchtungActivity extends NetworkedActivity {
     public void onReadyClicked(View view){
     	if(this.getNetworkService() != null) {
     		String message = this.getMessage();
-    		if(message != null) {
+    		if(message != "") {
     			this.getNetworkService().send(message);
     		}
     	}
@@ -52,8 +52,7 @@ public class AchtungActivity extends NetworkedActivity {
 		EditText text = (EditText)findViewById(R.id.editText1);
 		String name = text.getText().toString();
 		
-		if(name == "") return name;
-		else return "READY:" + name;
+		return name;
 	}
 
 	@Override

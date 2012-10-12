@@ -224,17 +224,18 @@ public class SpangSensorService extends Service{
 			throw new MissingSensorException("No sensor found with ID:"+sensorID);
 		
 		final ISensor sensor = temp;
+		sensor.start();
 		TimerTask task = new TimerTask() {
 			
 			@Override
 			public void run() {
-				if(isSensorActivated(sensor)){
-					sensor.stop();
-					sensor.start();
+			//	if(isSensorActivated(sensor)){
+			//		sensor.stop();
+			//		sensor.start();
 					processInput(sensor);
-				}
-				else
-					sensor.stop();
+			//	}
+			//	else
+			//		sensor.stop();
 			}
 		};
 		timer.scheduleAtFixedRate(task, 0, sampleRate);		

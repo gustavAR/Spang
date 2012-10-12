@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.network.NetworkService;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.sensors.SpangSensorService;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -28,8 +29,13 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		Intent intent = new Intent(MainActivity.this, NetworkService.class);
+		Intent intent = new Intent(this, NetworkService.class);
 		this.startService(intent);	
+		
+		Intent intent2 = new Intent(this, SpangSensorService.class);
+		intent2.putExtra(SpangSensorService.ORIENTATION_EXTRA, 15); //Activates the Orientation sensor and 
+																	//sets it's update frequency to 15hz
+		this.startService(intent2);
 
 		Logger.setLogger(new LogCatLogger());
 	}
@@ -99,11 +105,6 @@ public class MainActivity extends Activity {
 		});			
 	}
 	
-	public void captureScreen(View view){
-		
-		
-	}
-
 	/**
 	 * This tells the phone to scan a QR-code with zxing
 	 * and return the data to this activity.

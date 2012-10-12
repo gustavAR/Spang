@@ -155,7 +155,11 @@ namespace Ashtung
 
         void MesssageRecived(IServer sender, RecivedEventArgs eventArgs)
         {
-            this.screen.ConnectionRecived(sender, eventArgs);
+            if (eventArgs.Message is SensorEvent)
+            {
+                Console.WriteLine("Kind of got some SensorEvent");
+            }
+            this.screen.MessageRecived(sender, eventArgs);
         }
 
         void ConnectionRecived(IServer sender, ConnectionEventArgs eventArgs)

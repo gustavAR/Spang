@@ -64,6 +64,11 @@ namespace Ashtung
                 {
                     player.Phone.ProcessMessage((IPhoneMessage)eventArgs.Message);
                 }
+                else if (eventArgs.Message is SensorEvent)
+                {
+                    player.Phone.ProcessMessage((SensorEvent)eventArgs.Message);
+                    Console.WriteLine("Kind of got some SensorEvent");
+                }
 
             }
         }

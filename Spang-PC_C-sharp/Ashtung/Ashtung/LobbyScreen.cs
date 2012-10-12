@@ -21,6 +21,14 @@ namespace Ashtung
 
         public override void Enter()
         {
+            PlayerInfo info = new PlayerInfo();
+            info.Name = "Player1";
+            info.Color = Color.Gold;
+            info.ConnectionID = 1;
+
+            Player player = new Player(info);
+            this.achtung.players.Add(player);
+            this.isReady.Add(player, false);
         }
 
         public override void ConnectionRecived(Spang.Core.Network.IServer server, Spang.Core.Network.ConnectionEventArgs eventArgs)
@@ -54,13 +62,14 @@ namespace Ashtung
                 if (eventArgs.Message is string)
                 {
                     string message = eventArgs.Message.ToString();
-                    if (message == "READY")
+                    if (message == "") return;
+                    player.Info.Name = message;
+                    
+
+                    this.isReady[player] = true;
+                    if (AllReady())
                     {
-                        this.isReady[player] = true;
-                        if (AllReady())
-                        {
-                            this.achtung.ChangeScreen(new GamePlayScreen(this.achtung));
-                        }
+                        this.achtung.ChangeScreen(new GamePlayScreen(this.achtung));
                     }
                 }
             }
@@ -68,13 +77,14 @@ namespace Ashtung
 
         private bool AllReady()
         {
+
             foreach (var item in this.isReady.Values)
             {
                 if (!item)
-                    return false;
+                    return true;
             }
 
-            return this.achtung.players.Count > 1;
+            return true;
         }
 
         public override void Update(Microsoft.Xna.Framework.GameTime time)
