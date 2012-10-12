@@ -1,0 +1,30 @@
+<resources>
+
+    <string name="app_name">Spang</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_prefs">PrefsActivity</string>
+    <string name="button_send">Connect</string>
+    <string name="title_activity_mouse">MouseActivity</string>
+    <string name="default_ip">129.16.187.226</string>
+    <string name="default_port">1337</string>
+    <string name="title_activity_text_sender">Send Text!</string>
+    <string name="network_service_started">Service started</string>
+    <string name="title_activity_networked">NetworkedActivity</string>
+    <string name="title_activity_keyboardtest">KeyboardtestActivity</string>
+    <string name="title_activity_computer">ComputerActivity</string>
+    <string name="title_activity_connection">ConnectionActivity</string>
+    <string name="keyboardinputmessage_begin">${</string>
+    <string name="keyboardinputmessage_end">}</string>
+    <string name="keyboardinputmessage_shift">s</string>
+    <string name="keyboardinputmessage_ctrl">c</string>
+    <string name="keyboardinputmessage_altgr">a</string>
+    <string name="scan_qrc_text">Scan QRC</string>
+    <string name="show_keyboard_text">Show keyboard</string>
+    <string name="title_activity_shortcut">ShortcutActivity</string>
+    <string name="title_activity_achtung">AchtungActivity</string>
+    <string name="ready">Ready!</string>
+    <string name="your_name">Your name here.</string>
+
+</resources>
