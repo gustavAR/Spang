@@ -70,7 +70,7 @@ public class SpangSensorService extends Service{
 		this.timer = new Timer();
 		this.manager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE); 
 
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
+/*		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
 			
 			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
@@ -79,23 +79,23 @@ public class SpangSensorService extends Service{
 				
 			}
 		});
-
+*/
 		Resources resources = this.getResources();
 
 		SensorListBuilder builder = new SensorListBuilder(this.manager, resources);
 		this.sensors = builder.build();
 	}
-	
+/*	
 	public void onPreferenceChanged(SharedPreferences sharedPreferences, String key){
 		this.stopProcess();
 		this.startProcess();
 	}
-
+*/
 	/**
 	 * {@inheritDoc}
 	 */
 	@SuppressWarnings("deprecation") //Orientation sensor is deprecated, but we only use the sensor type value here.
-									 //The ISensor used in the service uses non-depricated methods.
+									 //The ISensor used in the service uses non-deprecated methods.
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Intent i = new Intent(this, NetworkService.class);
@@ -160,7 +160,7 @@ public class SpangSensorService extends Service{
 	 * input at a fixed sampling rate.
 	 */
 	public void startProcess() {
-		for (final ISensor sensor : sensors) {
+/*		for (final ISensor sensor : sensors) {
 			TimerTask task = new TimerTask() {
 				
 				@Override
@@ -176,7 +176,7 @@ public class SpangSensorService extends Service{
 			};
 			timer.scheduleAtFixedRate(task, 0, getSamplingRateBySensor(sensor));
 		}
-	}
+*/	}
 	/**
 	 * Stops the processing of the sensor input.
 	 */
