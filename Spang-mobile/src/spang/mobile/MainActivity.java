@@ -102,6 +102,17 @@ public class MainActivity extends Activity {
 		
 		
 	}
+	
+	/**
+	 * Goes to the shortcutview.
+	 * Is used for debug only.
+	 * Because the emulator is so fucking slow.
+	 * @param view
+	 */
+	public void goToShortcuts(View view){
+		Intent intent = new Intent(this, ShortcutActivity.class);
+		startActivity(intent);
+	}
 
 	/**
 	 * This tells the phone to scan a QR-code with zxing

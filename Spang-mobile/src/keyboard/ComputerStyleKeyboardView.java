@@ -25,6 +25,13 @@ import android.util.Log;
  */
 public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardView.OnKeyboardActionListener {
 
+	//These are only here to make the code somewhat readable.
+	private final String keyboardMessageBegin = this.getContext().getString(R.string.keyboardinputmessage_begin);
+	private final String keyboardMessageEnd = this.getContext().getString(R.string.keyboardinputmessage_end);
+	private final String keyboardMessageShift = this.getContext().getString(R.string.keyboardinputmessage_shift);
+	private final String keyboardMessageCtrl = this.getContext().getString(R.string.keyboardinputmessage_ctrl);
+	private final String keyboardMessageAltgr = this.getContext().getString(R.string.keyboardinputmessage_altgr);
+	
 	/**
 	 * This is the currently active keyboard,
 	 * the one we show.
@@ -121,8 +128,8 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 			return;
 		default://Was an F-key pressed?
 			if(ComputerStyleKeyboard.F12_KEYCODE<primaryCode && primaryCode<ComputerStyleKeyboard.F1_KEYCODE)//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
-				sendKeyPress(R.string.keyboardinputmessage_begin + "F" + (-primaryCode-10) + 
-							 R.string.keyboardinputmessage_end);//Is there any way we could avoid having the keyboard knowing the keycodelayout?
+				sendKeyPress(this.keyboardMessageBegin + "F" + (-primaryCode-10) + 
+						this.keyboardMessageEnd);//Is there any way we could avoid having the keyboard knowing the keycodelayout?
 		}
 	}
 
@@ -154,14 +161,14 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 		String toSend = "";
 		if(!(this.altgrActive || this.ctrlActive || this.shiftActive))
 			return textInput;
-		toSend += R.string.keyboardinputmessage_begin;
+		toSend += this.keyboardMessageBegin;
 		if(this.shiftActive)
-			toSend += R.string.keyboardinputmessage_shift;
+			toSend += this.keyboardMessageShift;
 		if(this.ctrlActive)
-			toSend += R.string.keyboardinputmessage_ctrl;
+			toSend += this.keyboardMessageCtrl;
 		if(this.altgrActive)
-			toSend += R.string.keyboardinputmessage_altgr;
-		toSend += R.string.keyboardinputmessage_end;
+			toSend += this.keyboardMessageAltgr;
+		toSend += this.keyboardMessageEnd;
 		
 		toSend += textInput;
 		return toSend;

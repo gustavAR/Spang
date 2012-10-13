@@ -21,14 +21,15 @@ public final class R {
         public static final int sym_keyboard_space=0x7f020007;
     }
     public static final class id {
-        public static final int Keyboard=0x7f090007;
+        public static final int Keyboard=0x7f090008;
         public static final int button1=0x7f090001;
-        public static final int button2=0x7f090005;
-        public static final int button3=0x7f090004;
+        public static final int button2=0x7f090004;
+        public static final int button3=0x7f090005;
         public static final int editText1=0x7f090002;
         public static final int editText2=0x7f090003;
         public static final int keyboard=0x7f090000;
-        public static final int menu_settings=0x7f090006;
+        public static final int menu_settings=0x7f090007;
+        public static final int shortcut_base_linear_layout=0x7f090006;
     }
     public static final class integer {
         public static final int Accelerometer=0x7f050002;
@@ -50,8 +51,9 @@ public final class R {
         public static final int activity_mouse=0x7f030003;
         public static final int activity_networked=0x7f030004;
         public static final int activity_shortcut=0x7f030005;
-        public static final int activity_text_sender=0x7f030006;
-        public static final int input=0x7f030007;
+        public static final int activity_shortcut_preference=0x7f030006;
+        public static final int activity_text_sender=0x7f030007;
+        public static final int input=0x7f030008;
     }
     public static final class menu {
         public static final int activity_computer=0x7f080000;
@@ -61,7 +63,8 @@ public final class R {
         public static final int activity_mouse=0x7f080004;
         public static final int activity_networked=0x7f080005;
         public static final int activity_shortcut=0x7f080006;
-        public static final int activity_text_sender=0x7f080007;
+        public static final int activity_shortcut_preference=0x7f080007;
+        public static final int activity_text_sender=0x7f080008;
     }
     public static final class string {
         public static final int app_name=0x7f060000;
@@ -77,6 +80,8 @@ public final class R {
         public static final int menu_settings=0x7f060002;
         public static final int network_service_started=0x7f06000a;
         public static final int scan_qrc_text=0x7f060014;
+        public static final int shortcut_button_keycombo=0x7f060018;
+        public static final int shortcut_button_name=0x7f060019;
         public static final int show_keyboard_text=0x7f060015;
         public static final int title_activity_computer=0x7f06000d;
         public static final int title_activity_connection=0x7f06000e;
@@ -86,6 +91,7 @@ public final class R {
         public static final int title_activity_networked=0x7f06000b;
         public static final int title_activity_prefs=0x7f060004;
         public static final int title_activity_shortcut=0x7f060016;
+        public static final int title_activity_shortcut_preference=0x7f060017;
         public static final int title_activity_text_sender=0x7f060009;
     }
     public static final class style {

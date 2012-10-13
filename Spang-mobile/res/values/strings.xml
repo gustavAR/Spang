@@ -23,5 +23,9 @@
     <string name="scan_qrc_text">Scan QRC</string>
     <string name="show_keyboard_text">Show keyboard</string>
     <string name="title_activity_shortcut">ShortcutActivity</string>
+    <string name="title_activity_shortcut_preference">ShortcutPreferenceActivity</string>
+    <string name="shortcut_button_keycombo">shortcut_button_keycombo</string>
+    <string name="shortcut_button_name">shortcut_button_name</string>
+    
 
 </resources>
