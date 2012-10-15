@@ -26,6 +26,6 @@
     <string name="title_activity_shortcut_preference">ShortcutPreferenceActivity</string>
     <string name="shortcut_button_keycombo">shortcut_button_keycombo</string>
     <string name="shortcut_button_name">shortcut_button_name</string>
-    
+    <string name="title_activity_shortcut_prefs">ShortcutPrefsActivity</string>
 
 </resources>
