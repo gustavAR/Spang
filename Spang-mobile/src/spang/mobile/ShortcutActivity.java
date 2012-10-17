@@ -35,6 +35,8 @@ public class ShortcutActivity extends Activity {
 
 	private static final String KEYCOMBINATION_NOT_FOUND = "Keycombination not found";
 	private static final String BUTTON_NAME_NOT_FOUND = "Button name not found";
+	private static final int BUTTON_WIDTH = 100;
+	private static final int BUTTON_HEIGHT = 100;
 
 	SharedPreferences preferences;
 
@@ -60,7 +62,7 @@ public class ShortcutActivity extends Activity {
 	 * Thus we fill our layout with a text instructing
 	 * the user to go to settings,
 	 * and a button which takes them there.
-	 * @param layout
+	 * @param layout the base layout
 	 */
 	private void directUserToSettings(LinearLayout layout) {
 		TextView textView = new TextView(this);
@@ -71,8 +73,8 @@ public class ShortcutActivity extends Activity {
 		buttonView.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
-				Intent intent = new Intent(ShortcutActivity.this, ShortcutPreferenceActivity.class);
-				
+				Intent intent = new Intent(ShortcutActivity.this, ShortcutPrefsActivity.class);
+				startActivity(intent);
 			}
 		});
 		
@@ -82,16 +84,14 @@ public class ShortcutActivity extends Activity {
 
 	private Button[] loadButtons() {
 		List<Button> buttons = new ArrayList<Button>();
-		int i = 0;
-		while(true){
+		for (int i = 0; ; i++) {//Infinite for-loop. It lets me initialize i, increment it and loop on one line.
 			Button button = this.loadButton(i);
 			if(button.getText().equals(BUTTON_NAME_NOT_FOUND))
 				break;
 			buttons.add(button);
-			i++;
 		}
 
-		return (Button[]) buttons.toArray();
+		return buttons.toArray(new Button[buttons.size()]);
 	}
 
 	@Override
@@ -139,11 +139,11 @@ public class ShortcutActivity extends Activity {
 	 * linearlayout) inside the big base vertical linearlayout 
 	 * every time we risk venturing outside the screen 
 	 * with the next button.
-	 * @param ll The base layout inside which we create our rows of buttons.
+	 * @param baseLayout The base layout inside which we create our rows of buttons.
 	 * 			 Should be vertical.
 	 * @param buttons The buttons which we will put inside the layouts.
 	 */
-	private void populateLayouts(LinearLayout ll, Button[] buttons) {
+	private void populateLayouts(LinearLayout baseLayout, Button[] buttons) {
 
 		Display display = getWindowManager().getDefaultDisplay();
 		Point size = new Point();
@@ -151,43 +151,42 @@ public class ShortcutActivity extends Activity {
 		int width = display.getWidth();       
 		int maxHeight = display.getHeight();
 		if (buttons.length > 0) {
-			LinearLayout llAlso = new LinearLayout(this);
-			llAlso.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+			LinearLayout row = new LinearLayout(this);
+			row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
 					LayoutParams.WRAP_CONTENT));
-			llAlso.setOrientation(LinearLayout.HORIZONTAL);
+			row.setOrientation(LinearLayout.HORIZONTAL);
 
 			TextView txtSample = new TextView(this);
 
-			llAlso.addView(txtSample);
+			row.addView(txtSample);
 			txtSample.measure(0, 0);
 
 			int widthSoFar = txtSample.getMeasuredWidth();
 			for (Button button : buttons) {
-				TextView txtSamItem = new TextView(this, null,
-						android.R.attr.textColorLink);
-				txtSamItem.setPadding(10, 0, 0, 0);
-				txtSamItem.setTag(button);
 
-				txtSamItem.measure(0, 0);
-				widthSoFar += txtSamItem.getMeasuredWidth();
+				button.setWidth(BUTTON_WIDTH);
+				button.setHeight(BUTTON_HEIGHT);
+
+				button.measure(0, 0);
+				widthSoFar += button.getMeasuredWidth();
 
 				if (widthSoFar >= width) {
-					ll.addView(llAlso);
+					baseLayout.addView(row);
 
-					llAlso = new LinearLayout(this);
-					llAlso.setLayoutParams(new LayoutParams(
+					row = new LinearLayout(this);
+					row.setLayoutParams(new LayoutParams(
 							LayoutParams.FILL_PARENT,
 							LayoutParams.WRAP_CONTENT));
-					llAlso.setOrientation(LinearLayout.HORIZONTAL);
+					row.setOrientation(LinearLayout.HORIZONTAL);
 
-					llAlso.addView(txtSamItem);
-					widthSoFar = txtSamItem.getMeasuredWidth();
+					row.addView(button);
+					widthSoFar = button.getMeasuredWidth();
 				} else {
-					llAlso.addView(txtSamItem);
+					row.addView(button);
 				}
 			}
 
-			ll.addView(llAlso);
+			baseLayout.addView(row);
 		}
 	}
 }

@@ -2,26 +2,32 @@ package keyboard;
 
 import spang.mobile.NetworkService;
 import spang.mobile.R;
+import spang.mobile.R.string;
+import spang.mobile.R.xml;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.inputmethodservice.KeyboardView;
 import android.util.AttributeSet;
 import android.util.Log;
 
 /**
- * This is the view which contains the keyboard.
- * The keyboard will send events to this view,
- * which sends them to the packer which will
- * send them over the network.
+ * This view contains a keyboard.
+ * As soon as a non-modifier key is pressed,
+ * the keyboard will finish the underlying activity
+ * with the keycombination (button + modifiers) pressed
+ * accessible through the result intent extra KeyCombination
  * 
- * ATTENTION: setPacker(Packer packer) MUST be
- * 			  called with a valid packer before
- * 			  any keypresses are made.
  * @author Gustav Alm Rosenblad
  *
  */
-public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardView.OnKeyboardActionListener {
+public class KeyboardForKeycomboView extends KeyboardView implements KeyboardView.OnKeyboardActionListener {
 
+	/**
+	 * This is the key with which you can extract the keycombo,
+	 * as a string, from the result intent.
+	 */
+	public static final String KEYCOMBO_EXTRAKEY = "KeyCombination";
 	//These are only here to make the code somewhat readable.
 	private final String keyboardMessageBegin = this.getContext().getString(R.string.keyboardinputmessage_begin);
 	private final String keyboardMessageEnd = this.getContext().getString(R.string.keyboardinputmessage_end);
@@ -35,7 +41,7 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	 */
 	private ComputerStyleKeyboard ctrlKeyboard;
 
-	private NetworkService network;
+
 	private boolean ctrlActive; //Is ctrl currently pressed?
 	private boolean altgrActive;//Is altgr currently pressed?
 	private boolean shiftActive;//Is shift currently pressed?
@@ -45,33 +51,11 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	 * @param context
 	 * @param attrs
 	 */
-	public ComputerStyleKeyboardView(Context context, AttributeSet attrs, NetworkService networkService ) {
+	public KeyboardForKeycomboView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.ctrlKeyboard = new ComputerStyleKeyboard(context, R.xml.unicodeqwerty);
 		this.setKeyboard(ctrlKeyboard);
 		this.setOnKeyboardActionListener(this);
-		this.network = networkService;
-	}
-
-	/**
-	 * This updates the appearance of the keyboard
-	 */
-	public void updateKeyboardState(){
-		if (ctrlActive){
-			ctrlKeyboard = new ComputerStyleKeyboard(this.getContext(), R.xml.unicodeqwerty);
-		} else if (altgrActive){
-			ctrlKeyboard = new ComputerStyleKeyboard(this.getContext(), R.xml.unicodealtgr);
-		}
-		else if (this.shiftActive){
-			ctrlKeyboard = new ComputerStyleKeyboard(this.getContext(), R.xml.unicodeshifted);
-		}
-		else {
-			ctrlKeyboard = new ComputerStyleKeyboard(this.getContext(), R.xml.unicodeqwerty);
-		}
-		this.setKeyboard(ctrlKeyboard);
-		ctrlKeyboard.getCtrlKey().on = this.ctrlActive;
-		ctrlKeyboard.getAltgrKey().on = this.altgrActive;
-		this.setShifted(this.shiftActive);
 	}
 
 	public void swipeLeft() {}
@@ -83,7 +67,7 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	 */
 	@Override
 	public void swipeUp() {
-		goBackToMain();
+		finishActivity();
 	}
 
 	/**
@@ -92,41 +76,21 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	 */
 	@Override
 	public void swipeDown() {
-		goBackToMain();
+		finishActivity();
 	}
 
 	/**
 	 * Called when a key is pressed.
 	 */
 	public void onKey(int primaryCode, int[] keyCodes) {
-		if(isFunctionKeycode(primaryCode)){
+		if(isModifierKeycode(primaryCode)){
+			handleModifierPress(primaryCode);
+		}else if (isFunctionKeycode(primaryCode)){
 			handleFunctionPress(primaryCode);
 		}else{
 			char character = (char)primaryCode;
-			sendKeyPress("" + character);
+			returnResult("" + character);
 			resetModifiers();
-		}
-		this.updateKeyboardState();
-	}
-
-	private void handleFunctionPress(int primaryCode) {
-		switch (primaryCode){
-		case ComputerStyleKeyboard.SHIFT_KEYCODE:
-			this.shiftActive = !this.shiftActive;
-			return;
-		case ComputerStyleKeyboard.CTRL_KEYCODE:
-			this.ctrlActive = !this.ctrlActive;
-			return;
-		case ComputerStyleKeyboard.HIDE_KEYBOARD_KEYCODE:
-			goBackToMain();
-			return;
-		case ComputerStyleKeyboard.ALTGR_KEYCODE:
-			this.altgrActive = !this.altgrActive;
-			return;
-		default://Was an F-key pressed?
-			if(ComputerStyleKeyboard.F12_KEYCODE<primaryCode && primaryCode<ComputerStyleKeyboard.F1_KEYCODE)//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
-				sendKeyPress(this.keyboardMessageBegin + "F" + (-primaryCode-10) + 
-						this.keyboardMessageEnd);//Is there any way we could avoid having the keyboard knowing the keycodelayout?
 		}
 	}
 
@@ -134,8 +98,62 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 		return primaryCode<0;
 	}
 
-	private void sendKeyPress(String character) {
-		this.network.send(addModifierIDs(character));
+	/**
+	 * Handles the different function keypresses.
+	 * Functions have keycodes below zero.
+	 * 
+	 * Methods like this one are mostly for readability.
+	 * @param primaryCode
+	 */
+	private void handleFunctionPress(int primaryCode) {
+		if(ComputerStyleKeyboard.F12_KEYCODE<primaryCode && primaryCode<ComputerStyleKeyboard.F1_KEYCODE){//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
+			returnResult(this.keyboardMessageBegin + "F" + (-primaryCode-10) + 
+					this.keyboardMessageEnd);//Is there any way we could avoid having the keyboard knowing the keycodelayout?
+		} else if (primaryCode == ComputerStyleKeyboard.HIDE_KEYBOARD_KEYCODE){
+			finishActivity();
+		} else {
+			throw new IllegalArgumentException("Class KeyboardForKeycomboView does not yet support function keycode " + primaryCode);
+		}
+	}
+
+	/**
+	 * Handles the different modifier keypresses.
+	 * Basically, 
+	 * 
+	 * Methods like this one are mostly for readability.
+	 * @param primaryCode
+	 */
+	private void handleModifierPress(int primaryCode) {
+		switch (primaryCode){
+		case ComputerStyleKeyboard.SHIFT_KEYCODE:
+			this.shiftActive = !this.shiftActive;
+			return;
+		case ComputerStyleKeyboard.CTRL_KEYCODE:
+			this.ctrlActive = !this.ctrlActive;
+			return;
+		case ComputerStyleKeyboard.ALTGR_KEYCODE:
+			this.altgrActive = !this.altgrActive;
+			return;
+		}
+	}
+
+	private boolean isModifierKeycode(int primaryCode) {
+		return 	primaryCode == ComputerStyleKeyboard.SHIFT_KEYCODE ||
+				primaryCode == ComputerStyleKeyboard.CTRL_KEYCODE ||
+				primaryCode == ComputerStyleKeyboard.ALTGR_KEYCODE;
+	}
+
+	/**
+	 * Ends the activity containing this view,
+	 * and adds the character with eventual modifiers
+	 * as an extra to the result intent
+	 * @param character
+	 */
+	private void returnResult(String character) {
+		Intent data = new Intent();
+		data.putExtra(KEYCOMBO_EXTRAKEY, addModifierIDs(character));
+		((Activity)this.getContext()).setResult(Activity.RESULT_OK, data);
+		finishActivity();
 		Log.i("Sent: ", character);
 	}
 
@@ -171,7 +189,10 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 		return toSend;
 	}
 
-	private void goBackToMain() {
+	/**
+	 * Finishes the underlying activity.
+	 */
+	private void finishActivity() {
 		((Activity)this.getContext()).finish();
 	}
 

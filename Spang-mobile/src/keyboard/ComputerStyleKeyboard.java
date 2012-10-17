@@ -33,8 +33,8 @@ public class ComputerStyleKeyboard extends Keyboard {
 	public static final int F11_KEYCODE = -21;
 	public static final int F12_KEYCODE = -22;
 	
-	Key ctrlKey;
-	Key altgrKey;
+	private Key ctrlKey;
+	private Key altgrKey;
 	
     public ComputerStyleKeyboard(Context context, int xmlLayoutResId) {
         super(context, xmlLayoutResId);

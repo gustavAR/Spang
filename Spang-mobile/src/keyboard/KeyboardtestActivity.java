@@ -15,11 +15,6 @@ import android.view.Menu;
 public class KeyboardtestActivity extends NetworkedActivity {
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_keyboardtest, menu);
 		return true;

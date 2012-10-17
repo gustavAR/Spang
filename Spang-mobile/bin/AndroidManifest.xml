@@ -83,7 +83,7 @@
             android:label="@string/title_activity_shortcut" >
         </activity>
         <activity
-            android:name=".ShortcutPreferenceActivity"
+            android:name=".ShortcutPrefsActivity"
             android:label="@string/title_activity_shortcut_preference" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -94,6 +94,15 @@
         <activity
             android:name=".ShortcutPrefsActivity"
             android:label="@string/title_activity_shortcut_prefs" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="keyboard.InputKeycombinationActivity"
+            android:label="@string/title_activity_input_keycombination" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
