@@ -4,4 +4,5 @@
         android:orderInCategory="100"
         android:showAsAction="never" />
     <item android:id="@+id/Keyboard" android:title="Open Keyboard" android:onClick="onShowKeyboard" android:showAsAction="never"></item>
+    <item android:id="@+id/shortcuts" android:onClick="goToShortcuts" android:title="Shortcuts"></item>
 </menu>

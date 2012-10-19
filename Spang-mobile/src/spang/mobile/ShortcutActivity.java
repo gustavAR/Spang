@@ -12,11 +12,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Display;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.textservice.TextInfo;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
@@ -31,7 +33,7 @@ import android.widget.TextView;
  * 
  * @author Gustav Alm Rosenblad
  */
-public class ShortcutActivity extends Activity {
+public class ShortcutActivity extends NetworkedActivity {
 
 	private static final String KEYCOMBINATION_NOT_FOUND = "Keycombination not found";
 	private static final String BUTTON_NAME_NOT_FOUND = "Button name not found";
@@ -45,15 +47,28 @@ public class ShortcutActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_shortcut);
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		this.preferences.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
+			
+			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+					String key) {
+				ShortcutActivity.this.reset();
+			}
+		});
 
 		LinearLayout layout = (LinearLayout)findViewById(R.id.shortcut_base_linear_layout);
 
 		Button[] buttons = this.loadButtons();
-//		if(buttons.length == 0){
+		if(buttons.length == 0){
 			this.directUserToSettings(layout);
-//		}else{
-//			this.populateLayouts(layout, buttons);
-//		}
+		}else{
+			this.populateLayouts(layout, buttons);
+		}
+	}
+
+	protected void reset() {
+		Intent intent = getIntent();
+		finish();
+		startActivity(intent);
 	}
 
 	/**
@@ -67,17 +82,17 @@ public class ShortcutActivity extends Activity {
 	private void directUserToSettings(LinearLayout layout) {
 		TextView textView = new TextView(this);
 		textView.setText("No saved shortcuts were found.\nYou can create some in settings.");
-		
+
 		Button buttonView = new Button(this);
 		buttonView.setText("Go to settings.");
 		buttonView.setOnClickListener(new OnClickListener() {
-			
+
 			public void onClick(View v) {
 				Intent intent = new Intent(ShortcutActivity.this, ShortcutPrefsActivity.class);
 				startActivity(intent);
 			}
 		});
-		
+
 		layout.addView(textView);
 		layout.addView(buttonView);
 	}
@@ -92,12 +107,6 @@ public class ShortcutActivity extends Activity {
 		}
 
 		return buttons.toArray(new Button[buttons.size()]);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_shortcut, menu);
-		return true;
 	}
 
 	/**
@@ -125,8 +134,13 @@ public class ShortcutActivity extends Activity {
 		return button;
 	}
 
+	/**
+	 * Sends a string representing a key-combination
+	 * over the network.
+	 * @param keyCombination
+	 */
 	protected void sendKeyCombination(String keyCombination) {
-
+		this.getNetworkService().send(keyCombination);
 	}
 
 	/**
@@ -150,43 +164,86 @@ public class ShortcutActivity extends Activity {
 
 		int width = display.getWidth();       
 		int maxHeight = display.getHeight();
-		if (buttons.length > 0) {
-			LinearLayout row = new LinearLayout(this);
-			row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-					LayoutParams.WRAP_CONTENT));
-			row.setOrientation(LinearLayout.HORIZONTAL);
+		LinearLayout row = new LinearLayout(this);
+		row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+				LayoutParams.WRAP_CONTENT));
+		row.setOrientation(LinearLayout.HORIZONTAL);
 
-			TextView txtSample = new TextView(this);
+		TextView txtSample = new TextView(this);
 
-			row.addView(txtSample);
-			txtSample.measure(0, 0);
+		row.addView(txtSample);
+		txtSample.measure(0, 0);
 
-			int widthSoFar = txtSample.getMeasuredWidth();
-			for (Button button : buttons) {
+		int widthSoFar = txtSample.getMeasuredWidth();
+		for (Button button : buttons) {
 
-				button.setWidth(BUTTON_WIDTH);
-				button.setHeight(BUTTON_HEIGHT);
+			button.setWidth(BUTTON_WIDTH);
+			button.setHeight(BUTTON_HEIGHT);
 
-				button.measure(0, 0);
-				widthSoFar += button.getMeasuredWidth();
+			button.measure(0, 0);
+			widthSoFar += button.getMeasuredWidth();
 
-				if (widthSoFar >= width) {
-					baseLayout.addView(row);
+			if (widthSoFar >= width) {
+				baseLayout.addView(row);
 
-					row = new LinearLayout(this);
-					row.setLayoutParams(new LayoutParams(
-							LayoutParams.FILL_PARENT,
-							LayoutParams.WRAP_CONTENT));
-					row.setOrientation(LinearLayout.HORIZONTAL);
+				row = new LinearLayout(this);
+				row.setLayoutParams(new LayoutParams(
+						LayoutParams.FILL_PARENT,
+						LayoutParams.WRAP_CONTENT));
+				row.setOrientation(LinearLayout.HORIZONTAL);
 
-					row.addView(button);
-					widthSoFar = button.getMeasuredWidth();
-				} else {
-					row.addView(button);
-				}
+				row.addView(button);
+				widthSoFar = button.getMeasuredWidth();
+			} else {
+				row.addView(button);
 			}
+		}
 
-			baseLayout.addView(row);
+		baseLayout.addView(row);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_shortcut, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.shortcut_settings:
+			this.goToShortcutSettings(item);
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 	}
+
+	private void goToShortcutSettings(MenuItem item){
+		Intent intent = new Intent(this, ShortcutPrefsActivity.class);
+		startActivity(intent);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	 @Override
+	 protected void onNetworkServiceConnected() {
+		 //Don't really care.
+	 }
+
+	 /**
+	  * {@inheritDoc}
+	  */
+	 @Override
+	 protected void onNetworkSerivceDissconnected() {
+		 Toast.makeText(this,"Disconnected!", Toast.LENGTH_SHORT).show();
+	 }
+
+	 /**
+	  * {@inheritDoc}
+	  */
+	 @Override
+	 protected void onMessageRecived(Object message) {
+		 //We don't really want t do anything
+	 }
 }

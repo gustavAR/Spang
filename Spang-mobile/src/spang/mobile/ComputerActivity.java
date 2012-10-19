@@ -1,6 +1,6 @@
 package spang.mobile;
 
-import keyboard.KeyboardtestActivity;
+import keyboard.KeyboardNetworkedActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -42,14 +42,20 @@ public class ComputerActivity extends NetworkedActivity {
         switch (item.getItemId()) {
             case R.id.Keyboard:
             	this.onShowKeyboard(item);
+            case R.id.shortcuts:
+            	this.goToShortcuts(item);
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-	
+
+	public void goToShortcuts(MenuItem item){
+		Intent intent = new Intent(this, ShortcutActivity.class);
+		startActivity(intent);
+	}
 	
 	public void onShowKeyboard(MenuItem item) {
-		Intent intent = new Intent(this, KeyboardtestActivity.class);
+		Intent intent = new Intent(this, KeyboardNetworkedActivity.class);
 		this.startActivity(intent);
 	}
 

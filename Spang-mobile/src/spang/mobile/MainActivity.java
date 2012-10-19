@@ -1,6 +1,6 @@
 package spang.mobile;
 
-import keyboard.KeyboardtestActivity;
+import keyboard.KeyboardNetworkedActivity;
 import utils.LogCatLogger;
 import utils.Logger;
 import android.app.Activity;
@@ -101,17 +101,6 @@ public class MainActivity extends Activity {
 	public void captureScreen(View view){
 		
 		
-	}
-	
-	/**
-	 * Goes to the shortcutview.
-	 * Is used for debug only.
-	 * Because the emulator is so fucking slow.
-	 * @param view
-	 */
-	public void goToShortcuts(View view){
-		Intent intent = new Intent(this, ShortcutActivity.class);
-		startActivity(intent);
 	}
 
 	/**

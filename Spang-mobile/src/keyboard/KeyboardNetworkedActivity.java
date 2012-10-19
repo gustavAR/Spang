@@ -6,13 +6,13 @@ import android.os.Bundle;
 import android.view.Menu;
 
 /**
- * This is just a test.
- * It was needed since we have been unable to
- * network the emulator to the computer.
+ * Activity which holds a view of a keyboard.
+ * When you push buttons on the keyboard,
+ * the pushes will be sent over the network.
  * @author Gustav Alm Rosenblad
  *
  */
-public class KeyboardtestActivity extends NetworkedActivity {
+public class KeyboardNetworkedActivity extends NetworkedActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

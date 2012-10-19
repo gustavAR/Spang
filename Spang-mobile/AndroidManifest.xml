@@ -65,7 +65,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="keyboard.KeyboardtestActivity"
+            android:name="keyboard.KeyboardNetworkedActivity"
             android:label="@string/title_activity_keyboardtest" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

@@ -26,7 +26,7 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 	private static final String SHORTCUT_NAME_NOT_FOUND = "Shortcut name was not found";
 	private static final String SHORTCUT_KEYCOMBO_NOT_FOUND = "Shortcut keycombo was not found";
 	private static final String DEFAULT_SHORTCUT_KEYCOMBO = "";
-	private static final String DEFAULT_SHORTCUT_NAME = NEW_SHORTCUT_BUTTON_TEXT;
+	private static final String DEFAULT_SHORTCUT_NAME = "";
 
 	private SharedPreferences preferences;
 	
