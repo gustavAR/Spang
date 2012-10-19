@@ -16,12 +16,23 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
+/**
+ * Activity for creating, deleting and editing shortcuts.
+ * @author Gustav Alm Rosenblad
+ */
 public class ShortcutPrefsActivity extends PreferenceActivity {
 
+	private static final String NEW_SHORTCUT_BUTTON_TEXT = "New shortcut";
 	private static final String SHORTCUT_NAME_NOT_FOUND = "Shortcut name was not found";
 	private static final String SHORTCUT_KEYCOMBO_NOT_FOUND = "Shortcut keycombo was not found";
+	private static final String DEFAULT_SHORTCUT_KEYCOMBO = "";
+	private static final String DEFAULT_SHORTCUT_NAME = NEW_SHORTCUT_BUTTON_TEXT;
 
 	private SharedPreferences preferences;
+	
+	/**
+	 * The number of shortcuts in memory.
+	 */
 	private int numOfShortcuts;
 
 	/**
@@ -34,7 +45,13 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 
 	}
 
-	//TODO: How should we do this? It's not really that clear.
+	/**
+	 * This method generates a plethora of preferences,
+	 * puts them in a screen, and returns it.
+	 * 
+	 * The preferences are generated from the shared preferences memory.
+	 * @return
+	 */
 	private PreferenceScreen getPref() {
 		PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(this);
 
@@ -47,13 +64,16 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 			}
 		});
 
-		String trooll = "TROLOLOL";
-		Editor editor = this.preferences.edit();
-		editor.putString(getString(R.string.shortcut_button_keycombo) + 0, trooll);
-		String nTOTOTOTOTOame = "nameHerre LOL";
-		editor.putString(getString(R.string.shortcut_button_name) + 0, nTOTOTOTOTOame);
-		editor.commit();
-		
+		Preference newButton = new Preference(this);
+		newButton.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			
+			public boolean onPreferenceClick(Preference preference) {
+				ShortcutPrefsActivity.this.createNewShortcut();
+				return true;
+			}
+		});
+		newButton.setTitle(NEW_SHORTCUT_BUTTON_TEXT);
+		screen.addPreference(newButton);
 		
 		for (int i = 0; ; i++) {//Infinite for-loop. It lets me initialize i, increment it and loop on one line.
 			if(!shortCutExists(i)){
@@ -72,18 +92,19 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 			PreferenceCategory shortCutCategory = new PreferenceCategory(this);
 			shortCutCategory.setSummary(name);
 			shortCutCategory.setTitle(name);
+			
+			screen.addPreference(shortCutCategory);
 
 			EditTextPreference nameEditText = new EditTextPreference(this);
 			nameEditText.setDefaultValue(name);
 			nameEditText.setText(name);
-			nameEditText.setTitle("Name");
+			nameEditText.setTitle("Name: " + name);
 			nameEditText.setKey(getString(R.string.shortcut_button_name) + i);
 
-			EditTextPreference comboEditText = new EditTextPreference(this);
+			Preference comboEditText = new Preference(this);
 			comboEditText.setDefaultValue(keyCombo);
-			comboEditText.setText(keyCombo);
-			comboEditText.setTitle("Keycombo");
-			comboEditText.setKey(getString(R.string.shortcut_button_keycombo) + i);
+			comboEditText.setTitle("Keycombo: " + keyCombo);
+			comboEditText.setKey(keyCombo);
 
 			OnPreferenceClickListener cListener = new OnPreferenceClickListener() {
 				int index = shortCutIndex;
@@ -94,8 +115,60 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 			};
 
 			comboEditText.setOnPreferenceClickListener(cListener);
+			
+			Preference deletePref = new Preference(this);
+			deletePref.setDefaultValue(keyCombo);
+			deletePref.setTitle("Delete");
+
+			OnPreferenceClickListener deleteListener = new OnPreferenceClickListener() {
+				int index = shortCutIndex;
+				public boolean onPreferenceClick(Preference preference) {
+					ShortcutPrefsActivity.this.deleteShortcut(index);
+					return true;
+				}
+			};
+
+			deletePref.setOnPreferenceClickListener(deleteListener);
+
+			shortCutCategory.addPreference(nameEditText);
+			shortCutCategory.addPreference(comboEditText);
+			shortCutCategory.addPreference(deletePref);
 		}
 		return screen;
+	}
+
+	/**
+	 * Creates a new shortcut with default name and keycombo.
+	 */
+	protected void createNewShortcut() {
+		Editor editor = this.preferences.edit();
+		editor.putString(getString(R.string.shortcut_button_keycombo) + this.numOfShortcuts, DEFAULT_SHORTCUT_KEYCOMBO);
+		editor.putString(getString(R.string.shortcut_button_name) + this.numOfShortcuts, DEFAULT_SHORTCUT_NAME);
+		editor.commit();
+		
+		reset();
+	}
+	
+	/**
+	 * Deletes a shortcut.
+	 * All shortcuts with a higher index will have their
+	 * index decremented by one.
+	 * @param shortcutIndex
+	 */
+	protected void deleteShortcut(int shortcutIndex) {
+		Editor editor = this.preferences.edit();
+		for(int i = shortcutIndex; i < this.numOfShortcuts;i++){
+			String name = this.preferences.getString(
+					getString(R.string.shortcut_button_name) + (i + 1), 
+					SHORTCUT_NAME_NOT_FOUND);
+			String keyCombo = this.preferences.getString(
+					getString(R.string.shortcut_button_keycombo) + (i + 1), 
+					SHORTCUT_KEYCOMBO_NOT_FOUND);
+			editor.putString(getString(R.string.shortcut_button_keycombo) + i, keyCombo);
+			editor.putString(getString(R.string.shortcut_button_name) + i, name);
+		}
+		editor.commit();
+		reset();
 	}
 
 	/**
@@ -115,6 +188,9 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 	}
 
 	/**
+	 * Sets the keycombo of the shortcut indexed by the requestcode
+	 * from the intent extra with the key KEYCOMBO_EXTRAKEY
+	 * (KEYCOMBO_EXTRAKEY is a public constant in KeyboardForKeycomboView).
 	 * {@inheritDoc}
 	 */
 	@Override

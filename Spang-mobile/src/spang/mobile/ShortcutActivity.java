@@ -49,11 +49,11 @@ public class ShortcutActivity extends Activity {
 		LinearLayout layout = (LinearLayout)findViewById(R.id.shortcut_base_linear_layout);
 
 		Button[] buttons = this.loadButtons();
-		if(buttons.length == 0){
+//		if(buttons.length == 0){
 			this.directUserToSettings(layout);
-		}else{
-			this.populateLayouts(layout, buttons);
-		}
+//		}else{
+//			this.populateLayouts(layout, buttons);
+//		}
 	}
 
 	/**

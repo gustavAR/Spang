@@ -106,7 +106,7 @@ public class KeyboardForKeycomboView extends KeyboardView implements KeyboardVie
 	 * @param primaryCode
 	 */
 	private void handleFunctionPress(int primaryCode) {
-		if(ComputerStyleKeyboard.F12_KEYCODE<primaryCode && primaryCode<ComputerStyleKeyboard.F1_KEYCODE){//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
+		if(ComputerStyleKeyboard.F12_KEYCODE<=primaryCode && primaryCode<=ComputerStyleKeyboard.F1_KEYCODE){//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
 			returnResult(this.keyboardMessageBegin + "F" + (-primaryCode-10) + 
 					this.keyboardMessageEnd);//Is there any way we could avoid having the keyboard knowing the keycodelayout?
 		} else if (primaryCode == ComputerStyleKeyboard.HIDE_KEYBOARD_KEYCODE){
