@@ -99,7 +99,9 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	 * Called when a key is pressed.
 	 */
 	public void onKey(int primaryCode, int[] keyCodes) {
-		if(isFunctionKeycode(primaryCode)){
+		if(isModifierKeycode(primaryCode)){
+			handleModifierPress(primaryCode);
+		}else if (isFunctionKeycode(primaryCode)){
 			handleFunctionPress(primaryCode);
 		}else{
 			char character = (char)primaryCode;
@@ -109,7 +111,36 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 		this.updateKeyboardState();
 	}
 
+	private boolean isFunctionKeycode(int primaryCode) {
+		return primaryCode<0;
+	}
+
+	/**
+	 * Handles the different function keypresses.
+	 * Functions have keycodes below zero.
+	 * 
+	 * Methods like this one are mostly for readability.
+	 * @param primaryCode
+	 */
 	private void handleFunctionPress(int primaryCode) {
+		if(ComputerStyleKeyboard.F12_KEYCODE<=primaryCode && primaryCode<=ComputerStyleKeyboard.F1_KEYCODE){//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
+			sendKeyPress(this.keyboardMessageBegin + "F" + (-primaryCode-10) + 
+					this.keyboardMessageEnd);//Is there any way we could avoid having the keyboard knowing the keycodelayout?
+		} else if (primaryCode == ComputerStyleKeyboard.HIDE_KEYBOARD_KEYCODE){
+			goBackToMain();
+		} else {
+			throw new IllegalArgumentException("Class KeyboardForKeycomboView does not yet support function keycode " + primaryCode);
+		}
+	}
+
+	/**
+	 * Handles the different modifier keypresses.
+	 * Basically, 
+	 * 
+	 * Methods like this one are mostly for readability.
+	 * @param primaryCode
+	 */
+	private void handleModifierPress(int primaryCode) {
 		switch (primaryCode){
 		case ComputerStyleKeyboard.SHIFT_KEYCODE:
 			this.shiftActive = !this.shiftActive;
@@ -117,23 +148,18 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 		case ComputerStyleKeyboard.CTRL_KEYCODE:
 			this.ctrlActive = !this.ctrlActive;
 			return;
-		case ComputerStyleKeyboard.HIDE_KEYBOARD_KEYCODE:
-			goBackToMain();
-			return;
 		case ComputerStyleKeyboard.ALTGR_KEYCODE:
 			this.altgrActive = !this.altgrActive;
 			return;
-		default://Was an F-key pressed?
-			if(ComputerStyleKeyboard.F12_KEYCODE<primaryCode && primaryCode<ComputerStyleKeyboard.F1_KEYCODE)//TODO: Make use of an immutable list? Creating one for the Fkeys is more work.
-				sendKeyPress(this.keyboardMessageBegin + "F" + (-primaryCode-10) + 
-						this.keyboardMessageEnd);//Is there any way we could avoid having the keyboard knowing the keycodelayout?
 		}
 	}
 
-	private boolean isFunctionKeycode(int primaryCode) {
-		return primaryCode<0;
+	private boolean isModifierKeycode(int primaryCode) {
+		return 	primaryCode == ComputerStyleKeyboard.SHIFT_KEYCODE ||
+				primaryCode == ComputerStyleKeyboard.CTRL_KEYCODE ||
+				primaryCode == ComputerStyleKeyboard.ALTGR_KEYCODE;
 	}
-
+	
 	private void sendKeyPress(String character) {
 		this.network.send(addModifierIDs(character));
 		Log.i("Sent: ", character);

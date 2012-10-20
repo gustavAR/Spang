@@ -75,10 +75,49 @@ namespace Spang_PC_C_sharp
 
         public void NetworkedText(string text)
         {
-            foreach (var item in text)
+            KeyModifier modifiers = KeyModifier.None;
+
+            for (int i = 0; i < text.Length; i++)
             {
-                os.SendKey(item);
+                if (text[i] == '$' && text[i + 1] == '{')
+                {
+                    i += 2;//Now we are at the first modifier/function inside the modifier string
+                    while (text[i] != '}')
+                    {
+                        switch (text[i])
+                        {
+                            case ('s'):
+                                modifiers |= KeyModifier.Shift;
+                                break;
+                            case ('c'):
+                                modifiers |= KeyModifier.Ctrl;
+                                break;
+                            case ('a'):
+                                modifiers |= KeyModifier.Alt;
+                                break;
+                            case ('F'):
+                                string toSend = "{";
+                                while (text[i] != '}')
+                                {
+                                    toSend += text[i];
+                                    i++;
+                                }
+                                toSend += "}";
+                                os.SendKey(toSend, modifiers);
+                                modifiers = KeyModifier.None;
+                                continue;
+                            default:
+                                break;
+                        }
+                        i++;
+                    }
+                }
+                else
+                {
+                    os.SendKey(text[i], modifiers);
+                }
             }
+
         }
 
     }

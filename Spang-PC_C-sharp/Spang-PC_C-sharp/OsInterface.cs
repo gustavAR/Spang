@@ -32,20 +32,49 @@ namespace Spang_PC_C_sharp
         {
             string modifiedKey = this.formatKey(key);
 
+            addModifiers(modifiedKey, modifier);
+
+            SendKeys.SendWait(modifiedKey);              
+        }
+
+        /// <summary>
+        /// Sends a virtual keypress to the active application.
+        /// Some keys do not have a proper unicode.
+        /// We therefore handle them in this string overload.
+        /// 
+        /// This method should never be called with a single char.
+        /// </summary>
+        /// <param name="key">The character to send.</param>
+        /// <param name="modifier">Modifiers on the character.</param>
+        public void SendKey(string key, KeyModifier modifier = KeyModifier.None)
+        {
+            key = addModifiers(key, modifier);
+
+            SendKeys.SendWait(key);
+        }
+
+        /// <summary>
+        /// Adds the proper chars to the beginning of the string 
+        /// for use with Sendkeys.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="modifier"></param>
+        /// <returns></returns>
+        private static string addModifiers(string key, KeyModifier modifier)
+        {
             if ((modifier & KeyModifier.Alt) == KeyModifier.Alt)
             {
-                modifiedKey = '%' + modifiedKey;
+                key = '%' + key;
             }
             if ((modifier & KeyModifier.Ctrl) == KeyModifier.Ctrl)
             {
-                modifiedKey = '^' + modifiedKey;
+                key = '^' + key;
             }
             if ((modifier & KeyModifier.Shift) == KeyModifier.Shift)
             {
-                modifiedKey = '+' + modifiedKey;
+                key = '+' + key;
             }
-
-            SendKeys.SendWait(modifiedKey);              
+            return key;
         }
 
 
