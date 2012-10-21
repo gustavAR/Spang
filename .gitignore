@@ -7,6 +7,7 @@
 .metadata
 bin/
 tmp/
+gen/
 *.tmp
 *.bak
 *.swp
@@ -14,6 +15,7 @@ tmp/
 local.properties
 .settings/
 .loadpath
+.classpath
 
 # External tool builders
 .externalToolBuilders/
