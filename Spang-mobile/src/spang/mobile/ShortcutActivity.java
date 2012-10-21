@@ -6,7 +6,6 @@ import java.util.List;
 import spang.android.network.NetworkedActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -34,8 +33,6 @@ import android.widget.Toast;
  */
 public class ShortcutActivity extends NetworkedActivity {
 
-	private static final String KEYCOMBINATION_NOT_FOUND = "Keycombination not found";
-	private static final String BUTTON_NAME_NOT_FOUND = "Button name not found";
 	private static final int BUTTON_WIDTH = 100;
 	private static final int BUTTON_HEIGHT = 100;
 
@@ -44,15 +41,13 @@ public class ShortcutActivity extends NetworkedActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
 		setContentView(R.layout.activity_shortcut);
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		this.preferences.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
-			
-			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-					String key) {
-				ShortcutActivity.this.reset();
-			}
-		});
 
 		LinearLayout layout = (LinearLayout)findViewById(R.id.shortcut_base_linear_layout);
 
@@ -100,7 +95,7 @@ public class ShortcutActivity extends NetworkedActivity {
 		List<Button> buttons = new ArrayList<Button>();
 		for (int i = 0; ; i++) {//Infinite for-loop. It lets me initialize i, increment it and loop on one line.
 			Button button = this.loadButton(i);
-			if(button.getText().equals(BUTTON_NAME_NOT_FOUND))
+			if(button.getText().equals(getString(R.string.shortcut_button_name_not_found)))
 				break;
 			buttons.add(button);
 		}
@@ -118,12 +113,11 @@ public class ShortcutActivity extends NetworkedActivity {
 		Button button = new Button(this);
 		button.setText(this.preferences.getString(
 				getString(R.string.shortcut_button_name) + buttonIndex, 
-				BUTTON_NAME_NOT_FOUND));
-
+				getString(R.string.shortcut_button_name_not_found)));
 		OnClickListener listener = new OnClickListener() {
 			String keyCombination = ShortcutActivity.this.preferences.getString(
 					getString(R.string.shortcut_button_keycombo) + buttonIndex, 
-					KEYCOMBINATION_NOT_FOUND);
+					getString(R.string.shortcut_button_keycombo_not_found));
 			public void onClick(View v) {
 				ShortcutActivity.this.sendKeyCombination(keyCombination);
 			}
@@ -225,24 +219,24 @@ public class ShortcutActivity extends NetworkedActivity {
 	/**
 	 * {@inheritDoc}
 	 */
-	 @Override
-	 protected void onNetworkServiceConnected() {
-		 //Don't really care.
-	 }
+	@Override
+	protected void onNetworkServiceConnected() {
+		//Don't really care.
+	}
 
-	 /**
-	  * {@inheritDoc}
-	  */
-	 @Override
-	 protected void onNetworkSerivceDissconnected() {
-		 Toast.makeText(this,"Disconnected!", Toast.LENGTH_SHORT).show();
-	 }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void onNetworkSerivceDissconnected() {
+		Toast.makeText(this,"Disconnected!", Toast.LENGTH_SHORT).show();
+	}
 
-	 /**
-	  * {@inheritDoc}
-	  */
-	 @Override
-	 protected void onMessageRecived(Object message) {
-		 //We don't really want t do anything
-	 }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void onMessageRecived(Object message) {
+		//We don't really want t do anything
+	}
 }

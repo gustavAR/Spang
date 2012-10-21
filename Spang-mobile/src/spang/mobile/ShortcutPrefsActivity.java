@@ -10,6 +10,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
@@ -23,8 +24,6 @@ import android.preference.PreferenceScreen;
 public class ShortcutPrefsActivity extends PreferenceActivity {
 
 	private static final String NEW_SHORTCUT_BUTTON_TEXT = "New shortcut";
-	private static final String SHORTCUT_NAME_NOT_FOUND = "Shortcut name was not found";
-	private static final String SHORTCUT_KEYCOMBO_NOT_FOUND = "Shortcut keycombo was not found";
 	private static final String DEFAULT_SHORTCUT_KEYCOMBO = "";
 	private static final String DEFAULT_SHORTCUT_NAME = "";
 
@@ -83,23 +82,31 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 
 			String name = this.preferences.getString(
 					getString(R.string.shortcut_button_name) + i, 
-					SHORTCUT_NAME_NOT_FOUND);
+					getString(R.string.shortcut_button_name_not_found));
 			String keyCombo = this.preferences.getString(
 					getString(R.string.shortcut_button_keycombo) + i, 
-					SHORTCUT_KEYCOMBO_NOT_FOUND);
+					getString(R.string.shortcut_button_keycombo_not_found));
 			final int shortCutIndex = i;
 
-			PreferenceCategory shortCutCategory = new PreferenceCategory(this);
+			final PreferenceCategory shortCutCategory = new PreferenceCategory(this);
 			shortCutCategory.setSummary(name);
 			shortCutCategory.setTitle(name);
 			
 			screen.addPreference(shortCutCategory);
 
-			EditTextPreference nameEditText = new EditTextPreference(this);
+			final EditTextPreference nameEditText = new EditTextPreference(this);
 			nameEditText.setDefaultValue(name);
 			nameEditText.setText(name);
 			nameEditText.setTitle("Name: " + name);
 			nameEditText.setKey(getString(R.string.shortcut_button_name) + i);
+			nameEditText.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+				
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					shortCutCategory.setTitle((String)newValue);
+					nameEditText.setTitle("Name: " + (String)newValue);
+					return true;
+				}
+			});
 
 			Preference comboEditText = new Preference(this);
 			comboEditText.setDefaultValue(keyCombo);
@@ -160,10 +167,10 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 		for(int i = shortcutIndex; i < this.numOfShortcuts;i++){
 			String name = this.preferences.getString(
 					getString(R.string.shortcut_button_name) + (i + 1), 
-					SHORTCUT_NAME_NOT_FOUND);
+					getString(R.string.shortcut_button_name_not_found));
 			String keyCombo = this.preferences.getString(
 					getString(R.string.shortcut_button_keycombo) + (i + 1), 
-					SHORTCUT_KEYCOMBO_NOT_FOUND);
+					getString(R.string.shortcut_button_keycombo_not_found));
 			editor.putString(getString(R.string.shortcut_button_keycombo) + i, keyCombo);
 			editor.putString(getString(R.string.shortcut_button_name) + i, name);
 		}
@@ -221,6 +228,6 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 	private boolean shortCutExists(int i) {
 		return !this.preferences.getString(
 				getString(R.string.shortcut_button_name) + i, 
-				SHORTCUT_NAME_NOT_FOUND).equals(SHORTCUT_NAME_NOT_FOUND);
+				getString(R.string.shortcut_button_name_not_found)).equals(getString(R.string.shortcut_button_name_not_found));
 	}
 }

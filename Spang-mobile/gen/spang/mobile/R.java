@@ -120,11 +120,13 @@ containing a value of this type.
         public static final int network_service_started=0x7f05000a;
         public static final int scan_qrc_text=0x7f050014;
         public static final int shortcut_button_keycombo=0x7f050018;
+        public static final int shortcut_button_keycombo_not_found=0x7f05001b;
         public static final int shortcut_button_name=0x7f050019;
+        public static final int shortcut_button_name_not_found=0x7f05001a;
         public static final int show_keyboard_text=0x7f050015;
         public static final int title_activity_computer=0x7f05000d;
         public static final int title_activity_connection=0x7f05000e;
-        public static final int title_activity_input_keycombination=0x7f05001b;
+        public static final int title_activity_input_keycombination=0x7f05001d;
         public static final int title_activity_keyboardtest=0x7f05000c;
         public static final int title_activity_main=0x7f050003;
         public static final int title_activity_mouse=0x7f050006;
@@ -132,7 +134,7 @@ containing a value of this type.
         public static final int title_activity_prefs=0x7f050004;
         public static final int title_activity_shortcut=0x7f050016;
         public static final int title_activity_shortcut_preference=0x7f050017;
-        public static final int title_activity_shortcut_prefs=0x7f05001a;
+        public static final int title_activity_shortcut_prefs=0x7f05001c;
         public static final int title_activity_text_sender=0x7f050009;
     }
     public static final class style {
