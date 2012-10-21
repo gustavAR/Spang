@@ -7,7 +7,7 @@
     <string name="title_activity_prefs">PrefsActivity</string>
     <string name="button_send">Connect</string>
     <string name="title_activity_mouse">MouseActivity</string>
-    <string name="default_ip">129.16.187.226</string>
+    <string name="default_ip">10.0.2.2</string>
     <string name="default_port">1337</string>
     <string name="title_activity_text_sender">Send Text!</string>
     <string name="network_service_started">Service started</string>
@@ -26,6 +26,8 @@
     <string name="title_activity_shortcut_preference">ShortcutPreferenceActivity</string>
     <string name="shortcut_button_keycombo">shortcut_button_keycombo</string>
     <string name="shortcut_button_name">shortcut_button_name</string>
+    <string name="shortcut_button_name_not_found">Shortcut name not found</string>
+    <string name="shortcut_button_keycombo_not_found">Shortcut keycombo not found</string>
     <string name="title_activity_shortcut_prefs">ShortcutPrefsActivity</string>
     <string name="title_activity_input_keycombination">InputKeycombinationActivity</string>
 
