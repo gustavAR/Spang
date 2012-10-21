@@ -125,19 +125,7 @@ public class MainActivity extends Activity {
 					marketUri);
 			startActivity(marketIntent);
 		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch(item.getItemId()){
-		case R.id.menu_settings: 
-			Intent intent = new Intent(this, PrefsActivity.class);
-			startActivity(intent);
-		}
-		return true;
-	}
-	
-	
+	}	
 
 	/**
 	 * This is called when we get a result from another activity.

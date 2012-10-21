@@ -18,17 +18,15 @@
 package spang.android.sensors;
 
 public enum SensorMapping {
-	TOUCH (0), 
-	TEXT(1),
-	ACCELEROMETER(2),
-	GYROSCOPE(3),
-	LUMINANCE(4),
-	MAGNETICFIELD(5),
-	PROXIMITY(6),
-	HUMIDITY(7),
-	AIRPRESSURE(8),
-	GRAVITY(9),
-	ORIENTATION(10);
+	ACCELEROMETER(0),
+	GYROSCOPE(1),
+	LUMINANCE(2),
+	MAGNETICFIELD(3),
+	PROXIMITY(4),
+	HUMIDITY(5),
+	AIRPRESSURE(6),
+	GRAVITY(7),
+	ORIENTATION(8);
 	
 	private int code;
  

@@ -51,23 +51,21 @@ import android.preference.PreferenceManager;
  */
 public class SpangSensorService extends Service{
 
-	public static String ACCELEROMETER_EXTRA	= "spang.spang_sensor_service.accelerometer";
-	public static String GYROSCOPE_EXTRA		= "spang.spang_sensor_service.gyroscope";
-	public static String LUMINANCE_EXTRA		= "spang.spang_sensor_service.luminance";
-	public static String MAGNETICFIELD_EXTRA	= "spang.spang_sensor_service.magneticField";
-	public static String HUMIDITY_EXTRA			= "spang.spang_sensor_service.humidity";
-	public static String PROXIMITY_EXTRA		= "spang.spang_sensor_service.proximity";
-	public static String AIRPRESSURE_EXTRA		= "spang.spang_sensor_service.airPressure";
-	public static String GRAVITY_EXTRA			= "spang.spang_sensor_service.gravity";
-	public static String ORIENTATION_EXTRA		= "spang.spang_sensor_service.orientation";
+	public static final String ACCELEROMETER_EXTRA	= "spang.spang_sensor_service.accelerometer";
+	public static final String GYROSCOPE_EXTRA		= "spang.spang_sensor_service.gyroscope";
+	public static final String LUMINANCE_EXTRA		= "spang.spang_sensor_service.luminance";
+	public static final String MAGNETICFIELD_EXTRA	= "spang.spang_sensor_service.magneticField";
+	public static final String HUMIDITY_EXTRA		= "spang.spang_sensor_service.humidity";
+	public static final String PROXIMITY_EXTRA		= "spang.spang_sensor_service.proximity";
+	public static final String AIRPRESSURE_EXTRA	= "spang.spang_sensor_service.airPressure";
+	public static final String GRAVITY_EXTRA		= "spang.spang_sensor_service.gravity";
+	public static final String ORIENTATION_EXTRA	= "spang.spang_sensor_service.orientation";
 	
 	
-	private static int DEFAULT_SAMPLINGRATE = 20;
-	private SharedPreferences preferences;
+	private static final int DEFAULT_SAMPLINGRATE = 10;
 	private List<ISensor> sensors = new ArrayList<ISensor>();
 	private NetworkService networkService;
 	private SensorManager manager;
-	private int samplingRate;
 	private Timer timer;
 	private IBinder binder = new SpangSensorBinder();
 
@@ -80,25 +78,10 @@ public class SpangSensorService extends Service{
 		this.timer = new Timer();
 		this.manager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE); 
 
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		preferences.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
-			
-			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-					String key) {
-				onPreferenceChanged(sharedPreferences, key);
-				
-			}
-		});
-
 		Resources resources = this.getResources();
 
 		SensorListBuilder builder = new SensorListBuilder(this.manager, resources);
 		this.sensors = builder.build();
-	}
-	
-	public void onPreferenceChanged(SharedPreferences sharedPreferences, String key){
-		this.stopProcess();
-		this.startProcess();
 	}
 
 	/**
@@ -153,55 +136,14 @@ public class SpangSensorService extends Service{
 	private ServiceConnection connection = new ServiceConnection() {
 
 		public void onServiceDisconnected(ComponentName name) {
-			stopProcess();
 			networkService = null;
 		}
 
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			networkService = ((NetworkService.NetworkBinder)service).getService();
-
-			startProcess();
 		}
 	};
-
-	/**
-	 * Starts processing input.
-	 * Creates a new timer and schedules one task per sensor, processing the sensor
-	 * input at a fixed sampling rate.
-	 */
-	public void startProcess() {
-		for (final ISensor sensor : sensors) {
-			TimerTask task = new TimerTask() {
-				
-				@Override
-				public void run() {
-					if(isSensorActivated(sensor)){
-						sensor.stop();
-						sensor.start();
-						processInput(sensor);
-					}
-					else
-						sensor.stop();
-				}
-			};
-			timer.scheduleAtFixedRate(task, 0, getSamplingRateBySensor(sensor));
-		}
-	}
-	/**
-	 * Stops the processing of the sensor input.
-	 */
-	public void stopProcess() {
-		this.timer.cancel();
-	}
-
-	private int getSamplingRateBySensor(ISensor sensor){	
-		return 1000 / (this.preferences.getInt("sampleRate"+sensor.getName(), DEFAULT_SAMPLINGRATE) + 1);
-	}
-
-	private boolean isSensorActivated(ISensor sensor){
-		return this.preferences.getBoolean("isActivated"+sensor.getName(), true);
-	}
-
+	
 	/**
 	 * Updates the value of getEncodedSensorInput() for the specified sensor
 	 * @param sensor 
@@ -235,50 +177,20 @@ public class SpangSensorService extends Service{
 		
 		final ISensor sensor = temp;
 		sensor.start();
-		TimerTask task = new TimerTask() {
-			
+		TimerTask task = new TimerTask() {	
 			@Override
 			public void run() {
-			//	if(isSensorActivated(sensor)){
-			//		sensor.stop();
-			//		sensor.start();
 					processInput(sensor);
-			//	}
-			//	else
-			//		sensor.stop();
 			}
 		};
 		timer.scheduleAtFixedRate(task, 0, sampleRate);		
 	}
 	
-	public void removeSensor(int sensorID) {
-		//TODO Implement
-		throw new RuntimeException("removeSensor not implementet yet...");
-	}
-
-	/**
-	 * @return The sampling rate of the processor. 
-	 */
-	public int getSamplingRate() {
-		return samplingRate;
-	}
-
-	/**
-	 * Sets the sampling rate to a new value.
-	 * @param samplingRate the new sampling rate.
-	 */
-	public void setSamplingRate(int samplingRate) {
-		this.samplingRate = samplingRate;
-	}
-
-	
 	public class SpangSensorBinder extends Binder {
-		
 		public SpangSensorService getService()
 		{
 			return SpangSensorService.this;
 		}
-	
 	}
 	
 	@Override
