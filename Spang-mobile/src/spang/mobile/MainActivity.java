@@ -2,8 +2,6 @@ package spang.mobile;
 
 import spang.android.network.NetworkService;
 import spang.events.Action1;
-import utils.LogCatLogger;
-import utils.Logger;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+import debug.LogCatLogger;
+import debug.Logger;
 
 public class MainActivity extends Activity {
 	

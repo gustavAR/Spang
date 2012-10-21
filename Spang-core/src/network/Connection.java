@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import network.exceptions.NetworkException;
@@ -239,7 +239,7 @@ public class Connection implements IConnection {
 	 * {@inheritDoc}
 	 */
 	public boolean isConnected() {
-		return this.connected;
+		return this.connected  && this.socket.isConnected() && !this.socket.isClosed();
 	}
 
 
@@ -282,8 +282,8 @@ public class Connection implements IConnection {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void close() {
-		if(this.connected) {
+	public void close() {	
+		if(this.connected && this.socket.isConnected() && !this.socket.isClosed()) {
 			this.sendShutdownMessage();
 			this.connected = false;
 		}
@@ -553,15 +553,15 @@ public class Connection implements IConnection {
 		volatile int lastOrderedMessage;
 		
 		//Stores all the messages that arrived out of order.
-        private SortedMap<Integer, byte[]> outOfOrderMessages = new ConcurrentSkipListMap<Integer, byte[]>();
+        private SortedMap<Integer, byte[]> outOfOrderMessages = new TreeMap<Integer, byte[]>();
 
-        protected int getHeaderLength()
+        protected synchronized int getHeaderLength()
         {
 			//ID byte + acknowledgment Integer 1 + 4 = 5.
             return 5;
         }
 
-        protected void addHeader(Packer packer, byte[] message)
+        protected synchronized void addHeader(Packer packer, byte[] message)
         {
 			//The number to send.			
 			int toSendAccNum = this.lastAccNumSent++;
@@ -582,7 +582,7 @@ public class Connection implements IConnection {
 			Connection.this.resender.addResender(info);
         }
 
-        protected byte[] processMessage(UnPacker unPacker)
+        protected synchronized byte[] processMessage(UnPacker unPacker)
         {      	
 			//Unpack the flag bit (ID bit is included in this)
 			int flags = unPacker.unpackByte();		
@@ -603,13 +603,14 @@ public class Connection implements IConnection {
 			}
         }
 
-        private byte[] processRecivedMessage(UnPacker unPacker, int accnum)
+        private synchronized byte[] processRecivedMessage(UnPacker unPacker, int accnum)
         {
         	//If the message is the next message in order it's acknowledgment number
         	//should be one higher then the previous one to arrive.
             if (this.lastOrderedMessage + 1 == accnum)
             {
                 this.lastOrderedMessage++;
+                
                 //If we have no out of order messages we simply returns this message.
                 if (this.outOfOrderMessages.isEmpty())
                     return unPacker.unpackByteArray(unPacker.remaining());
@@ -671,7 +672,7 @@ public class Connection implements IConnection {
         }
       
 		//Sends an acknowledgment message.
-		private void sendAckMessage(int accnum) {
+		private synchronized void sendAckMessage(int accnum) {
 			Packer packer = new Packer(5);
 			//The acknowledgment is specified using the ACK_BIT so we add it to the ID byte. and pack it.
 			packer.packByte((byte)(Protocol.Reliable.getBit() | ACK_BIT));

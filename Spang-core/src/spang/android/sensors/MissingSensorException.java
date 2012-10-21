@@ -15,38 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with Spang.  If not, see <http://www.gnu.org/licenses/>.
  */
-package utils;
+package spang.android.sensors;
 
-/**
- * Simple logger class. That can be used to log exceptions and dubug information.
- * @author Lukas
- *
- */
-public class Logger {
-	
-	private static ILogger logger;
-	
-	public static void setLogger(ILogger logger) {
-		Logger.logger = logger;
+@SuppressWarnings("serial")
+public class MissingSensorException extends RuntimeException {
+	public MissingSensorException() {
+		super();
 	}
-	
-	public static void logException(Exception exe) {
-		logger.logException(exe);
+
+	public MissingSensorException(String message, Throwable cause) {
+		super(message, cause);
 	}
-	
-	public static void logError(Error error) {
-		logger.logError(error);
+
+	public MissingSensorException(String message) {
+		super(message);
 	}
-	
-	public static void logDebug(String message) {
-		logger.logDebugg(message);
-	}
-	
-	public static void logInfo(String message){
-		logger.logInfo(message);
-	}
-	
-	public static void logAssert(String message) {
-		logger.logAssert(message);
+
+	public MissingSensorException(Throwable cause) {
+		super(cause);
 	}
 }

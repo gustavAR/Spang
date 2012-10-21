@@ -18,6 +18,8 @@
 package network;
 import java.net.InetSocketAddress;
 
+import network.exceptions.NetworkException;
+
 /**
  * Interface used to connect IConnections.
  * @author LukasFiddle
@@ -29,7 +31,8 @@ public interface IConnector {
 	 * Connects to a remote endpoint.
 	 * @param address the remote endpoint to connect to.
 	 * @param timeout the time the connector will try to connect.
+	 * @throw NetworkException if a connection cannot be made.
 	 * @return a new IConnection object that connects the two remote points.
 	 */
-	IConnection connect(InetSocketAddress address, int timeout);
+	IConnection connect(InetSocketAddress address, int timeout) throws NetworkException;
 }

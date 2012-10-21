@@ -10,16 +10,14 @@ namespace Spang.Core.Android
     public class AndroidPhone : Spang.Core.Android.IPhone 
     {
         private const int ACCELEROMETER_ID = 0;
-        private const int LUMINANCE_ID = 1;
-        private const int GYROSCOPE_ID = 2;
+        private const int GYROSCOPE_ID = 1;
+        private const int LUMINANCE_ID = 2;
         private const int MAGNETIC_FIELD_ID = 3;
-        private const int ORIENTATION_ID = 4;
-        private const int PROXIMITY_ID = 5;
-        private const int HUMIDITY_ID = 6;
-        private const int AIR_PRESSURE_ID = 7;
-        private const int GPS_ID = 8;
-        private const int GRAVITY_ID = 9;
-
+        private const int PROXIMITY_ID = 4;
+        private const int HUMIDITY_ID = 5;
+        private const int AIR_PRESSURE_ID = 6;
+        private const int GRAVITY_ID = 7;
+        private const int ORIENTATION_ID = 8;
 
         private readonly TouchEventManager touchEventManager;
 
@@ -354,9 +352,6 @@ namespace Spang.Core.Android
                     break;
                 case AIR_PRESSURE_ID:
                     this.Pressure = data[0];
-                    break;
-                case GPS_ID:
-                    this.GPSLocation = new Vector2(data[0], data[1]);
                     break;
                 case GRAVITY_ID:
                     this.Gravity = new Vector3(data[0], data[1], data[2]);

@@ -43,5 +43,4 @@ public class SensorEventSerializer extends Serializer<SensorEvent>{
 
         return new SensorEvent(id, data);
     }
-
 }

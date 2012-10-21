@@ -20,7 +20,6 @@ package spang.android.network;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.Vector2;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -51,7 +50,7 @@ public class SpangTouchView extends TouchView {
 	@Override
 	public void onDraw(Canvas canvas) {
 		for (Vector2 p : positions) {
-			canvas.drawCircle(p.getX(), p.getY(), 90, this.paint);
+			canvas.drawCircle(p.x, p.y, 90, this.paint);
 		}	
 		
 		positions.clear();
@@ -86,4 +85,17 @@ public class SpangTouchView extends TouchView {
 			invalidate();
 		}
 	};
+	
+	private  class Vector2 {
+		public float x, y;
+		
+		public Vector2(float x, float y) {
+			this.x = x;
+			this.y = y;
+		}
+		
+		public String toString() {
+			return "X: " + this.x + "\nY: " + this.y; 
+		}
+	}
 }

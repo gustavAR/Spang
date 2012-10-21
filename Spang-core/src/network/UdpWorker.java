@@ -17,13 +17,13 @@
  */
 package network;
 
+import debug.Logger;
 import network.exceptions.NetworkException;
 import network.exceptions.RemoteCrashException;
 import network.exceptions.RemoteShutdownException;
 import network.exceptions.TimeoutException;
 import spang.events.Action1;
 import spang.events.Action1Delegate;
-import utils.Logger;
 
 /**
  * Worker class that listens to incoming udp messages on a connection.

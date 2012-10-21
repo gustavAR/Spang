@@ -24,7 +24,6 @@ import java.util.TimerTask;
 
 import network.messages.SensorEvent;
 import spang.android.network.NetworkService;
-import utils.MissingSensorException;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;

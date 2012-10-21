@@ -21,6 +21,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
+import debug.Logger;
+
 import network.exceptions.InvalidEndpointException;
 import network.exceptions.NetworkException;
 import serialization.ISerializer;
@@ -28,7 +30,6 @@ import serialization.SerializeManager;
 import spang.events.Action1;
 import spang.events.EventHandler;
 import spang.events.EventHandlerDelegate;
-import utils.Logger;
 import utils.Packer;
 import utils.UnPacker;
 
@@ -36,44 +37,44 @@ public class Client implements IClient {
 
 	//Default interval in which to send heart-beat callback to a server.
 	private static final int DEF_HEARTBEAT_INTERVAL = 1000;
-	
+
 	//Default time it takes for the connection to time out.
 	private static final int DEF_TIMEOUT = 5000;
-	
+
 	//Last connection connected to or null if we never connected.
 	private InetSocketAddress lastConnectedAddress;
-	
+
 	//Connector used to connect with.
 	private final IConnector connector;
-	
+
 	//The connection used to send and receive messages.
 	private IConnection connection;
-	
+
 	//Worker used to receive udp messages asynchronously.
 	private UdpWorker udpWorker;	
-	
+
 	//Event handler that raises the connected event.
 	private EventHandlerDelegate<IClient, Boolean> connectionEvent;
-	
+
 	//Event handler that raises the received event.
 	private EventHandlerDelegate<IClient, Object> recivedEvent;
-	
+
 	//Event handler that raises the disconnected event.
 	private EventHandlerDelegate<IClient, DCCause> disconnectedEvent;
-	
+
 	//Stores the connectionTimeout.
 	private int connectionTimeout;
-	
+
 	//Stores the interval that heart-beats will be sent in.
 	private int heartBeatInterval;
-	
+
 	//Stores the time the last message was sent.
 	private long lastMessageSent;
-	
+
 	//Serializes messages to byte arrays.
 	private final SerializeManager serializeManager;
-	
-	
+
+
 	/**
 	 * Creates a new client.
 	 */
@@ -86,13 +87,13 @@ public class Client implements IClient {
 		this.connectionTimeout = DEF_TIMEOUT;
 		this.heartBeatInterval = DEF_HEARTBEAT_INTERVAL;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean isConnected() {
 		return this.connection != null &&
-			   this.connection.isConnected();
+				this.connection.isConnected();
 	}
 
 
@@ -102,7 +103,7 @@ public class Client implements IClient {
 	public void registerSerializer(ISerializer serializer) {
 		this.serializeManager.registerSerilizer(serializer);
 	}	
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -118,13 +119,13 @@ public class Client implements IClient {
 		this.connectionTimeout = value;
 		if(this.connection != null)
 			this.connection.setTimeout(value);
-		
+
 	}
-	
+
 	public int getHearthBeatInterval() {
 		return this.heartBeatInterval;		
 	}
-	
+
 	public void setHeartBeatInterval(int value) {
 		this.heartBeatInterval = value;
 	}
@@ -151,19 +152,17 @@ public class Client implements IClient {
 			InetAddress address = InetAddress.getByName(host);
 			this.connect(address, port);
 		} catch (UnknownHostException e) {
-			String message = "Host name invalid name =" + host;
-			if(port < 0 || port > 0xFFFF) {
-				message += " Port invalid port=" + port;
-			}
-			throw new InvalidEndpointException(message);			
-		}				
+			throw new InvalidEndpointException("Invalid host name");			
+		} catch (IllegalArgumentException e) {
+			throw new InvalidEndpointException("Invalid port (range is 1-0xFFFE");
+		}
 	}
-	
+
 	private void connect(InetSocketAddress address, int timeout, boolean reconnecting) {
 		//If we are connected it makes no since to connect again.
 		if(this.connection != null)
 			throw new NetworkException("We are already connected. Can't connect to a new connecting.");
-		
+
 		this.connection = this.connector.connect(address, timeout);
 		this.lastConnectedAddress = address;
 		this.onConnected(reconnecting);
@@ -172,20 +171,21 @@ public class Client implements IClient {
 	private void onConnected(boolean reconnecting) {
 		this.connection.setTimeout(this.connectionTimeout);				
 		this.connectionEvent.invoke(this, reconnecting);	
-		
+
 		//Starts a receiver thread to start receiving new messages.
 		this.startReciving();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public void reconnect(int retries, int timeout) {
-		if(this.lastConnectedAddress == null) {
+		if(this.lastConnectedAddress == null)
 			throw new IllegalArgumentException("Never been connected to anything so cannot reconnect");
-		} else {
+		else if (this.connection != null)
+			return;
+		else
 			this.reconnectInternal(retries, timeout, this.lastConnectedAddress);
-		}
 	}
 
 	private void reconnectInternal(int retries, int timeout, InetSocketAddress endpoint) {
@@ -195,16 +195,16 @@ public class Client implements IClient {
 				this.connect(endpoint, timeout, true);
 				System.out.println("Success!");	
 				return;
-				
+
 			} catch(NetworkException e) {
 				System.out.println("Failed to reconnect " + i + " retrying...");
 			}		
 		}
-		
+
 		//If we failed to reconnect
 		if(this.connection == null)
 			throw new NetworkException("Failed to reconnect!");
-		
+
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class Client implements IClient {
 		if(this.connection == null) {
 			return;
 		}
-		
+
 		this.onDisconnect(DCCause.LocalShutdown);
 	}
 
@@ -222,26 +222,26 @@ public class Client implements IClient {
 		this.stopReciving();
 		this.connection.close();
 		this.connection = null;
-		
+
 		this.disconnectedEvent.invoke(this, cause);
 	}
 
 	private void startReciving() {
 		this.udpWorker = new UdpWorker(this.connection);
-		
+
 		this.udpWorker.addRecivedAction(new Action1<byte[]>() {
-			
+
 			public void onAction(byte[] obj) {
 				onRecived(obj);
 			}
 		});
-				
+
 		this.udpWorker.addReciveFailedListener(new Action1<DCCause>() {
 			public void onAction(DCCause obj) {
 				onDisconnect(obj);
 			}
 		});
-		
+
 		new Thread(udpWorker).start();
 	}
 
@@ -251,7 +251,7 @@ public class Client implements IClient {
 
 		this.udpWorker.clearEventListeners();
 		this.udpWorker.StopWorking();
-		
+
 		this.udpWorker = null;
 	}
 
@@ -267,7 +267,7 @@ public class Client implements IClient {
 			}
 		}	
 	}
-		
+
 	private boolean shouldSendHeartbeatCallback() {
 		return System.currentTimeMillis() > this.lastMessageSent + this.heartBeatInterval;
 	}
@@ -281,9 +281,9 @@ public class Client implements IClient {
 	private boolean isHeartbeat(byte[] message) {
 		return message.length == 0;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * {@inheritDoc}
 	 */

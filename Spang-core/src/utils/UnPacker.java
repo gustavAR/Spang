@@ -124,30 +124,7 @@ public class UnPacker {
 		return array;
 	}
 	
-	/**
-	 * Unpacks a half float.
-	 * @return a float.
-	 */
-	public float unpackHalfFloat() {
-		int hbits = (this.packedData.get() << 8);
-		hbits |= this.packedData.get();
-		
-		return toFloat(hbits);
-	}
-	
-	/**
-	 * Unpacks a half float array
-	 * @param size the size of the array.
-	 * @return a float array
-	 */
-	public float[] unpackHalfFloatArray(int size) {
-		float[] array = new float[size];
-		for (int i = 0; i < array.length; i++) {
-			array[i] = this.unpackHalfFloat();
-		}
-		return array;
-	}
-	
+
 	/**
 	 * Unpacks a float.
 	 * @return a float.
@@ -199,33 +176,5 @@ public class UnPacker {
 		} catch (UnsupportedEncodingException e) {
 			throw new IllegalArgumentException("UTF-8 not supported on the implementation.");
 		}	
-	}
-	
-	// Public Domain http://stackoverflow.com/questions/6162651/half-precision-floating-point-in-java
-	private static float toFloat( int hbits )
-	{
-	    int mant = hbits & 0x03ff;            // 10 bits mantissa
-	    int exp =  hbits & 0x7c00;            // 5 bits exponent
-	    if( exp == 0x7c00 )                   // NaN/Inf
-	        exp = 0x3fc00;                    // -> NaN/Inf
-	    else if( exp != 0 )                   // normalized value
-	    {
-	        exp += 0x1c000;                   // exp - 15 + 127
-	        if( mant == 0 && exp > 0x1c400 )  // smooth transition
-	            return Float.intBitsToFloat( ( hbits & 0x8000 ) << 16
-	                                            | exp << 13 | 0x3ff );
-	    }
-	    else if( mant != 0 )                  // && exp==0 -> subnormal
-	    {
-	        exp = 0x1c400;                    // make it normal
-	        do {
-	            mant <<= 1;                   // mantissa * 2
-	            exp -= 0x400;                 // decrease exp by 1
-	        } while( ( mant & 0x400 ) == 0 ); // while not normal
-	        mant &= 0x3ff;                    // discard subnormal bit
-	    }                                     // else +/-0 -> +/-0
-	    return Float.intBitsToFloat(          // combine all parts
-	        ( hbits & 0x8000 ) << 16          // sign  << ( 31 - 15 )
-	        | ( exp | mant ) << 13 );         // value << ( 23 - 10 )
 	}
 }
