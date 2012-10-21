@@ -1,12 +1,14 @@
 package spang.mobile;
 
 import keyboard.KeyboardNetworkedActivity;
+import spang.android.network.NetworkedActivity;
+import spang.android.network.SpangTouchView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
+
 
 public class ComputerActivity extends NetworkedActivity {
 

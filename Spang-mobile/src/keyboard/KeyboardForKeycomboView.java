@@ -1,9 +1,6 @@
 package keyboard;
 
-import spang.mobile.NetworkService;
 import spang.mobile.R;
-import spang.mobile.R.string;
-import spang.mobile.R.xml;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;

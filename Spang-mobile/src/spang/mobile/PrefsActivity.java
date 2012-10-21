@@ -2,9 +2,8 @@ package spang.mobile;
 
 import java.util.List;
 
-import sensors.ISensor;
-import sensors.SensorListBuilder;
-import android.hardware.Sensor;
+import spang.android.sensors.ISensor;
+import spang.android.sensors.SensorListBuilder;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;

@@ -1,21 +1,5 @@
 package tests;
 
-import static junit.framework.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.net.InetSocketAddress;
-
-import network.Client;
-import network.DCCause;
-import network.IClient;
-import network.IConnection;
-import network.IConnector;
-import network.exceptions.InvalidEndpointException;
-import network.exceptions.NetworkException;
-
-import org.junit.Test;
-
-import events.EventHandler;
 
 /**
  * Tests the client class.

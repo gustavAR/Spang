@@ -1,3 +1,0 @@
-2012-10-10 We refactored the way we implemented sensors in Spang. Instead of having one class (implementing ISensor) per sensor we decided to have a SpangSensor class (implementing ISensor) that can represent an arbritary sensor using instance variables.
-Because of this refactoring, a lot of lines of code was lost. It was no great loss though, since most of those lines was duplicated in each sensor class anyway.
-The original reason for not designing this way in the first place is the fear for not being able to freely customize the methods for specific sensors, but this can still be achieved by creating a single customized sensor class (see OrientationSensor)

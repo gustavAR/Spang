@@ -1,6 +1,7 @@
 package spang.mobile;
 
-import keyboard.KeyboardNetworkedActivity;
+import spang.android.network.NetworkService;
+import spang.events.Action1;
 import utils.LogCatLogger;
 import utils.Logger;
 import android.app.Activity;
@@ -16,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-import events.Action1;
 
 public class MainActivity extends Activity {
 	

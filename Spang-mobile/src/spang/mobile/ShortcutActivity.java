@@ -3,7 +3,7 @@ package spang.mobile;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
+import spang.android.network.NetworkedActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -15,12 +15,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.textservice.TextInfo;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * This activity contains buttons containing keycombinations.

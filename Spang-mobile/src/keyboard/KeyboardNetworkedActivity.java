@@ -1,8 +1,7 @@
 package keyboard;
 
-import spang.mobile.NetworkedActivity;
+import spang.android.network.NetworkedActivity;
 import spang.mobile.R;
-import android.os.Bundle;
 import android.view.Menu;
 
 /**

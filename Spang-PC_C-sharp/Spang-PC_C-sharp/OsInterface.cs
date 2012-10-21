@@ -32,7 +32,7 @@ namespace Spang_PC_C_sharp
         {
             string modifiedKey = this.formatKey(key);
 
-            addModifiers(modifiedKey, modifier);
+            modifiedKey = addModifiers(modifiedKey, modifier);
 
             SendKeys.SendWait(modifiedKey);              
         }

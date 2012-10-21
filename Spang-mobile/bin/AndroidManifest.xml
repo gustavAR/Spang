@@ -16,12 +16,13 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+       
         <service
-            android:name=".NetworkService"
+            android:name="spang.android.network.NetworkService"
             android:enabled="true" >
         </service>
         <service
-            android:name=".SpangSensorService"
+            android:name="spang.android.sensors.SpangSensorService"
             android:enabled="true" >
         </service>
 
@@ -85,15 +86,6 @@
         <activity
             android:name=".ShortcutPrefsActivity"
             android:label="@string/title_activity_shortcut_preference" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".ShortcutPrefsActivity"
-            android:label="@string/title_activity_shortcut_prefs" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
