@@ -42,11 +42,12 @@ public class ComputerActivity extends NetworkedActivity {
         switch (item.getItemId()) {
             case R.id.Keyboard:
             	this.onShowKeyboard(item);
+            	break;
             case R.id.shortcuts:
             	this.goToShortcuts(item);
-            default:
-                return super.onOptionsItemSelected(item);
+            	break;
         }
+        return super.onOptionsItemSelected(item);
     }
 
 	public void goToShortcuts(MenuItem item){
