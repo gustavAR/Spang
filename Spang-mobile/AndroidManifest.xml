@@ -61,9 +61,6 @@
         <activity
             android:name=".NetworkedActivity"
             android:label="@string/title_activity_networked" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
         </activity>
         <activity
             android:name="keyboard.KeyboardNetworkedActivity"
@@ -75,9 +72,6 @@
         <activity
             android:name=".ComputerActivity"
             android:label="@string/title_activity_computer" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".ShortcutActivity"
@@ -86,20 +80,10 @@
         <activity
             android:name=".ShortcutPrefsActivity"
             android:label="@string/title_activity_shortcut_preference" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="keyboard.InputKeycombinationActivity"
             android:label="@string/title_activity_input_keycombination" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 
