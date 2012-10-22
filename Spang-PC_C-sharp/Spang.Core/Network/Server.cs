@@ -88,6 +88,11 @@ namespace Spang.Core.Network
         /// </summary>
         /// <param name="toSend">The message to send.</param>
         void SendToAll(object toSend, Protocol protocol);
+
+        /// <summary>
+        /// Sends a message to all connected client exept the client with theid provided.
+        /// </summary>
+        void SendToAllExcept(int id, object toSend, Protocol protocol);
     }
 
     public class Server : IServer
