@@ -27,5 +27,5 @@ public interface ILogger {
 	
 	void logAssert(String assertInfo);
 	
-	void logDebugg(String debuggInfo);
+	void logDebug(String debuggInfo);
 }

@@ -39,7 +39,7 @@ public class Logger {
 	}
 	
 	public static void logDebug(String message) {
-		logger.logDebugg(message);
+		logger.logDebug(message);
 	}
 	
 	public static void logInfo(String message){

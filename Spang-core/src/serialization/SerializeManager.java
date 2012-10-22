@@ -26,9 +26,9 @@ import utils.Packer;
 import utils.UnPacker;
 
 @SuppressLint("UseSparseArrays")
-public class SerializeManager {
+public class SerializeManager { 
 	private int nextID = 0;
-
+	
 	private Map<Integer, Class<?>> idToType;
 	private Map<Class<?>, Integer> typeToID;
 	private Map<Class<?>, ISerializer> serializerByType;

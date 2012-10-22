@@ -37,7 +37,7 @@ public class LogCatLogger implements ILogger {
 		Log.wtf("Assert", assertInfo);
 	}
 
-	public void logDebugg(String debuggInfo) {
+	public void logDebug(String debuggInfo) {
 		Log.d("Debug", debuggInfo);
 	}
 }
