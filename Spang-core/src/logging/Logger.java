@@ -18,35 +18,64 @@
 package logging;
 
 /**
- * Simple logger class. That can be used to log exceptions and dubug information.
+ * Simple logger class. That can be used to log important things..
  * @author Lukas
  *
  */
 public class Logger {
 	
+	//The logger to do the logging.
 	private static ILogger logger;
 	
+	/**
+	 * Sets the logger that will be used to log.
+	 */
 	public static void setLogger(ILogger logger) {
 		Logger.logger = logger;
 	}
 	
+	/**
+	 * Log an exception.
+	 * @param exe exception to log.
+	 */
 	public static void logException(Exception exe) {
-		logger.logException(exe);
+		if(logger != null)
+			logger.logException(exe);
 	}
 	
+	/**
+	 * Log an error.
+	 * @param error error to log.
+	 */
 	public static void logError(Error error) {
-		logger.logError(error);
+		if(logger != null)
+			logger.logError(error);
 	}
 	
+	/**
+	 * Log debugg info.
+	 * @param message info.
+	 */
 	public static void logDebug(String message) {
-		logger.logDebug(message);
+		if(logger != null)
+			logger.logDebug(message);
 	}
 	
+	/**
+	 * Log info information.
+	 * @param message info.
+	 */
 	public static void logInfo(String message){
-		logger.logInfo(message);
+		if(logger != null)
+			logger.logInfo(message);
 	}
 	
+	/**
+	 * Log assert information.
+	 * @param message info.
+	 */
 	public static void logAssert(String message) {
-		logger.logAssert(message);
+		if(logger != null)
+			logger.logAssert(message);
 	}
 }

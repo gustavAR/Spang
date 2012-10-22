@@ -43,16 +43,4 @@ public class KeyboardNetworkedActivity extends NetworkedActivity {
 		setContentView(cKV);
 	}
 
-	@Override
-	protected void onNetworkSerivceDissconnected() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void onMessageRecived(Object message) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

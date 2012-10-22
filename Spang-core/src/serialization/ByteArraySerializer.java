@@ -20,12 +20,19 @@ package serialization;
 import utils.Packer;
 import utils.UnPacker;
 
+/**
+ * A class that can serialize byte arrays.
+ * @author Lukas Kurtyan
+ */
 public class ByteArraySerializer extends Serializer<byte[]> {
 	
-	public Class<?> getSerializableType() {
-		return byte[].class;
+	public ByteArraySerializer() {
+		super(byte[].class);
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void serializeInternal(Packer packer, byte[] message) {
 		packer.packInt(message.length);
@@ -33,10 +40,12 @@ public class ByteArraySerializer extends Serializer<byte[]> {
 		
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public byte[] deserialize(UnPacker unpacker) {
 		int size = unpacker.unpackInt();
 		return unpacker.unpackByteArray(size);
 	}
-
 }

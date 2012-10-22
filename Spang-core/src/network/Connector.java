@@ -38,7 +38,7 @@ public class Connector implements IConnector {
 			socket.setSoTimeout(timeout);
 			
 			sendConnectionRequest(address, socket);				
-			reciveConnectionInformation(address, socket);		
+			receiveConnectionInformation(address, socket);		
 			
 			sendConnectionAcknowledgement(socket);		
 		
@@ -49,7 +49,7 @@ public class Connector implements IConnector {
 		}
 	}
 
-	private void reciveConnectionInformation(InetSocketAddress address,
+	private void receiveConnectionInformation(InetSocketAddress address,
 			DatagramSocket socket) throws IOException, SocketException {
 		//Receives a callback message giving endpoint specific information.
 		int remotePort = this.readOutgoingUdpPort(socket);
@@ -66,7 +66,7 @@ public class Connector implements IConnector {
 	}
 
 	private int readOutgoingUdpPort(DatagramSocket socket) throws IOException {
-		//Recives connection information package.
+		//Receives connection information package.
 		DatagramPacket dpacket = new DatagramPacket(new byte[4], 4);
 		socket.receive(dpacket);
 		//Unpack the contents of the package.
@@ -75,7 +75,7 @@ public class Connector implements IConnector {
 	}
 
 	private void sendConnectionAcknowledgement(DatagramSocket socket) throws IOException {
-		//Send an empty message to let the endpoint know that we are ready to send and recive data.
+		//Send an empty message to let the endpoint know that we are ready to send and receive data.
 		DatagramPacket dpacket = new DatagramPacket(new byte[0], 0);
 		socket.send(dpacket);
 	}

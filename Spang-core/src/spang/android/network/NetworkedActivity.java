@@ -20,6 +20,7 @@ package spang.android.network;
 import spang.events.Action;
 import spang.events.Action1;
 import network.DCCause;
+import network.messages.HardwareButtonEvent;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -29,6 +30,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 /**
@@ -49,6 +51,9 @@ public abstract class NetworkedActivity extends Activity {
 		return this.network;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void onStart() {
 		//Bind the service so we can use it.
@@ -57,6 +62,35 @@ public abstract class NetworkedActivity extends Activity {
 		super.onStart();
 	}
 
+
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		int action = event.getAction();
+		int keyCode = event.getKeyCode();
+		if(action != KeyEvent.ACTION_DOWN || this.network == null)
+			return super.dispatchKeyEvent(event);
+
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			this.network.send(new HardwareButtonEvent(HardwareButtonEvent.VOLUME_UP));
+			break;
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			this.network.send(new HardwareButtonEvent(HardwareButtonEvent.VOLUME_DOWN));
+			break;
+		case KeyEvent.KEYCODE_SEARCH:
+			this.network.send(new HardwareButtonEvent(HardwareButtonEvent.SEARCH));
+			break;
+		default:
+			return super.dispatchKeyEvent(event);
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void onStop() {
 		this.removeListeners();
@@ -65,20 +99,29 @@ public abstract class NetworkedActivity extends Activity {
 		super.onStop();
 	}
 
+	/*
+	 * Removes the listeners from our NetworkService.
+	 */
 	private void removeListeners() {
 		if(network != null) {
 			network.removeConnectedListener(networkConnection);
 			network.removeDisconnectedListener(networkDisconnected);
-			network.removeRevicedListener(networkRecived);
+			network.removeRevicedListener(networkReceived);
 		}
 	}
 
+	/*
+	 * Adds the listeners to our NetworkService.
+	 */
 	private void addListeners() {
 		network.addConnectedListener(networkConnection);
 		network.addDisconnectedListener(networkDisconnected);
-		network.addRevicedListener(networkRecived);	
+		network.addRevicedListener(networkReceived);	
 	}
 
+	/*
+	 * Invoked on successful connection.
+	 */
 	private Action networkConnection = new Action() {
 
 		public void onAction() {
@@ -86,13 +129,19 @@ public abstract class NetworkedActivity extends Activity {
 		}
 	};
 
-	private Action1<Object> networkRecived = new Action1<Object>() {
+	/*
+	 * Invoked on message received.
+	 */
+	private Action1<Object> networkReceived = new Action1<Object>() {
 
 		public void onAction(Object eventArgs) {
-			NetworkedActivity.this.onMessageRecived(eventArgs);
+			NetworkedActivity.this.onMessageReceived(eventArgs);
 		}
 	};
 
+	/*
+	 * Invoked on disconnect.
+	 */
 	private Action1<DCCause> networkDisconnected = new Action1<DCCause>() {
 
 		public void onAction(DCCause eventArgs) {
@@ -116,15 +165,33 @@ public abstract class NetworkedActivity extends Activity {
 		}
 	};
 
-	protected abstract void onNetworkServiceConnected();
-	protected abstract void onNetworkSerivceDissconnected();
-	protected abstract void onMessageRecived(Object message);
+	/**
+	 * Called when the network service has connected.
+	 */
+	protected void onNetworkServiceConnected() { }
+
+	/**
+	 * Called when the network service has disconnected.
+	 */
+	protected void onNetworkServiceDisconnected() { }
+
+	/**
+	 * Called when a message is received over the network.
+	 * @param message the message.
+	 */
+	protected void onMessageReceived(Object message) { }
+
+	/**
+	 * Called when the network service has connected to a remote endpoint.
+	 */
+	protected void onConnected() { }
 
 
-	protected void onConnected() {
-		//Dunno what to do here atm :O
-	}
-
+	/**
+	 * Called when the network service has disconnected from a remote endpoint.
+	 * Also opens a dialog prompting the user to reconnect.
+	 * @param cause The cause of the disconnection.
+	 */
 	protected void onDisconnected(DCCause cause) {	
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage("We disconnected! Cause: " + cause);

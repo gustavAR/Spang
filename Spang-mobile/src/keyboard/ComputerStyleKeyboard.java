@@ -23,7 +23,7 @@ import android.content.res.XmlResourceParser;
 import android.inputmethodservice.Keyboard;
 
 /**
- * This keyboard can return its ctrl- and altgr-key from getters.
+ * A keyboard that can return its ctrl- and altgr-key from getters.
  * 
  * @author Gustav Alm Rosenblad
  */

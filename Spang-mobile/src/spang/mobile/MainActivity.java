@@ -34,76 +34,114 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+/**
+ * The entry point of the application.
+ * 
+ * @author Lukas Kurtyan & Gustav Alm Rosenblad & Joakim Johansson & Pontus Pall
+ *
+ */
 public class MainActivity extends Activity {
 	
+	//A service that can connect over the network.
 	private NetworkService service;
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		//Starts a network service.
 		Intent intent = new Intent(MainActivity.this, NetworkService.class);
 		this.startService(intent);	
-
+		
+		//Makes the application log to logcat.  
 		Logger.setLogger(new LogCatLogger());
 	}
 	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;		
 	}
 	
-    private ServiceConnection connection = new ServiceConnection() {
-		
+	/*
+	 * The connection used when binding and unbinding the networkservice. 
+	 */
+    private ServiceConnection connection = new ServiceConnection() {	
 		public void onServiceDisconnected(ComponentName name) {
 			service = null;
 		}
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
+			//Binds the service to the MainActivity.
 			MainActivity.this.service = ((NetworkService.NetworkBinder)service).getService();
 		}
 	};
 	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override 
 	protected void onStart() {
 		super.onStart();
+		//Binds to the network service.
 		Intent intent = new Intent(this, NetworkService.class);		
 		this.bindService(intent, connection, Context.BIND_WAIVE_PRIORITY);	
 	}
 	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void onStop() {
 		super.onStop();
+		//Unbinds the network service.
 		this.unbindService(connection);
 	}
 
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override 
 	protected void onDestroy() {
 		super.onDestroy();
-
+		//Stops the network service.
 		Intent intent = new Intent(this, NetworkService.class);
 		this.stopService(intent);
 	}
 	
 
-	public void sendData(View view){
+	public void connect(View view){
 
+		//Gets the ip.
 		EditText text = (EditText)this.findViewById(R.id.editText1);
 		final String ip = text.getText().toString();
 
+		//Gets the port.
 		EditText number = (EditText)this.findViewById(R.id.editText2);
 		final int port = Integer.parseInt(number.getText().toString());
 		
 		//Notify users that we are making a connection attempt.
 		Toast.makeText(this, "Connecting...!", Toast.LENGTH_SHORT).show();
-		service.connectAsync(ip, port, new Action1<Boolean>() {
-			
+		
+		//Connects the NetworkService to the remote endpoint specified by ip and port. 
+		service.connectAsync(ip, port, new Action1<Boolean>() {	
+			//Callback when the connection is complete.
 			public void onAction(Boolean success) {
 				if(success) {
 					//Notify users of success
-					Toast.makeText(MainActivity.this, "Connected!",Toast.LENGTH_SHORT).show();	
+					Toast.makeText(MainActivity.this, "Connected!",Toast.LENGTH_SHORT).show();
+					//Start computer activity.
 					Intent intent = new Intent(MainActivity.this, ComputerActivity.class);
 					MainActivity.this.startActivity(intent);				
 				} else {

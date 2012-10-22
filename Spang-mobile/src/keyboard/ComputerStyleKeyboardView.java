@@ -46,16 +46,17 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	private final String keyboardMessageCtrl = this.getContext().getString(R.string.keyboardinputmessage_ctrl);
 	private final String keyboardMessageAltgr = this.getContext().getString(R.string.keyboardinputmessage_altgr);
 	
-	/**
+	/*
 	 * This is the currently active keyboard,
 	 * the one we show.
 	 */
 	private ComputerStyleKeyboard ctrlKeyboard;
 
+	
 	private NetworkService network;
-	private boolean ctrlActive; //Is ctrl currently pressed?
-	private boolean altgrActive;//Is altgr currently pressed?
-	private boolean shiftActive;//Is shift currently pressed?
+	private boolean ctrlActive;  //Is ctrl currently pressed?
+	private boolean altgrActive; //Is altgr currently pressed?
+	private boolean shiftActive; //Is shift currently pressed?
 
 	/**
 	 * This constructor is mostly used by the android api.
@@ -91,7 +92,14 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 		this.setShifted(this.shiftActive);
 	}
 
+	/**
+	 * Does nothing.
+	 */
 	public void swipeLeft() {}
+	
+	/**
+	 * Does nothing.
+	 */
 	public void swipeRight() {}
 
 	/**
@@ -170,7 +178,7 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 			return;
 		}
 	}
-
+	
 	private boolean isModifierKeycode(int primaryCode) {
 		return 	primaryCode == ComputerStyleKeyboard.SHIFT_KEYCODE ||
 				primaryCode == ComputerStyleKeyboard.CTRL_KEYCODE ||
@@ -223,7 +231,6 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	 * since everything is handled in onKey
 	 */
 	public void onPress(int primaryCode) {
-
 	}
 
 	/**
@@ -231,7 +238,6 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	 * since everything is handled in onKey
 	 */
 	public void onRelease(int primaryCode) {
-
 	}
 
 	/**
@@ -239,6 +245,5 @@ public class ComputerStyleKeyboardView extends KeyboardView implements KeyboardV
 	 * since everything is handled in onKey
 	 */
 	public void onText(CharSequence text) {
-
 	}
 }

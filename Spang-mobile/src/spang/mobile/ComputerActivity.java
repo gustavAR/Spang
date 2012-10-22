@@ -26,22 +26,35 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-
+/**
+ * Activity that serves as a touch pad for a remotely connected 
+ * computer. 
+ * @author Lukas Kurtyan & Gustav Alm Rosenblad
+ *
+ */
 public class ComputerActivity extends NetworkedActivity {
 
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_computer);
     }
-
+    
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_computer, menu);
         return true;
     }
 
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void onNetworkServiceConnected() {				
 		//TODO remove testing code!.
@@ -51,36 +64,43 @@ public class ComputerActivity extends NetworkedActivity {
 		view.requestFocus();	
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected void onNetworkSerivceDissconnected() {
-		Toast.makeText(this,"Dissconnected!", Toast.LENGTH_SHORT).show();
+	protected void onNetworkServiceDisconnected() {
+		Toast.makeText(this,"Disconnected!", Toast.LENGTH_SHORT).show();
 	}
 	
+	/**
+	 * Handles menu button presses. 
+	 */
 	public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.Keyboard:
-            	this.onShowKeyboard(item);
+            	this.onShowKeyboard();
             	break;
             case R.id.shortcuts:
-            	this.goToShortcuts(item);
+            	this.goToShortcuts();
             	break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-	public void goToShortcuts(MenuItem item){
+	/**
+	 * Opens shortcut activity.
+	 */
+	public void goToShortcuts(){
 		Intent intent = new Intent(this, ShortcutActivity.class);
 		startActivity(intent);
 	}
 	
-	public void onShowKeyboard(MenuItem item) {
+	/**
+	 * Opens the keyboard.
+	 */
+	public void onShowKeyboard() {
 		Intent intent = new Intent(this, KeyboardNetworkedActivity.class);
 		this.startActivity(intent);
-	}
-
-	@Override
-	protected void onMessageRecived(Object message) {
-		//Don't rly care tbh :O
 	}
 }

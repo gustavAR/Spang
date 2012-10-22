@@ -20,6 +20,7 @@ package serialization;
 import java.util.Arrays;
 import java.util.Collection;
 
+import network.messages.HardwareButtonEvent;
 import network.messages.SensorEvent;
 import network.messages.Touch;
 import network.messages.TouchEvent;
@@ -53,6 +54,9 @@ public class SerializerTests {
 										   	 new TouchEvent(new Touch[] { new Touch(10,412,0.4f), new Touch(14,42,0.4f)} )}, 
 										   { SensorEvent.class, new SensorEventSerializer(), 
 										     new SensorEvent(8, new float[] {-34f, 21f, 0.3f }) },
+										     { HardwareButtonEvent.class, new HardwareButtonSerializer(),
+										    	 new HardwareButtonEvent(HardwareButtonEvent.VOLUME_UP)
+										     }
 										   };
 		return Arrays.asList(data);
 	}	

@@ -58,7 +58,7 @@ public class Client implements IClient {
 	private EventHandlerDelegate<IClient, Boolean> connectionEvent;
 
 	//Event handler that raises the received event.
-	private EventHandlerDelegate<IClient, Object> recivedEvent;
+	private EventHandlerDelegate<IClient, Object> receivedEvent;
 
 	//Event handler that raises the disconnected event.
 	private EventHandlerDelegate<IClient, DCCause> disconnectedEvent;
@@ -83,7 +83,7 @@ public class Client implements IClient {
 		this.connector = connector;
 		this.serializeManager = serializeManager;
 		this.connectionEvent = new EventHandlerDelegate<IClient, Boolean>();
-		this.recivedEvent = new EventHandlerDelegate<IClient, Object>();
+		this.receivedEvent = new EventHandlerDelegate<IClient, Object>();
 		this.disconnectedEvent = new EventHandlerDelegate<IClient, DCCause>();
 		this.connectionTimeout = DEF_TIMEOUT;
 		this.heartBeatInterval = DEF_HEARTBEAT_INTERVAL;
@@ -102,7 +102,7 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public void registerSerializer(ISerializer serializer) {
-		this.serializeManager.registerSerilizer(serializer);
+		this.serializeManager.registerSerializer(serializer);
 	}	
 
 	/**
@@ -227,14 +227,14 @@ public class Client implements IClient {
 	private void startReciving() {
 		this.udpWorker = new UdpWorker(this.connection);
 
-		this.udpWorker.addRecivedAction(new Action1<byte[]>() {
+		this.udpWorker.addReceivedAction(new Action1<byte[]>() {
 
 			public void onAction(byte[] obj) {
-				onRecived(obj);
+				onReceived(obj);
 			}
 		});
 
-		this.udpWorker.addReciveFailedListener(new Action1<DCCause>() {
+		this.udpWorker.addReceiveFailedListener(new Action1<DCCause>() {
 			public void onAction(DCCause obj) {
 				onDisconnect(obj);
 			}
@@ -253,7 +253,7 @@ public class Client implements IClient {
 		this.udpWorker = null;
 	}
 
-	private void onRecived(byte[] message) {
+	private void onReceived(byte[] message) {
 		if(isHeartbeat(message)) { 
 			if(shouldSendHeartbeatCallback())
 				this.sendHeartBeatResponse();
@@ -261,7 +261,7 @@ public class Client implements IClient {
 			UnPacker unpacker = new UnPacker(message);
 			while(unpacker.remaining() > 0) {
 				Object deserializedMessage = this.serializeManager.deserialize(unpacker);
-				this.recivedEvent.invoke(this, deserializedMessage);	
+				this.receivedEvent.invoke(this, deserializedMessage);	
 			}
 		}	
 	}
@@ -343,14 +343,14 @@ public class Client implements IClient {
 	 * {@inheritDoc}
 	 */
 	public void addRevicedListener(EventHandler<IClient, Object> listener) {
-		this.recivedEvent.addListener(listener);
+		this.receivedEvent.addListener(listener);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void removeRevicedListener(EventHandler<IClient, Object> listener) {
-		this.recivedEvent.removeListener(listener);
+		this.receivedEvent.removeListener(listener);
 	}
 
 	/**

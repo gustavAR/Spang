@@ -25,6 +25,7 @@ import network.DCCause;
 import network.IClient;
 import network.Protocol;
 import network.exceptions.NetworkException;
+import serialization.HardwareButtonSerializer;
 import serialization.ISerializer;
 import serialization.SensorEventSerializer;
 import serialization.SerializeManager;
@@ -83,7 +84,7 @@ public class NetworkService extends Service {
 	private Action1Delegate<DCCause> disconnectedEvent;
 	
 	//Event invoked when the service receives data on the incoming connection.
-	private Action1Delegate<Object> recivedEvent;
+	private Action1Delegate<Object> receivedEvent;
 	
 	//Handler used to offload work to the UI thread. This is done so that listeners
 	//of the network can change UI without upsetting the android API.
@@ -98,9 +99,10 @@ public class NetworkService extends Service {
 			throw new IllegalStateException("The thread that starts the NetworkService must be the UI thread.");
 		
 		SerializeManager manager = new SerializeManager();
-		manager.registerSerilizer(new TouchEventSerializer());
-		manager.registerSerilizer(new SensorEventSerializer());
-		manager.registerSerilizer(new StringSerializer());
+		manager.registerSerializer(new TouchEventSerializer());
+		manager.registerSerializer(new SensorEventSerializer());
+		manager.registerSerializer(new StringSerializer());
+		manager.registerSerializer(new HardwareButtonSerializer());
 		
 		client = new Client(new Connector(), manager);
 		
@@ -108,7 +110,7 @@ public class NetworkService extends Service {
 		this.messageSendInterval = DEF_MESSAGE_SEND_INTERVALL;
 		this.connectedEvent = new ActionDelegate();
 		this.disconnectedEvent = new Action1Delegate<DCCause>();
-		this.recivedEvent = new Action1Delegate<Object>();		
+		this.receivedEvent = new Action1Delegate<Object>();		
 		this.handler = new Handler();
 		
 		addListeners();
@@ -223,17 +225,17 @@ public class NetworkService extends Service {
 		
 		client.addRevicedListener(new EventHandler<IClient, Object>() {	
 			public void onAction(IClient sender, Object eventArgs) {
-				NetworkService.this.onRecived(eventArgs);
+				NetworkService.this.onReceived(eventArgs);
 			}
 		});
 	}
 	
-	private void onRecived(final Object eventArgs) {
+	private void onReceived(final Object eventArgs) {
 		//Make the event get invoked on the UI thread.
 		this.handler.post(new Runnable() {
 			
 			public void run() {
-				NetworkService.this.recivedEvent.invoke(eventArgs);	
+				NetworkService.this.receivedEvent.invoke(eventArgs);	
 			}
 		});
 	}
@@ -460,11 +462,11 @@ public class NetworkService extends Service {
 	/**
 	 * Add a listener to start listening for received events.
 	 * The received event is triggered when a message is received from the network.
-	 * The data received from onAction is the message recived.
+	 * The data received from onAction is the message received.
 	 * @param listener the listener to add.
 	 */
 	public void addRevicedListener(Action1<Object> listener) {
-		this.recivedEvent.addListener(listener);
+		this.receivedEvent.addListener(listener);
 	}
 
 	/**
@@ -472,6 +474,6 @@ public class NetworkService extends Service {
 	 * @param listener the listener to remove.
 	 */
 	public void removeRevicedListener(Action1<Object> listener) {
-		this.recivedEvent.removeListener(listener);
+		this.receivedEvent.removeListener(listener);
 	}
 }

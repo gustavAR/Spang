@@ -42,6 +42,7 @@ public class KeyboardForKeycomboView extends KeyboardView implements KeyboardVie
 	 * as a string, from the result intent.
 	 */
 	public static final String KEYCOMBO_EXTRAKEY = "KeyCombination";
+	
 	//These are only here to make the code somewhat readable.
 	private final String keyboardMessageBegin = this.getContext().getString(R.string.keyboardinputmessage_begin);
 	private final String keyboardMessageEnd = this.getContext().getString(R.string.keyboardinputmessage_end);
@@ -49,7 +50,7 @@ public class KeyboardForKeycomboView extends KeyboardView implements KeyboardVie
 	private final String keyboardMessageCtrl = this.getContext().getString(R.string.keyboardinputmessage_ctrl);
 	private final String keyboardMessageAltgr = this.getContext().getString(R.string.keyboardinputmessage_altgr);
 	
-	/**
+	/*
 	 * This is the currently active keyboard,
 	 * the one we show.
 	 */

@@ -45,14 +45,14 @@ public class UdpWorkerTests {
 	}
 	
 	@Test
-	public void testIfRecivedEventIsTriggeredWhenDataIsRecived() throws InterruptedException {
+	public void testIfReceivedEventIsTriggeredWhenDataIsReceived() throws InterruptedException {
 		final boolean[] flag = {false}; //zzzz this java
-		worker.addRecivedAction(new Action1<byte[]>() {
+		worker.addReceivedAction(new Action1<byte[]>() {
 			public void onAction(byte[] obj) {
 				flag[0] = true;	
 			}
 		});		
-		when(mockedConnection.recive()).thenReturn(new byte[0]);
+		when(mockedConnection.receive()).thenReturn(new byte[0]);
 
 		//Start the worker on a diffrent thread as per the design.
 		Thread thread = new Thread(worker);
@@ -94,7 +94,7 @@ public class UdpWorkerTests {
 	public void testIfReadFailedInvokesWithCorrectDCCause(NetworkException exception, final DCCause expected) 
 			throws InterruptedException {
 		final boolean[] flag = {false}; //zzzz this java
-		worker.addReciveFailedListener(new Action1<DCCause>() {
+		worker.addReceiveFailedListener(new Action1<DCCause>() {
 			@Override
 			public void onAction(DCCause obj) {
 				if(obj == expected) {
@@ -103,7 +103,7 @@ public class UdpWorkerTests {
 			}
 		});
 		
-		when(this.mockedConnection.recive()).thenThrow(exception);
+		when(this.mockedConnection.receive()).thenThrow(exception);
 		
 		//Start the worker on a diffrent thread as per the design.
 		Thread thread = new Thread(worker);

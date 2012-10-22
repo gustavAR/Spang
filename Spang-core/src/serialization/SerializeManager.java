@@ -25,6 +25,10 @@ import android.annotation.SuppressLint;
 import utils.Packer;
 import utils.UnPacker;
 
+/**
+ * Handles the serialization of objects.
+ * @author Lukas Kurtyan
+ */
 @SuppressLint("UseSparseArrays")
 public class SerializeManager { 
 	private int nextID = 0;
@@ -40,7 +44,11 @@ public class SerializeManager {
 		this.serializerByType = new HashMap<Class<?>, ISerializer>();
 	}
 
-	public void registerSerilizer(ISerializer serializer)
+	/**
+	 * 
+	 * @param serializer
+	 */
+	public void registerSerializer(ISerializer serializer)
 	{
 		if(serializerByType.containsKey(serializer.getSerializableType()))
 			throw new IllegalArgumentException("The serializable type" + 
@@ -73,32 +81,22 @@ public class SerializeManager {
 
 	private int UnpackID(UnPacker unpacker)
 	{
-		if (this.nextID < Byte.MAX_VALUE)
-		{
+		if (this.nextID < Byte.MAX_VALUE) {
 			return unpacker.unpackByte();
-		}
-		else if (this.nextID < Short.MAX_VALUE)
-		{
+		} else if (this.nextID < Short.MAX_VALUE) {
 			return unpacker.unpackShort();
-		}
-		else
-		{
+		} else {
 			return unpacker.unpackInt();
 		}
 	}
 
 	private void PackID(Packer packer, int id)
 	{
-		if (this.nextID < Byte.MAX_VALUE)
-		{
+		if (this.nextID < Byte.MAX_VALUE) {
 			packer.packByte((byte)id);
-		}
-		else if (this.nextID < Short.MAX_VALUE)
-		{
+		} else if (this.nextID < Short.MAX_VALUE) {
 			packer.packShort((short)id);
-		}
-		else
-		{
+		} else	{
 			packer.packInt(id);
 		}
 	}

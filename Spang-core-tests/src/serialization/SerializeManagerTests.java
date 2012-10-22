@@ -38,13 +38,13 @@ public class SerializeManagerTests {
 	 
 	@Test
 	public void testRegisterSerializer() {
-		manager.registerSerilizer(new StringSerializer());
+		manager.registerSerializer(new StringSerializer());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testIfExceptionIsThrownOnDuplicateSerializer() {
-		manager.registerSerilizer(new StringSerializer());
-		manager.registerSerilizer(new StringSerializer());
+		manager.registerSerializer(new StringSerializer());
+		manager.registerSerializer(new StringSerializer());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -57,13 +57,13 @@ public class SerializeManagerTests {
 			public Object deserialize(UnPacker unpacker){ return null;}
 		};
 		
-		manager.registerSerilizer(new StringSerializer());
-		manager.registerSerilizer(serializer);	
+		manager.registerSerializer(new StringSerializer());
+		manager.registerSerializer(serializer);	
 	}
 	
 	@Test
 	public void testIfCanSerialize() {
-		manager.registerSerilizer(new StringSerializer());
+		manager.registerSerializer(new StringSerializer());
 		
 		Packer packer = new Packer();
 		manager.serialize(packer, "Hello");
@@ -78,9 +78,9 @@ public class SerializeManagerTests {
 	
 	@Test
 	public void testIfCorredIdsAreGeneratedOnSerialization() {
-		manager.registerSerilizer(new StringSerializer());
-		manager.registerSerilizer(new ByteArraySerializer());
-		manager.registerSerilizer(new SensorEventSerializer());
+		manager.registerSerializer(new StringSerializer());
+		manager.registerSerializer(new ByteArraySerializer());
+		manager.registerSerializer(new SensorEventSerializer());
 		
 		Packer packer = new Packer();
 		assertCorrectID(packer, "Hello", (byte)0);
@@ -97,7 +97,7 @@ public class SerializeManagerTests {
 	
 	@Test
 	public void testIfCanDeserialize() {
-		this.manager.registerSerilizer(new StringSerializer());
+		this.manager.registerSerializer(new StringSerializer());
 		String expected = "Hello";
 		Packer packer = new Packer();
 		this.manager.serialize(packer, expected);

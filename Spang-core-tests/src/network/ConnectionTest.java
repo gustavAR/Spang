@@ -93,29 +93,29 @@ public class ConnectionTest {
 	}
 
 	@Test 
-	public void testCanReciveMessage() throws Exception {
+	public void testCanReceiveMessage() throws Exception {
 		DatagramSocket sendSocket = new DatagramSocket(new InetSocketAddress(InetAddress.getByName("localhost"), 5123));
-		DatagramSocket reciveSocket = new DatagramSocket(new InetSocketAddress(InetAddress.getByName("localhost"), 34255));
-		reciveSocket.connect(sendSocket.getLocalSocketAddress());
-		//sendSocket.connect(reciveSocket.getLocalSocketAddress());
+		DatagramSocket receiveSocket = new DatagramSocket(new InetSocketAddress(InetAddress.getByName("localhost"), 34255));
+		receiveSocket.connect(sendSocket.getLocalSocketAddress());
+		//sendSocket.connect(receiveSocket.getLocalSocketAddress());
 		
-		this.connection = new Connection(reciveSocket);
+		this.connection = new Connection(receiveSocket);
 		
 		byte[] array = { 1,2,3,4 };
 		
 		Packer packer = new Packer();
 		packer.packByte((byte)0x01);
 		packer.packByteArray(array);
-		sendSocket.send(new DatagramPacket(packer.getPackedData(), packer.getPackedSize(), reciveSocket.getLocalSocketAddress()));
+		sendSocket.send(new DatagramPacket(packer.getPackedData(), packer.getPackedSize(), receiveSocket.getLocalSocketAddress()));
 	
-		byte[] recived = this.connection.recive();
+		byte[] received = this.connection.receive();
 		
-		for (int i = 0; i < recived.length; i++) {
-			assertEquals(recived[i], array[i]);
+		for (int i = 0; i < received.length; i++) {
+			assertEquals(received[i], array[i]);
 		}
 		
 		sendSocket.close();
-		reciveSocket.close();
+		receiveSocket.close();
 	}
 	
 	@Test

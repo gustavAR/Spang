@@ -19,24 +19,44 @@ package logging;
 
 import android.util.Log;
 
+/**
+ * Logs to logcat. 
+ * @author LukasFiddle
+ *
+ */
 public class LogCatLogger implements ILogger {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void logException(Exception exe) {
 		Log.e("Exception", exe.getMessage(), exe);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void logError(Error error) {
 		Log.e("Error", error.getMessage(), error);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void logInfo(String info) {
 		Log.i("Info", info);
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	public void logAssert(String assertInfo) {
 		Log.wtf("Assert", assertInfo);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void logDebug(String debuggInfo) {
 		Log.d("Debug", debuggInfo);
 	}

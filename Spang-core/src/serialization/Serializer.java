@@ -20,12 +20,45 @@ package serialization;
 import utils.Packer;
 import utils.UnPacker;
 
+/**
+ * @see ISerializer
+ * Abstract class that enforces typesafety.
+ * @author Lukas Kurtyan
+ *
+ * @param <T> the type this serializer can serialize.
+ */
 public abstract class Serializer<T> implements ISerializer {
+	
+	private Class<T> serialiazableType;
+	
+	public Serializer(Class<T> typeToSerialize) {
+		this.serialiazableType = typeToSerialize;
+	}
+	
+	/**
+	 * Serializes the object using the packer.
+	 * @param packer the packer used. 
+	 * @param message the object to serialize.
+	 */
 	protected abstract void serializeInternal(Packer packer, T message);
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	public abstract T deserialize(UnPacker unpacker);
 	
-	@SuppressWarnings("unchecked") //Silly java why you so silly?
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked") //Silly warning why you so silly?
 	public void serialize(Packer packer, Object message) {
 		this.serializeInternal(packer, (T)message);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public final Class<?> getSerializableType() {
+		return this.serialiazableType;
 	}
 }

@@ -57,8 +57,8 @@ containing a value of this type.
         public static final int Keyboard=0x7f090007;
         public static final int button1=0x7f090001;
         public static final int button2=0x7f090004;
-        public static final int editText1=0x7f090002;
-        public static final int editText2=0x7f090003;
+        public static final int editText1=0x7f090003;
+        public static final int editText2=0x7f090002;
         public static final int keyboard=0x7f090000;
         public static final int menu_settings=0x7f090006;
         public static final int shortcut_base_linear_layout=0x7f090005;
@@ -83,14 +83,12 @@ containing a value of this type.
         public static final int activity_input_keycombination=0x7f030001;
         public static final int activity_keyboardtest=0x7f030002;
         public static final int activity_main=0x7f030003;
-        public static final int activity_mouse=0x7f030004;
-        public static final int activity_networked=0x7f030005;
-        public static final int activity_shortcut=0x7f030006;
-        public static final int activity_shortcut_preference=0x7f030007;
-        public static final int activity_shortcut_prefs=0x7f030008;
-        public static final int activity_text_sender=0x7f030009;
-        public static final int input=0x7f03000a;
-        public static final int sample_keyboard_for_keycombo_view=0x7f03000b;
+        public static final int activity_networked=0x7f030004;
+        public static final int activity_shortcut=0x7f030005;
+        public static final int activity_shortcut_preference=0x7f030006;
+        public static final int activity_shortcut_prefs=0x7f030007;
+        public static final int input=0x7f030008;
+        public static final int sample_keyboard_for_keycombo_view=0x7f030009;
     }
     public static final class menu {
         public static final int activity_computer=0x7f080000;

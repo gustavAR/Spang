@@ -25,10 +25,13 @@ import utils.UnPacker;
 
 public class TouchEventSerializer extends Serializer<TouchEvent>{
 
-	public Class<?> getSerializableType() {
-		return TouchEvent.class;
+	public TouchEventSerializer() {
+		super(TouchEvent.class);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void serializeInternal(Packer packer, TouchEvent message) {
 		packer.packByte((byte)message.data.length);
@@ -39,6 +42,9 @@ public class TouchEventSerializer extends Serializer<TouchEvent>{
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public TouchEvent deserialize(UnPacker unpacker) {
 		int count = unpacker.unpackByte();

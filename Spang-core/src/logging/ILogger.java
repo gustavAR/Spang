@@ -19,13 +19,33 @@ package logging;
 
 public interface ILogger {
 	
+	/**
+	 * Logs an exception. 
+	 * @param exe the exception to log.
+	 */
 	void logException(Exception exe);
 	
+	/**
+	 * Logs an error.
+	 * @param error the error to log.
+	 */
 	void logError(Error error);
 	
+	/**
+	 * Logs information.
+	 * @param info information to log.
+	 */
 	void logInfo(String info);
 	
+	/**
+	 * Logs assert information.
+	 * @param assertInfo the information to log.
+	 */
 	void logAssert(String assertInfo);
 	
+	/**
+	 * Logs debug information. 
+	 * @param debuggInfo logs debug information.
+	 */
 	void logDebug(String debuggInfo);
 }

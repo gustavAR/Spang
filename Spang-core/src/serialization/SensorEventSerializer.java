@@ -22,12 +22,20 @@ import serialization.Serializer;
 import utils.Packer;
 import utils.UnPacker;
 
+/**
+ * A class that can serialize SensorEvents.
+ * @author Lukas Kurtyan
+ */
 public class SensorEventSerializer extends Serializer<SensorEvent>{
 
-	public Class<?> getSerializableType() {
-		return SensorEvent.class;
+	public SensorEventSerializer() {
+		super(SensorEvent.class);
+		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
     public void serializeInternal(Packer packer, SensorEvent message)
     {
         packer.packByte((byte)message.SensorID);
@@ -35,6 +43,9 @@ public class SensorEventSerializer extends Serializer<SensorEvent>{
         packer.packFloatArray(message.SensorData);
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
     public SensorEvent deserialize(UnPacker unpacker)
     {
         int id = unpacker.unpackByte();

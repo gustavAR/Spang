@@ -21,17 +21,28 @@ import serialization.Serializer;
 import utils.Packer;
 import utils.UnPacker;
 
+/**
+ * A class that can serialize Strings.
+ * @author Lukas Kurtyan
+ *
+ */
 public class StringSerializer extends Serializer<String>{
 
-	public Class<?> getSerializableType() {
-		return String.class;
+	public StringSerializer() {
+		super(String.class);
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void serializeInternal(Packer packer, String message) {
 		packer.packString(message);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String deserialize(UnPacker unpacker) {
 		return unpacker.unpackString();

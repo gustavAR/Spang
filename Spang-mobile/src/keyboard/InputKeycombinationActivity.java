@@ -33,6 +33,9 @@ import android.widget.Toast;
  */
 public class InputKeycombinationActivity extends Activity {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +45,9 @@ public class InputKeycombinationActivity extends Activity {
 		Toast.makeText(this, "Please input desired keycombination", Toast.LENGTH_SHORT).show();
 	}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_input_keycombination, menu);

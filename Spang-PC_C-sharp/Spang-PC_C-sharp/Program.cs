@@ -50,6 +50,7 @@ namespace Spang_PC_C_sharp
             serializeManager.RegisterSerilizer(new TouchEventSerializer());
             serializeManager.RegisterSerilizer(new SensorEventSerializer());
             serializeManager.RegisterSerilizer(new StringSerializer());
+            serializeManager.RegisterSerilizer(new HardwareButtonSerializer());
 
             IServer server = new Server(serializeManager);
             server.ConnectionTimeout = 5000;
@@ -97,6 +98,16 @@ namespace Spang_PC_C_sharp
                 else if(message.Message is String)
                 {
                     controller.NetworkedText(message.Message.ToString());
+                }
+                else if (message.Message is HardwareButtonEvent)
+                {
+                    int id = ((HardwareButtonEvent)message.Message).ID;
+                    if (id == HardwareButtonEvent.VOLUME_UP)
+                        controller.IncreaseVolume();
+                    else if (id == HardwareButtonEvent.VOLUME_DOWN)
+                        controller.DecreaseVolume();
+                    else
+                        System.Diagnostics.Process.Start("http://www.google.com");
                 }
 
             };

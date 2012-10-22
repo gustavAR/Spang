@@ -28,11 +28,20 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 
+/**
+ * Touch input on this view is sent over the network
+ * and interpreted by the server.
+ * @author Pontus Pall
+ */
 public class SpangTouchView extends TouchView {
 	private Paint paint = new Paint();
 	private List<Vector2> positions;
 	private GestureDetector gDetector;
 	
+	/**
+	 * @param context Context within which this view is put
+	 * @param service Touch input is sent over this network
+	 */
 	public SpangTouchView(Context context, NetworkService service) {
 		super(context, service);
 		
@@ -47,6 +56,9 @@ public class SpangTouchView extends TouchView {
 	    this.positions = new ArrayList<Vector2>();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onDraw(Canvas canvas) {
 		for (Vector2 p : positions) {
@@ -56,6 +68,11 @@ public class SpangTouchView extends TouchView {
 		positions.clear();
 	}
 	
+	/**
+	 * Sends all the pointers over the network.
+	 * 
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		super.onTouchEvent(event);

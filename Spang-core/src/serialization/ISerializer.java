@@ -20,8 +20,34 @@ package serialization;
 import utils.Packer;
 import utils.UnPacker;
 
+/**
+ * Implementations of this interface are able to serialize and deserialize a 
+ * specific type of java object.
+ * 
+ * @author Lukas Kurtyan
+ *
+ */
 public interface ISerializer {
-	public void serialize(Packer packer, Object message);
+	
+	/**
+	 * Serializes the object using the packer.
+	 * @param packer the packer used. 
+	 * @param message the object to serialize.
+	 * @throws ClassCastException if the toSerialize.getClass() does not equal getSerializableTpe()
+	 */
+	public void serialize(Packer packer, Object toSerialize);
+	
+	/**
+	 * Deserializes a object from data in an unpacker to a java Object.
+	 * @param unpacker the unpacker with the data.
+	 * @throws OverflowException if the data in the unpacker is invalid.
+	 * @return a deserialized object.
+	 */
 	public Object deserialize(UnPacker unpacker);
+	
+	/**
+	 * The type this class is capable of serializing.
+	 * @return a class.
+	 */
 	public Class<?> getSerializableType();
 }

@@ -143,13 +143,13 @@ public class Connection implements IConnection {
 	/**
 	 * {@inheritDoc}
 	 */
-	public byte[] recive() {
-		byte[] recived;
+	public byte[] receive() {
+		byte[] received;
 		while(true) {
 			//Create a new packet for the next incomming message.
 			DatagramPacket packet = new DatagramPacket(new byte[DATA_CAPACITY], DATA_CAPACITY);
 			//Receive the message.
-			this.reciveUdpPackage(packet);		
+			this.receiveUdpPackage(packet);		
 						
 			//Copy the received data. 
 			byte[] copy = copyPacketData(packet);
@@ -168,12 +168,12 @@ public class Connection implements IConnection {
 				continue;
 			
 			//Process the received data by protocol specific processing.
-			recived = this.protocols.get(protocol).processMessage(new UnPacker(copy));
-			if(recived != null)
+			received = this.protocols.get(protocol).processMessage(new UnPacker(copy));
+			if(received != null)
 				break;	
 		}
 		
-		return recived;
+		return received;
 	}
 
 	private boolean isShutDownMessage(byte[] copy) {
@@ -206,7 +206,7 @@ public class Connection implements IConnection {
 	}
 	
 	//Helper that exception checks the receive.
-	private void reciveUdpPackage(DatagramPacket packet) {
+	private void receiveUdpPackage(DatagramPacket packet) {
 		while(true) {		
 			try {
 				//Receives the packet.
@@ -400,9 +400,9 @@ public class Connection implements IConnection {
 	//This protocol discards messages that arrive out of order.
 	private class OrderedProtocol extends ProtocolManager {
 		//The largest sequence number received so far.
-		volatile int lastRecivedSequenceNumber;
+		volatile int lastReceivedSequenceNumber;
 		//The largest sequence number sent so far.
-		volatile int sendReciveSequenceNumber;
+		volatile int sendReceiveSequenceNumber;
 		
 		protected int getHeaderLength() {
 			//ID byte + sequence-number Integer 1 + 4 = 5
@@ -413,7 +413,7 @@ public class Connection implements IConnection {
 			//Pack id bit.
 			packer.packByte(Protocol.Ordered.getBit());
 			//Pack sequence number.
-			packer.packInt(sendReciveSequenceNumber++);
+			packer.packInt(sendReceiveSequenceNumber++);
 			//Pack message.
 			packer.packByteArray(message);
 		}
@@ -424,11 +424,11 @@ public class Connection implements IConnection {
 			unPacker.unpackByte();
 			//Retrieve the sequence number.
 			int seqNum = unPacker.unpackInt();
-			if(seqNum < lastRecivedSequenceNumber) {
+			if(seqNum < lastReceivedSequenceNumber) {
 				return null; //Discard the message if it is old. 
 			} else {
 				//This is the largest sequence number so far so we remember it as such.
-				lastRecivedSequenceNumber = seqNum;
+				lastReceivedSequenceNumber = seqNum;
 				//Unpacks the message without header.
 				return unPacker.unpackByteArray(unPacker.remaining());
 			}
@@ -442,7 +442,7 @@ public class Connection implements IConnection {
 		volatile int lastAccNumSent;
 		
 		//The largest acknowledgment number received so far.
-		volatile int lastRecivedMessageAck;
+		volatile int lastReceivedMessageAck;
 		
 		//All messages that are missing. Messages that should have made it here 
 		//based on different acknowledgment number received.
@@ -488,23 +488,23 @@ public class Connection implements IConnection {
 				return null;
 			} else {		
 				//If the message is not a callback we send our own callback message
-				//to notify the other endpoint that we recived the message.
+				//to notify the other endpoint that we received the message.
 				sendAckMessage(accnum);				
 				
 				//Do additional processing on the message.
-				return processRecivedMessage(unPacker, accnum);
+				return processReceivedMessage(unPacker, accnum);
 			}
 		}
 
-		private byte[] processRecivedMessage(UnPacker unPacker, int accnum) {
+		private byte[] processReceivedMessage(UnPacker unPacker, int accnum) {
 		    //If the received message has an acknowledgment number larger than 
 			//any we have received before we can be certain that we receive this message 
 			//for the first time.
-			if (accnum > this.lastRecivedMessageAck)
+			if (accnum > this.lastReceivedMessageAck)
             {   	
 				//If the accnum is out of order add any missing messages.
                 addMissingMessages(accnum);
-                this.lastRecivedMessageAck = accnum;
+                this.lastReceivedMessageAck = accnum;
                 
                 //Return the actual message.
                 return unPacker.unpackByteArray(unPacker.remaining());
@@ -525,8 +525,8 @@ public class Connection implements IConnection {
 		}
 
 		private void addMissingMessages(int accnum) {
-			//Adds any missing messages in the interval (lastRecivedMessageAck, accnum)
-            for (int i = this.lastRecivedMessageAck; i < this.lastRecivedMessageAck - accnum; i++)
+			//Adds any missing messages in the interval (lastReceivedMessageAck, accnum)
+            for (int i = this.lastReceivedMessageAck; i < this.lastReceivedMessageAck - accnum; i++)
             {
                 this.missingMessages.add(i);
             }
@@ -599,11 +599,11 @@ public class Connection implements IConnection {
 				sendAckMessage(accnum);				
 				
 				//Do additional processing on the message.
-				return processRecivedMessage(unPacker, accnum);
+				return processReceivedMessage(unPacker, accnum);
 			}
         }
 
-        private synchronized byte[] processRecivedMessage(UnPacker unPacker, int accnum)
+        private synchronized byte[] processReceivedMessage(UnPacker unPacker, int accnum)
         {
         	//If the message is the next message in order it's acknowledgment number
         	//should be one higher then the previous one to arrive.

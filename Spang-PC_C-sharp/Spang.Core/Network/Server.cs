@@ -355,11 +355,26 @@ namespace Spang.Core.Network
             }
         }
 
+
+        public void SendToAllExcept(int id, object toSend, Protocol protocol)
+        {
+            byte[] message = this.Serialize(toSend);
+            foreach (var connection in this.connections.Values)
+            {
+                if (connection.ID != id)
+                    connection.Send(message);
+            }
+        }
+
+
+
         public void SendToAll(object toSend)
         {
             this.SendToAll(toSend, Protocol.Unordered);
         }
 
         #endregion
+
+
     }
 }

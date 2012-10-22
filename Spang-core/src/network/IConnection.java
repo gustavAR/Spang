@@ -51,7 +51,7 @@ public interface IConnection {
 	 * @throws TimeoutException if the connection timed out.
 	 * @throws NetworkException if the connection is unable to send messages.
 	 */
-	byte[] recive() throws TimeoutException , NetworkException;
+	byte[] receive() throws TimeoutException , NetworkException;
 		
 	/**
 	 * Is the connected connected.

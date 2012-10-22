@@ -243,7 +243,7 @@ public class ShortcutActivity extends NetworkedActivity {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void onNetworkSerivceDissconnected() {
+	protected void onNetworkServiceDisconnected() {
 		Toast.makeText(this,"Disconnected!", Toast.LENGTH_SHORT).show();
 	}
 
@@ -251,7 +251,7 @@ public class ShortcutActivity extends NetworkedActivity {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void onMessageRecived(Object message) {
+	protected void onMessageReceived(Object message) {
 		//We don't really want t do anything
 	}
 }

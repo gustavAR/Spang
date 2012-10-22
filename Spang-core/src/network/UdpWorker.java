@@ -36,8 +36,8 @@ public class UdpWorker extends AsyncWorker{
 	//The connection used.
 	private final IConnection connection;
 
-	//Event raised when a message is recived.
-	private Action1Delegate<byte[]> recivedEvent;
+	//Event raised when a message is received.
+	private Action1Delegate<byte[]> receivedEvent;
 	
 	//Event raised when the connection timesout.
 	private Action1Delegate<DCCause> readFailedEvent;
@@ -48,7 +48,7 @@ public class UdpWorker extends AsyncWorker{
 	 */
 	public UdpWorker(IConnection connection) {
 		this.connection = connection;
-		this.recivedEvent = new Action1Delegate<byte[]>();
+		this.receivedEvent = new Action1Delegate<byte[]>();
 		this.readFailedEvent = new Action1Delegate<DCCause>();
 	}
 	
@@ -56,16 +56,16 @@ public class UdpWorker extends AsyncWorker{
 	 * Adds a listener that will be notified when a new message was received.
 	 * @param action the listener to add.
 	 */
-	public void addRecivedAction(Action1<byte[]> action) {
-		this.recivedEvent.addListener(action);		
+	public void addReceivedAction(Action1<byte[]> action) {
+		this.receivedEvent.addListener(action);		
 	}
 	
 	/**
 	 * Removes a listener so that it will no longer be notified when a message is received.
 	 * @param action the listener to remove.
 	 */
-	public void removeRecivedAction(Action1<byte[]> action) {
-		this.recivedEvent.removeListener(action);
+	public void removeReceivedAction(Action1<byte[]> action) {
+		this.receivedEvent.removeListener(action);
 	}	
 	
 
@@ -73,7 +73,7 @@ public class UdpWorker extends AsyncWorker{
 	 * Adds a listener that will be notified when the connection times out.
 	 * @param action the listener to add.
 	 */
-	public void addReciveFailedListener(Action1<DCCause> action) {
+	public void addReceiveFailedListener(Action1<DCCause> action) {
 		this.readFailedEvent.addListener(action);
 	}	
 	
@@ -89,8 +89,8 @@ public class UdpWorker extends AsyncWorker{
 	@Override
 	protected void DoWork() {
 		try {
-			byte[] bytes = this.connection.recive();
-			this.recivedEvent.invoke(bytes);				
+			byte[] bytes = this.connection.receive();
+			this.receivedEvent.invoke(bytes);				
 		} catch(TimeoutException exe) {
 			Logger.logInfo("Connection timed out.");
 			this.StopWorking();			
@@ -120,7 +120,7 @@ public class UdpWorker extends AsyncWorker{
 	 * Clears the events. Removing any listener that listens to received or timeout events.
 	 */
 	public void clearEventListeners() {
-		this.recivedEvent.clear();
+		this.receivedEvent.clear();
 		this.readFailedEvent.clear();
 	}
 }

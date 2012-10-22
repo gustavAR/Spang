@@ -82,7 +82,7 @@ public class ClientTests {
 	public void testRegisterSerializer(){
 		StringSerializer serializer = new StringSerializer();
 		client.registerSerializer(serializer);
-		verify(this.mockedManager).registerSerilizer(serializer);
+		verify(this.mockedManager).registerSerializer(serializer);
 	}
 	
 	@Test
@@ -193,10 +193,10 @@ public class ClientTests {
 	}
 	
 	@Test
-	public void testIfReciveEventIsTriggeredWhenDataIsRecived() throws InterruptedException {
+	public void testIfReceiveEventIsTriggeredWhenDataIsReceived() throws InterruptedException {
 		byte[] array = { 1,2,3,4 };
 		final String string = "HellO";
-		when(this.mockedConnection.recive()).thenReturn(array);
+		when(this.mockedConnection.receive()).thenReturn(array);
 		when(this.mockedManager.deserialize(any(UnPacker.class))).thenReturn(string);
 		
 		final boolean[] flag = {false};
