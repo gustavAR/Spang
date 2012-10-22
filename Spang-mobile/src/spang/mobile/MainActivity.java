@@ -96,11 +96,6 @@ public class MainActivity extends Activity {
 			}
 		});			
 	}
-	
-	public void captureScreen(View view){
-		
-		
-	}
 
 	/**
 	 * This tells the phone to scan a QR-code with zxing
@@ -152,9 +147,6 @@ public class MainActivity extends Activity {
 				
 				EditText portField = (EditText)this.findViewById(R.id.editText2);
 				portField.setText(portNumber);
-			}
-			if(resultCode == android.app.Activity.RESULT_CANCELED){
-				//handle cancel
 			}
 		}
 	}
