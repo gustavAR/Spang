@@ -20,10 +20,12 @@ package spang.android.network;
 import network.Protocol;
 import network.messages.Touch;
 import network.messages.TouchEvent;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.MotionEvent;
 import android.view.View;
 
+@SuppressLint("ViewConstructor")
 public class TouchView extends View {
 
 	private NetworkService service;

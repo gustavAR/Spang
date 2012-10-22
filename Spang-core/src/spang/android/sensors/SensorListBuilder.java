@@ -42,6 +42,7 @@ public class SensorListBuilder {
 	 * @param resources 
 	 * @param context
 	 */
+	@SuppressWarnings("deprecation")
 	public SensorListBuilder(SensorManager manager, Resources resources) {
 		this.manager = manager;
 		

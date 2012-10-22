@@ -59,6 +59,7 @@ public class OrientationSensor implements ISensor, SensorEventListener {
 		return -1;
 	}
 
+	@SuppressWarnings("deprecation")
 	public int getSensorID() {
 		return Sensor.TYPE_ORIENTATION; //Just as good as any
 	}

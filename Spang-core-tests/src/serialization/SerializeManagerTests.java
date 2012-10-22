@@ -1,5 +1,6 @@
 package serialization;
 
+import static org.junit.Assert.assertEquals;
 import network.messages.SensorEvent;
 
 import org.junit.Before;
@@ -7,8 +8,6 @@ import org.junit.Test;
 
 import utils.Packer;
 import utils.UnPacker;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 public class SerializeManagerTests {
 

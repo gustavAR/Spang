@@ -29,22 +29,19 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 
 /**
  * Class used to communicate sensor input with other parts of the system.
- * Sensors can be activated by sending samplingrate integers as intent extras with
+ * Sensors can be activated by sending sampling rate integers as intent extras with
  * a string key corresponding to the specific sensor 
  * (e.g. the string SpangSensorService.ACCELEROMETER_EXTRA will identify the sample rate
  * of the accelerometer sensor). 
- * Any samplingrate > 0 will also make the sensor activated.
+ * Any sampling rate > 0 will also make the sensor activated.
  * 
  * @author Pontus Pall, Lukas Kurtyan, Joakim Johansson & Gustav Alm Rosenblad
  */
@@ -60,8 +57,6 @@ public class SpangSensorService extends Service{
 	public static final String GRAVITY_EXTRA		= "spang.spang_sensor_service.gravity";
 	public static final String ORIENTATION_EXTRA	= "spang.spang_sensor_service.orientation";
 	
-	
-	private static final int DEFAULT_SAMPLINGRATE = 10;
 	private List<ISensor> sensors = new ArrayList<ISensor>();
 	private NetworkService networkService;
 	private SensorManager manager;
