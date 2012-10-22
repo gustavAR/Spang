@@ -1,12 +1,8 @@
 package keyboard;
 
-import javax.xml.datatype.Duration;
-
 import spang.mobile.R;
-import spang.mobile.R.layout;
-import spang.mobile.R.menu;
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.widget.Toast;
 

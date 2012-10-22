@@ -6,7 +6,6 @@ import java.util.List;
 import spang.android.network.NetworkedActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Display;
@@ -150,13 +149,12 @@ public class ShortcutActivity extends NetworkedActivity {
 	 * 			 Should be vertical.
 	 * @param buttons The buttons which we will put inside the layouts.
 	 */
+	@SuppressWarnings("deprecation")
 	private void populateLayouts(LinearLayout baseLayout, Button[] buttons) {
 
 		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
 
-		int width = display.getWidth();       
-		int maxHeight = display.getHeight();
+		int width = display.getWidth();      
 		LinearLayout row = new LinearLayout(this);
 		row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
 				LayoutParams.WRAP_CONTENT));

@@ -37,6 +37,7 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -52,11 +53,13 @@ public class ShortcutPrefsActivity extends PreferenceActivity {
 	 * @return
 	 */
 	private PreferenceScreen getPref() {
+		@SuppressWarnings("deprecation")
 		PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(this);
 
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		this.preferences.registerOnSharedPreferenceChangeListener(new OnSharedPreferenceChangeListener() {
 
+			@SuppressWarnings("deprecation")
 			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 					String key) {
 				setPreferenceScreen(ShortcutPrefsActivity.this.getPref());
