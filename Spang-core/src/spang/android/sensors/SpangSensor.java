@@ -51,7 +51,7 @@ public class SpangSensor implements ISensor, SensorEventListener {
 		this.encodeID = encodeID;
 		
 		if (this.sensor == null) {
-			throw new NoSensorException("Device has no MagneticField-sensor");
+			throw new MissingSensorException("Device has no MagneticField-sensor");
 		}
 	}
 
