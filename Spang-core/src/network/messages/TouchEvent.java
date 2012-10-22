@@ -24,4 +24,18 @@ public class TouchEvent implements IPhoneMessage {
 	public TouchEvent(Touch[] data) {
 		this.data = data;		
 	}
+	
+	public boolean equals(Object object) {
+		if(object instanceof TouchEvent) {
+			TouchEvent other = (TouchEvent)object;
+			if(other.data.length == this.data.length) {
+				for (int i = 0; i < data.length; i++) {
+					if(!other.data[i].equals(this.data[i]))
+						return false;
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 }

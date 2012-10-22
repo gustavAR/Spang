@@ -15,29 +15,29 @@
     You should have received a copy of the GNU General Public License
     along with Spang.  If not, see <http://www.gnu.org/licenses/>.
  */
-package network.messages;
+package logging;
 
-public class Touch {
-	
-	public final float X;
-	public final float Y;
-	public final float Pressure;
+import android.util.Log;
 
-	public Touch(float x, float y, float pressure) {
-		this.X = x;
-		this.Y = y;
-		this.Pressure = pressure;
+public class LogCatLogger implements ILogger {
+
+	public void logException(Exception exe) {
+		Log.e("Exception", exe.getMessage(), exe);
 	}
-	
-	public boolean equals(Object object) {
-		if(object instanceof Touch) {
-			Touch other = (Touch)object;
-			return other.X == this.X && 
-				   other.Y == this.Y &&
-				   other.Pressure + 0.01f > this.Pressure &&
-				   other.Pressure - 0.01f < this.Pressure;
-		}
-		return false;
+
+	public void logError(Error error) {
+		Log.e("Error", error.getMessage(), error);
 	}
-	
+
+	public void logInfo(String info) {
+		Log.i("Info", info);
+	}
+
+	public void logAssert(String assertInfo) {
+		Log.wtf("Assert", assertInfo);
+	}
+
+	public void logDebugg(String debuggInfo) {
+		Log.d("Debug", debuggInfo);
+	}
 }

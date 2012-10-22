@@ -17,7 +17,7 @@
  */
 package network;
 
-import debug.Logger;
+import logging.Logger;
 import network.exceptions.NetworkException;
 import network.exceptions.RemoteCrashException;
 import network.exceptions.RemoteShutdownException;

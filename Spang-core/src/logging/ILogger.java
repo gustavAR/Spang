@@ -15,29 +15,17 @@
     You should have received a copy of the GNU General Public License
     along with Spang.  If not, see <http://www.gnu.org/licenses/>.
  */
-package network.messages;
+package logging;
 
-public class Touch {
+public interface ILogger {
 	
-	public final float X;
-	public final float Y;
-	public final float Pressure;
-
-	public Touch(float x, float y, float pressure) {
-		this.X = x;
-		this.Y = y;
-		this.Pressure = pressure;
-	}
+	void logException(Exception exe);
 	
-	public boolean equals(Object object) {
-		if(object instanceof Touch) {
-			Touch other = (Touch)object;
-			return other.X == this.X && 
-				   other.Y == this.Y &&
-				   other.Pressure + 0.01f > this.Pressure &&
-				   other.Pressure - 0.01f < this.Pressure;
-		}
-		return false;
-	}
+	void logError(Error error);
 	
+	void logInfo(String info);
+	
+	void logAssert(String assertInfo);
+	
+	void logDebugg(String debuggInfo);
 }

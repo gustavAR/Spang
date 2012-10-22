@@ -20,21 +20,22 @@ package serialization;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.util.SparseArray;
+import android.annotation.SuppressLint;
 
 import utils.Packer;
 import utils.UnPacker;
 
+@SuppressLint("UseSparseArrays")
 public class SerializeManager {
 	private int nextID = 0;
 
-	private SparseArray<Class<?>> idToType;
+	private Map<Integer, Class<?>> idToType;
 	private Map<Class<?>, Integer> typeToID;
 	private Map<Class<?>, ISerializer> serializerByType;
 
 	public SerializeManager()
-	{
-		this.idToType = new SparseArray<Class<?>>();
+	{ 
+		this.idToType = new HashMap<Integer, Class<?>>();
 		this.typeToID = new HashMap<Class<?>, Integer>();
 		this.serializerByType = new HashMap<Class<?>, ISerializer>();
 	}

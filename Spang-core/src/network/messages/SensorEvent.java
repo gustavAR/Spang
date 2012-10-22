@@ -27,4 +27,18 @@ public class SensorEvent implements IPhoneMessage{
     	this.SensorID = id;
         this.SensorData = data;
     }
+    
+    public boolean equals(Object object) {
+    	if(object instanceof SensorEvent) {
+    		SensorEvent event = (SensorEvent)object;
+    		if(event.SensorID == this.SensorID) {
+    			for (int i = 0; i < this.SensorData.length; i++) {
+					if(this.SensorData[i] == event.SensorData[i]) 
+						return false;
+				}
+    			return true;
+    		}
+    	}
+    	return false;
+    }
 }
