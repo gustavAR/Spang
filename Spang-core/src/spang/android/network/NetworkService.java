@@ -139,7 +139,6 @@ public class NetworkService extends Service {
 	 */
 	@Override
 	public IBinder onBind(Intent intent) {
-		Toast.makeText(this, "Just bound!", Toast.LENGTH_SHORT).show();
 		return this.binder;
 	}
 
@@ -148,7 +147,6 @@ public class NetworkService extends Service {
 	 */
 	@Override
 	public void onDestroy() {
-		Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show(); 
 		this.disconnect();
 		super.onDestroy();
 	}

@@ -162,7 +162,7 @@ public class Client implements IClient {
 	private void connect(InetSocketAddress address, int timeout, boolean reconnecting) {
 		//If we are connected it makes no since to connect again.
 		if(this.connection != null)
-			throw new NetworkException("We are already connected. Can't connect to a new connecting.");
+			throw new NetworkException("We are already connected. Can't connect to a new connection.");
 
 		this.connection = this.connector.connect(address, timeout);
 		this.lastConnectedAddress = address;
@@ -192,13 +192,10 @@ public class Client implements IClient {
 	private void reconnectInternal(int retries, int timeout, InetSocketAddress endpoint) {
 		for (int i = 0; i < retries; i++) {
 			try {
-				System.out.println("Trying to reconnect to " + endpoint);	
 				this.connect(endpoint, timeout, true);
-				System.out.println("Success!");	
 				return;
-
 			} catch(NetworkException e) {
-				System.out.println("Failed to reconnect " + i + " retrying...");
+				Logger.logInfo("Failed to reconnect " + i + " retrying...");
 			}		
 		}
 
@@ -221,7 +218,7 @@ public class Client implements IClient {
 
 	private void onDisconnect(DCCause cause) {
 		this.stopReciving();
-		this.connection.close();
+		this.close();
 		this.connection = null;
 
 		this.disconnectedEvent.invoke(this, cause);

@@ -6,13 +6,17 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
+import logging.ILogger;
+import logging.Logger;
+
 import network.exceptions.InvalidEndpointException;
+import network.exceptions.NetworkException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +47,7 @@ public class ClientTests {
 		when(mockedConnector.connect(any(InetSocketAddress.class), anyInt())).thenReturn(mockedConnection);
 			
 		client = new Client(mockedConnector, mockedManager);
+		Logger.setLogger(mock(ILogger.class));
 	}
 	
 	
@@ -101,6 +106,26 @@ public class ClientTests {
 	@Test (expected = IllegalArgumentException.class)
 	public void testIfConnectionIsThrownIfCannotReconnect(){
 		client.reconnect(5, 4000);
+	}
+	
+	@Test
+	public void testIfDisconnectIsTriggeredWhenSendFails() {
+		client.connect("localhost", 1244);
+		doThrow(new NetworkException()).when(this.mockedConnection).send(any(byte[].class), any(Protocol.class));
+		
+		final boolean flag[] = {false};
+		client.addDisconnectedListener(new EventHandler<IClient, DCCause>() {
+			public void onAction(IClient sender, DCCause eventArgs) {
+				if(eventArgs == DCCause.LocalNetworkCrash) {
+					flag[0] = true;
+				}
+			}
+		});
+		
+		client.send("HI");
+		
+		assertTrue(flag[0]);
+		
 	}
 	
 	@Test 
@@ -171,6 +196,12 @@ public class ClientTests {
 		assertTrue(flag[0]);
 	}
 	
+	@Test(expected = NetworkException.class)
+	public void testIfExceptionIsThrownIfTryingToConnectToANewConnectionWhileConected() {
+		this.client.connect("localhost",1324);
+		this.client.connect("localhost",134);
+	}
+	
 	@Test
 	public void testIfCanSendMessages() {
 		String message = "Hello";
@@ -190,7 +221,4 @@ public class ClientTests {
 		verify(this.mockedManager).serialize(any(Packer.class), any(String.class));
 		verify(this.mockedConnection).send(new byte[0],Protocol.Ordered);
 	}
-	
-	
-	
 }
